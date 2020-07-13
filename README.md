@@ -4,7 +4,8 @@
 * MOD LINK: 1.0 Beta 1: https://mega.nz/file/OU5nUSBB#fO2lsZAloSvzogK_fK7lfNPoPB6_BTmvnz3SWyym-7w
 
 Remove the older one instead of overwriting it if you are updating from the previous version.
-SUMMARY
+
+### SUMMARY
 bHaptics Tactsuit integration mod for Blade & Sorcery. Many different haptic effects on Vest, Arms and Face including feedback from enemy melee, ranged, spell damage, player melee, bow, spell usage, potion drinking, heartbeat, climbing, fall damage etc. and also support for mod added gun, spell, weapon effects too.
 
 Everything is configurable in the mod. Check Configuration section below for details.

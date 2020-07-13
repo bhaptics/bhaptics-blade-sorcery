@@ -1,0 +1,1190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6C04A707-597A-4559-8811-D3F8FBEDC4FA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TactsuitBS</RootNamespace>
+    <AssemblyName>TactsuitBS</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Bhaptics.Tact, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Bhaptics.Tact.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PowerBooks, Version=1.0.6580.37786, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\PowerBooks.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Engine.cs" />
+    <Compile Include="lib\HapticPlayer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomNumber.cs" />
+    <Compile Include="TactsuitVR.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\Bhaptics.Tact.dll" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="bHaptics\ClimbingRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntFireLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntFireSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntFleshLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntFleshSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntIceLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntIceSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntLightningLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntMetalLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntMetalSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntStoneLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntStoneSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntWoodLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntWoodSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadDrain_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadEnergy_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadEnergy_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadFireArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadFire_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadFire_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadGravity_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadIceArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadIce_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadLightningArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadLightning_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadLightning_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadPierceLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashFireLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashFireSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashIceLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashIceSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashLightningLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntFireLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntFireSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntFleshLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntFleshSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntIceLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntIceSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntLightningLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntMetalLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntStoneLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntStoneSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntWoodLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntWoodSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmDrain_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmDrain_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmDrain_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmEnergy_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmEnergy_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmFireArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmFireArrow_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmFire_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmFire_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmFire_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmGravity_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmGravity_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmGravity_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmIceArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmIceArrow_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmIce_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmIce_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmIce_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmLightningArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmLightningArrow_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceFireLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceFireSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceIceLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceIceSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceLightningLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmPierceLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashFireLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashFireSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashIceLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashIceSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashLightningLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntFireLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntFireSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntFleshLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntFleshSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntIceLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntIceSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntLightningLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntMetalLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntMetalLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntMetalSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntStoneLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntStoneSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntWoodLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntWoodSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestDrain_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestDrain_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestDrain_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestEnergy_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestEnergy_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestFireArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestFire_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestFire_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestFire_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestGravity_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestGravity_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestGravity_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestIceArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestIce_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestIce_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestIce_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestLightningArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestLightningArrow_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestLightning_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestLightning_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceBladeLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceBladeLarge_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceBladeSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceBladeSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceFireLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceFireSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceIceLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceIceSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceLightningLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestPierceLightningSmall_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeLargeLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeLargeLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeLargeRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeLargeRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeSmallLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeSmallLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeSmallRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashBladeSmallRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireLargeLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireLargeLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireLargeRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireLargeRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireSmallLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireSmallLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireSmallRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashFireSmallRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceLargeLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceLargeLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceLargeRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceLargeRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceSmallLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceSmallLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceSmallRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashIceSmallRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningLargeLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningLargeLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningLargeRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningLargeRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningSmallLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningSmallLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningSmallRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightningSmallRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DefaultDamage_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\Explosion_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\FallDamageFeet_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\FallDamage_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\Healing_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HeartBeatFast_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HeartBeat_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HolsterArrowLeftShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HolsterArrowRightShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HolsterLeftShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HolsterRightShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunBallisticLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunBallisticRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunHeavyLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunHeavyRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunLaserLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunLaserRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunPistolLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunPistolRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunPlasmaLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunPlasmaRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunSprayLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunSprayLeft_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunSprayRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunSprayRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerBowPullRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunAutomaticRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunBallisticRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunBazookaRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunBlasterRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunEnergyRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunHeavyRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunLaserRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunLaserRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunLaserRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunMiniGunRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunPistolRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunPlasmaRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunPlasmaRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunRifleRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunRifleRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunRifleRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunRifleRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunShotgunRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunSprayRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunSprayRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunSprayRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunSprayRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunSprayRight_5.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerKickFabricRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerKickFleshRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerKickMetalRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerKickOtherRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerKickStoneRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerKickWoodRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeFabricBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeFabricPierceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeFabricSlashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeFleshBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeFleshPierceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeFleshSlashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeMetalBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeMetalPierceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeMetalSlashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeStoneBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeStonePierceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeStoneSlashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeWoodBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeWoodPierceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeBladeWoodSlashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeStoneFabricBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeStoneFleshBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeStoneStoneBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeWoodFabricBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeWoodFleshBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeWoodMetalBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeWoodStoneBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeWoodWoodBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchFabricRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchFabricRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchFleshRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchMetalRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchOtherRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchStoneRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerPunchWoodRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellCorruptionRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellCorruptionRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellCrushRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellDrainRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellDrainRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellFireRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellFireRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellFireRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellForceFieldRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellForceFieldRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellForceFieldRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellGravityRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellGravityRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellHealRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellHealRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellHealRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellHealRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellIceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellIceRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellIceRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellIceRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellIceRight_5.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellImplosionRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellImplosionRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellInvisibilityRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellLightningRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellLightningRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellLightningRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellLightningRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellNeedleRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellNeedleRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellNeedleRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellNeedleRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellOtherRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellOtherRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellOtherRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellOtherRight_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellRasenganRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellRasenganRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellTeleportRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellTeleportRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellTeslaRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellTeslaRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellTeslaRight_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerSpellUtilityRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerTelekinesisActiveRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerTelekinesisCatchRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerTelekinesisPullRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerTelekinesisRepelRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerThrowRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PoisonDrinking_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PotionDrinking_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\SlowMotion_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnholsterArrowLeftShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnholsterArrowRightShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnholsterLeftShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnholsterRightShoulder_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Level_TactsuitBS_Settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

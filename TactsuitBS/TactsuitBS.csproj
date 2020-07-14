@@ -87,6 +87,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\Bhaptics.Tact.dll" />
+    <Content Include="UnityDlls\Assembly-CSharp.dll" />
+    <Content Include="UnityDlls\PowerBooks.dll" />
+    <Content Include="UnityDlls\UnityEngine.AudioModule.dll" />
+    <Content Include="UnityDlls\UnityEngine.CoreModule.dll" />
+    <Content Include="UnityDlls\UnityEngine.dll" />
+    <Content Include="UnityDlls\UnityEngine.ParticleSystemModule.dll" />
+    <Content Include="UnityDlls\UnityEngine.PhysicsModule.dll" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

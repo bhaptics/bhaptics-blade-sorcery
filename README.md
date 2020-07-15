@@ -1,7 +1,7 @@
 # TACTSUIT BLADE & SORCERY INTEGRATION
 
 
-* MOD LINK: 1.0 Beta 1: https://mega.nz/file/OU5nUSBB#fO2lsZAloSvzogK_fK7lfNPoPB6_BTmvnz3SWyym-7w
+* MOD LINK: 1.0: https://www.nexusmods.com/bladeandsorcery/mods/2301
 
 Remove the older one instead of overwriting it if you are updating from the previous version.
 

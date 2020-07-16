@@ -882,7 +882,7 @@ namespace TactsuitBS
             {
                 return FeedbackType.PlayerSpellTeleportRight;
             }
-            else if (lowerId.Contains("rasengan"))
+            else if (lowerId.Contains("rasengan") || lowerId.Contains("whirl"))
             {
                 return FeedbackType.PlayerSpellRasenganRight;
             }
@@ -2696,7 +2696,7 @@ namespace TactsuitBS
                 return FeedbackType.PlayerGunPistolRight;
             else if (lower.Contains("auto") || lower.Contains("sentinel") || lower.Contains("smg") || lower.Contains("machine") ||lower.Contains("s2200"))
                 return FeedbackType.PlayerGunAutomaticRight;
-            else if (lower.Contains("ball") ||lower.Contains("grapple"))
+            else if (lower.Contains("ball") || lower.Contains("grapple") || lower.Contains("flint"))
                 return FeedbackType.PlayerGunBallisticRight;
             else if (lower.Contains("sibyl") || lower.Contains("energy"))
                 return FeedbackType.PlayerGunEnergyRight;

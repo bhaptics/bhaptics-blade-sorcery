@@ -2303,7 +2303,7 @@ namespace TactsuitBS
         {
             if (!systemInitialized)
             {
-                hapticPlayer = new Bhaptics.Tact.HapticPlayer();
+                hapticPlayer = new Bhaptics.Tact.HapticPlayer("mod_blade_sorcery", "mod_blade_sorcery");
 
                 if (hapticPlayer != null)
                 {

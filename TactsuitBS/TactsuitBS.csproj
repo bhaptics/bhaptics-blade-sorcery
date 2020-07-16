@@ -36,8 +36,8 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Bhaptics.Tact, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Bhaptics.Tact.dll</HintPath>
+      <HintPath>..\packages\Bhaptics.Tac.1.4.14\lib\net35\Bhaptics.Tact.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -79,14 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
-    <Compile Include="lib\HapticPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomNumber.cs" />
     <Compile Include="TactsuitVR.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib\Bhaptics.Tact.dll" />
     <Content Include="UnityDlls\Assembly-CSharp.dll" />
     <Content Include="UnityDlls\PowerBooks.dll" />
     <Content Include="UnityDlls\UnityEngine.AudioModule.dll" />
@@ -1192,6 +1190,7 @@
     <None Include="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

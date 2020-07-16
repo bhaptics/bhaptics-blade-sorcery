@@ -304,10 +304,8 @@ namespace TactsuitBS
         private ParticleSystem rightItemShoot2VFX = null;
 
         private AudioSource leftItemShootSFX = null;
-        private AudioSource leftItemShoot2SFX = null;
 
         private AudioSource rightItemShootSFX = null;
-        private AudioSource rightItemShoot2SFX = null;
 
         private float deltaTime = 0.0f;
         private float shootGunCheckTimeLeft = 0.0f;
@@ -1603,127 +1601,69 @@ namespace TactsuitBS
             
             if (Player.local?.head != null && Player.local?.body?.creature != null)
             {
-                float intensity = 0f;
+                string objectName = "";
+                if (handle.gameObject != null)
+                    objectName += handle.gameObject.name;
+                if (handle.item != null)
+                    objectName += " " + handle.item.name;
 
-                //if (handle == null)
-                //{
-                //    intensity = Side.Left == side ? Math.Abs(Player.local.handLeft.transform.position.y - Player.local.head.transform.position.y) : Math.Abs(Player.local.handRight.transform.position.y - Player.local.head.transform.position.y);
+                LOG("Grabbed handle with " + (side == Side.Left ? "left" : "right") + " hand. Object Name: " + objectName);
 
-                //    LOG("Grabbed handle is null.");
-                //}
-                //else
-                //{
-                    string objectName = "";
-                    if (handle.gameObject != null)
-                        objectName += handle.gameObject.name;
-                    if (handle.item != null)
-                        objectName += " " + handle.item.name;
 
-                    LOG("Grabbed handle with " + (side == Side.Left ? "left" : "right") + " hand. Object Name: " + objectName);
-
-                    //Item leftItem = Player.local.body.creature.GetHeldWeapon(Side.Left);
-                    //Item rightItem = Player.local.body.creature.GetHeldWeapon(Side.Right);
-
-                    if (handle !=null)//?.data.type == ItemPhysic.Type.Weapon || handle?.item?.data.type == ItemPhysic.Type.Shield)
+                if (handle !=null)
+                {
+                    if (handle?.name == "HandleString" && handle?.item?.data?.moduleAI?.weaponClass == ItemModuleAI.WeaponClass.Bow)
                     {
-                        if (handle?.name == "HandleString" && handle?.item?.data?.moduleAI?.weaponClass == ItemModuleAI.WeaponClass.Bow)
+                        LOG("...it is a bow string, grabbed with " + (side == Side.Right ? "right" : "left") + "hand.");
+                        if (!bowStringHeld)
                         {
-                            LOG("...it is a bow string, grabbed with " + (side == Side.Right ? "right" : "left") + "hand.");
-                            if (!bowStringHeld)
+                            bowStringHeld = true;
+                            Thread thread = new Thread(() => BowStringFunc(side));
+                            thread.Start();
+                        }
+
+                        return;
+                    }
+                    else 
+                    {
+                        if (handle.item != null)
+                        {
+                            LOG("...grabbed with " + (side == Side.Right ? "right" : "left") + "hand.");
+                            if (side == Side.Left)
                             {
-                                bowStringHeld = true;
-                                Thread thread = new Thread(() => BowStringFunc(side));
-                                thread.Start();
+                                if (!ItemHeldInLeftHand)
+                                {
+                                    ItemHeldInLeftHand = true;
+                                    foreach (var collisionHandler in handle.item.definition.collisionHandlers)
+                                    {
+                                        if (collisionHandler != null)
+                                        {
+                                            collisionHandler.OnCollisionStartEvent += HeldItemLeftCollisionStartFunc;
+                                        }
+                                    }
+                                    handle.item.OnHeldActionEvent += LeftItemHeldActionEventFunc;
+                                }
+                            }
+                            else
+                            {
+                                if (!ItemHeldInRightHand)
+                                {
+                                    ItemHeldInRightHand = true;
+                                    foreach (var collisionHandler in handle.item.definition.collisionHandlers)
+                                    {
+                                        if (collisionHandler != null)
+                                        {
+                                            collisionHandler.OnCollisionStartEvent += HeldItemRightCollisionStartFunc;
+                                        }
+                                    }
+                                    handle.item.OnHeldActionEvent += RightItemHeldActionEventFunc;
+                                }
                             }
 
                             return;
                         }
-                        else //if (handle?.item?.data?.moduleAI?.weaponClass != ItemModuleAI.WeaponClass.None)
-                        {
-                            if (handle.item != null)
-                            {
-                                LOG("...grabbed with " + (side == Side.Right ? "right" : "left") + "hand.");
-                                if (side == Side.Left)
-                                {
-                                    if (!ItemHeldInLeftHand)
-                                    {
-                                        ItemHeldInLeftHand = true;
-                                        foreach (var collisionHandler in handle.item.definition.collisionHandlers)
-                                        {
-                                            if (collisionHandler != null)
-                                            {
-                                                collisionHandler.OnCollisionStartEvent += HeldItemLeftCollisionStartFunc;
-                                            }
-                                        }
-                                        handle.item.OnHeldActionEvent += LeftItemHeldActionEventFunc;
-                                    }
-                                }
-                                else
-                                {
-                                    if (!ItemHeldInRightHand)
-                                    {
-                                        ItemHeldInRightHand = true;
-                                        foreach (var collisionHandler in handle.item.definition.collisionHandlers)
-                                        {
-                                            if (collisionHandler != null)
-                                            {
-                                                collisionHandler.OnCollisionStartEvent += HeldItemRightCollisionStartFunc;
-                                            }
-                                        }
-                                        handle.item.OnHeldActionEvent += RightItemHeldActionEventFunc;
-                                    }
-                                }
-
-                                return;
-                            }
-                        }
                     }
-
-                    //LOG("...it is something else, grabbed with " + (side == Side.Right ? "right" : "left") + "hand.");
-
-                    //if (handle.forcePlayerJoint || (handle.data!= null && handle.data.forceClimbing))
-                //    if (Player.local.body.creature.GetHeldobject(side) == null)
-                //    {
-                //        intensity = Math.Abs(handle.transform.position.y - Player.local.head.transform.position.y);
-                //        LOG("Held object is null.");
-                //    }
-                //    else
-                //    {
-                //        LOG("Held object is not null:" + (Player.local.body.creature.GetHeldobject(side).gameObject != null ? Player.local.body.creature.GetHeldobject(side).gameObject.name : Player.local.body.creature.GetHeldobject(side).name));
-                //    }
-                //}
-
-                //if (side == Side.Left)
-                //{
-                //    if (leftHandGrabIntensity < 0.001f)
-                //    {
-                //        if (intensity >= 0.001f)
-                //        {
-                //            leftHandGrabIntensity = intensity;
-                //            Thread thread = new Thread(() => GrabbedFunc(Side.Left));
-                //            thread.Start();
-                //            LOG("Climbing with left hand starting...");
-                //        }
-                //    }
-
-                //    leftHandGrabIntensity = intensity;
-                //}
-                //else
-                //{
-                //    if (rightHandGrabIntensity < 0.001f)
-                //    {
-                //        if (intensity >= 0.001f)
-                //        {
-                //            rightHandGrabIntensity = intensity;
-                //            Thread thread = new Thread(() => GrabbedFunc(Side.Right));
-                //            thread.Start();
-                //            LOG("Climbing with right hand starting...");
-                //        }
-                //    }
-
-                //    rightHandGrabIntensity = intensity;
-                //}
-
+                }
             }
         }
 

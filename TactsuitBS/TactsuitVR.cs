@@ -2285,13 +2285,11 @@ namespace TactsuitBS
                 if (filename == "." || filename == "..")
                     continue;
 
-                bool found = false;
                 foreach (var element in feedbackMap)
                 {
                     if (filename.StartsWith(element.Value.prefix))
                     {
                         TactFileRegister(fullName, element.Value);
-                        found = true;
                         LOG("Tact file registered: " + filename);
                         break;
                     }
@@ -2303,7 +2301,7 @@ namespace TactsuitBS
         {
             if (!systemInitialized)
             {
-                hapticPlayer = new Bhaptics.Tact.HapticPlayer();
+                hapticPlayer = new Bhaptics.Tact.HapticPlayer("mod_blade_sorcery", "mod_blade_sorcery");
 
                 if (hapticPlayer != null)
                 {

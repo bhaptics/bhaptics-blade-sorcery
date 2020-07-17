@@ -56,6 +56,11 @@
       <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>UnityDlls\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
@@ -87,6 +92,7 @@
   <ItemGroup>
     <Content Include="UnityDlls\Assembly-CSharp.dll" />
     <Content Include="UnityDlls\PowerBooks.dll" />
+    <Content Include="UnityDlls\UnityEngine.AnimationModule.dll" />
     <Content Include="UnityDlls\UnityEngine.AudioModule.dll" />
     <Content Include="UnityDlls\UnityEngine.CoreModule.dll" />
     <Content Include="UnityDlls\UnityEngine.dll" />
@@ -782,6 +788,10 @@
     <None Include="bHaptics\HolsterRightShoulder_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\HoverJetFeet_1.tact" />
+    <None Include="bHaptics\HoverJetFeet_2.tact" />
+    <None Include="bHaptics\HoverJetFeet_3.tact" />
+    <None Include="bHaptics\HoverJetFeet_4.tact" />
     <None Include="bHaptics\KickbackPlayerGunBallisticLeft_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -830,6 +840,9 @@
     <None Include="bHaptics\KickbackPlayerGunSprayRight_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\LeftShoulderTurret_1.tact" />
+    <None Include="bHaptics\LeftShoulderTurret_2.tact" />
+    <None Include="bHaptics\LeftShoulderTurret_3.tact" />
     <None Include="bHaptics\PlayerBowPullRight_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

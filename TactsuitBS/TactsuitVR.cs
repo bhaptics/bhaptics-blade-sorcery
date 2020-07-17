@@ -243,6 +243,10 @@ namespace TactsuitBS
 
         public float IntensityExplosion = 1.0f;
 
+        public float IntensityShoulderTurret = 1.0f;
+        public float IntensityHoverJetFeet = 1.0f;
+
+
 
         public bool Logging = false;
         
@@ -529,6 +533,9 @@ namespace TactsuitBS
             feedbackMap.Add(FeedbackType.PlayerThrowRight, new Feedback(FeedbackType.PlayerThrowRight, "PlayerThrowRight_", 0));
 
             feedbackMap.Add(FeedbackType.Explosion, new Feedback(FeedbackType.Explosion, "Explosion_", 0));
+
+            feedbackMap.Add(FeedbackType.LeftShoulderTurret, new Feedback(FeedbackType.LeftShoulderTurret, "LeftShoulderTurret_", 0));
+            feedbackMap.Add(FeedbackType.HoverJetFeet, new Feedback(FeedbackType.HoverJetFeet, "HoverJetFeet_", 0));
 
         }
 
@@ -827,6 +834,9 @@ namespace TactsuitBS
             PlayerThrowRight,
 
             Explosion,
+
+            LeftShoulderTurret,
+            HoverJetFeet,
 
             NoFeedback
         }
@@ -2584,6 +2594,8 @@ namespace TactsuitBS
                 case TactsuitVR.FeedbackType.KickbackPlayerGunHeavyLeft: return IntensityKickbackPlayerGunHeavy; break;
                 case TactsuitVR.FeedbackType.PlayerThrowRight: return IntensityPlayerThrow; break;
                 case TactsuitVR.FeedbackType.Explosion: return IntensityExplosion; break;
+                case TactsuitVR.FeedbackType.LeftShoulderTurret: return IntensityShoulderTurret; break;
+                case TactsuitVR.FeedbackType.HoverJetFeet: return IntensityHoverJetFeet; break;
 
 
             }
@@ -2591,7 +2603,7 @@ namespace TactsuitBS
             return IntensityDefaultDamage;
         }
 
-        public void ProvideHapticFeedbackThread(float locationAngle, float locationHeight, FeedbackType effect, float intensityMultiplier, bool waitToPlay, bool reflected)
+        public void ProvideHapticFeedbackThread(float locationAngle, float locationHeight, FeedbackType effect, float intensityMultiplier, bool waitToPlay, bool reflected, float duration = 1.0f)
         {
             if (intensityMultiplier < 0.001f)
                 return;
@@ -2622,8 +2634,8 @@ namespace TactsuitBS
 
                         Bhaptics.Tact.RotationOption RotOption = new RotationOption(locationAngle, locationHeight);
 
-                        Bhaptics.Tact.ScaleOption scaleOption = new ScaleOption(intensityMultiplier, 1.0f);
-                        
+                        Bhaptics.Tact.ScaleOption scaleOption = new ScaleOption(intensityMultiplier, duration);
+
                         //hapticPlayer.SubmitRegistered(key, scaleOption);
                         hapticPlayer.SubmitRegisteredVestRotation(key, key, RotOption, scaleOption);
                         LOG("===> Submitted Feedback: " + key + " Intensity: " + intensityMultiplier + " Height: " + locationHeight + " Angle: " + locationAngle);
@@ -2631,19 +2643,19 @@ namespace TactsuitBS
                 }
             }
         }
-
-        public void ProvideHapticFeedback(float locationAngle, float locationHeight, FeedbackType effect, bool waitToPlay, float intensity, FeedbackType secondEffect, bool reflected)
+        
+        public void ProvideHapticFeedback(float locationAngle, float locationHeight, FeedbackType effect, bool waitToPlay, float intensity, FeedbackType secondEffect, bool reflected, float duration = 1.0f)
         {
             if (effect != FeedbackType.NoFeedback)
             {
                 float intensityMultiplier = GetIntensityMultiplier(effect)*intensity;
                 if (intensityMultiplier > 0.01f)
                 {
-                    Thread thread = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected));
+                    Thread thread = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
                     thread.Start();
                     if (secondEffect != FeedbackType.NoFeedback)
                     {
-                        Thread thread2 = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected));
+                        Thread thread2 = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
                         thread2.Start();
                     }
                 }
@@ -2690,7 +2702,7 @@ namespace TactsuitBS
                 return FeedbackType.PlayerGunPlasmaRight;
             else if (lower.Contains("shotgun"))
                 return FeedbackType.PlayerGunShotgunRight;
-            else if (lower.Contains("revolver") || lower.Contains("beretta") || lower.Contains("pistol") || lower.Contains("glock") || lower.Contains("hamada") || lower.Contains("luger") || lower.Contains("mustang") || lower.Contains("m1911"))
+            else if (lower.Contains("revolver") || lower.Contains("beretta") || lower.Contains("pistol") || lower.Contains("kitchen") || lower.Contains("glock") || lower.Contains("hamada") || lower.Contains("luger") || lower.Contains("mustang") || lower.Contains("m1911"))
                 return FeedbackType.PlayerGunPistolRight;
             else if (lower.Contains("auto") || lower.Contains("sentinel") || lower.Contains("smg") || lower.Contains("machine") ||lower.Contains("s2200"))
                 return FeedbackType.PlayerGunAutomaticRight;

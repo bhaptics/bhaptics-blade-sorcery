@@ -25,6 +25,8 @@ namespace TactsuitBS
         public bool GravityEffectOnArms = false;
         public bool GravityEffectOnHead = false;
         public bool PlayFallbackEffectsForArmHead = true;
+        public bool NoFallEffectWhenFallDamageIsDisabled = false;
+        
 
         //Sleep Durations
         public int SleepDurationHeartBeat = 900;
@@ -35,6 +37,10 @@ namespace TactsuitBS
         public int SleepDurationClimb = 500;
         public int SleepDurationSlowMotion = 1500;
         public int SleepDurationSpellHit = 300;
+
+        //public float StuckArrowIntensityMultiplier = 0.4f;
+        //public float StuckArrowDurationMultiplier = 4.0f;
+        //public int StuckArrowSleepDuration = 3000;
 
         public float FallEffectMinVelocityMagnitude = 10.0f;
 
@@ -267,6 +273,10 @@ namespace TactsuitBS
         public float IntensityPlayerThrow = 1.0f;
 
         public float IntensityExplosion = 1.0f;
+
+        public float IntensityShoulderTurret = 1.0f;
+        public float IntensityHoverJetFeet = 1.0f;
+
         #endregion
 
         //Private parameters
@@ -303,6 +313,10 @@ namespace TactsuitBS
         private ParticleSystem rightItemShootVFX = null;
         private ParticleSystem rightItemShoot2VFX = null;
 
+        private ParticleSystem leftShoulderTurretShootVFX = null;
+        private ParticleSystem hoverJetVFX = null;
+
+
         private AudioSource leftItemShootSFX = null;
 
         private AudioSource rightItemShootSFX = null;
@@ -338,6 +352,10 @@ namespace TactsuitBS
         private bool shootingRightGun = false;
         private bool altShootingLeftGun = false;
         private bool altShootingRightGun = false;
+
+        private bool shootingLeftShoulderTurret = false;
+        private bool hoveringWithHoverJet = false;
+
 
         private Vector3 lastFrameVelocity = Vector3.zero;
         private bool noExplosionFeedback = false;
@@ -596,6 +614,9 @@ namespace TactsuitBS
             tactsuitVr.IntensityPlayerThrow = IntensityPlayerThrow;
 
             tactsuitVr.IntensityExplosion = IntensityExplosion;
+
+            tactsuitVr.IntensityShoulderTurret = IntensityShoulderTurret;
+            tactsuitVr.IntensityHoverJetFeet = IntensityHoverJetFeet;
 
             tactsuitVr.Logging = Logging;
 
@@ -1532,8 +1553,12 @@ namespace TactsuitBS
 
                     if (rightItem != null && rightItem.name.Contains("Grapple"))
                     {
-                        Thread thread = new Thread(ExplosionWaitFunc);
-                        thread.Start();
+                        if (!noExplosionFeedback)
+                        {
+                            noExplosionFeedback = true;
+                            Thread thread = new Thread(ExplosionWaitFunc);
+                            thread.Start();
+                        }
                     }
                 }
             }
@@ -1568,8 +1593,12 @@ namespace TactsuitBS
 
                     if (leftItem != null && leftItem.name.Contains("Grapple"))
                     {
-                        Thread thread = new Thread(ExplosionWaitFunc);
-                        thread.Start();
+                        if (!noExplosionFeedback)
+                        {
+                            noExplosionFeedback = true;
+                            Thread thread = new Thread(ExplosionWaitFunc);
+                            thread.Start();
+                        }
                     }
                 }
             }
@@ -1694,6 +1723,11 @@ namespace TactsuitBS
 
         private void OnGroundFunc(bool grounded, Vector3 velocity)
         {
+            if (NoFallEffectWhenFallDamageIsDisabled && !Health.playerFallDamage)
+            {
+                return;
+            }
+
             if (grounded && Player.local?.body?.creature?.data != null)
             {
                 //Play default damage effect
@@ -1764,11 +1798,10 @@ namespace TactsuitBS
 
         private void ExplosionWaitFunc()
         {
-            noExplosionFeedback = true;
             while (true)
             {
                 Thread.Sleep(5000);
-                if (Player.local?.body?.creature != null)
+                if (Player.local?.body?.creature != null && Player.local?.locomotion != null)
                 {
                     Item rightItem = Player.local?.body?.creature.GetHeldobject(Side.Right);
 
@@ -1793,6 +1826,38 @@ namespace TactsuitBS
             }
 
             noExplosionFeedback = false;
+        }
+
+        private void FireLeftShoulderTurret()
+        {
+            if (tactsuitVr != null)
+            {
+                while (!gamePaused && !GameManager.timeStopped && (leftShoulderTurretShootVFX != null && leftShoulderTurretShootVFX.isPlaying))
+                {
+                    tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.LeftShoulderTurret, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                    Thread.Sleep(SleepDurationShootGun);
+                }
+
+                LOG("Player stopped firing left shoulder turret.");
+
+                shootingLeftShoulderTurret = false;
+            }
+        }
+
+        private void FireHoverJet()
+        {
+            if (tactsuitVr != null)
+            {
+                while (!gamePaused && !GameManager.timeStopped && (hoverJetVFX != null && hoverJetVFX.isPlaying))
+                {
+                    tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HoverJetFeet, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                    Thread.Sleep(SleepDurationShootGun);
+                }
+
+                LOG("Player stopped hovering.");
+
+                hoveringWithHoverJet = false;
+            }
         }
 
         private void FireGun(string name, string displayname, bool altFire, bool leftHand)
@@ -2013,7 +2078,7 @@ namespace TactsuitBS
 
                 #region Pushed
 
-                if (Player.local.locomotion.isGrounded && !Player.local.locomotion.isEnabled && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f)
+                if (Player.local.locomotion.isGrounded && !Player.local.locomotion.isEnabled && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f && (hoverJetVFX == null))
                 {
                     if (!beingPushed)
                     {
@@ -2025,7 +2090,7 @@ namespace TactsuitBS
                     }
                 }
 
-                if (!beingPushed)
+                if (!beingPushed && (hoverJetVFX == null))
                 {
                     Item leftItem = creature.GetHeldobject(Side.Left);
                     Item rightItem = creature.GetHeldobject(Side.Right);
@@ -2626,6 +2691,58 @@ namespace TactsuitBS
                             }
                         }
                     }
+
+                    //Barzel support
+                    if (creature?.animator?.GetBoneTransform(HumanBodyBones.LeftShoulder) != null && creature?.animator?.GetBoneTransform(HumanBodyBones.LeftShoulder).childCount > 0)
+                    {
+                        for (int i = 0; i < creature?.animator?.GetBoneTransform(HumanBodyBones.LeftShoulder).childCount; i++)
+                        {
+                            if (creature?.animator?.GetBoneTransform(HumanBodyBones.LeftShoulder)?.GetChild(i)?.Find("muzflash")?.gameObject != null)
+                            {
+                                leftShoulderTurretShootVFX = creature.animator.GetBoneTransform(HumanBodyBones.LeftShoulder).GetChild(i).Find("muzflash").gameObject.GetComponent<ParticleSystem>();
+                                if (leftShoulderTurretShootVFX != null && leftShoulderTurretShootVFX.isPlaying)
+                                {
+                                    if (!shootingLeftShoulderTurret)
+                                    {
+                                        shootingLeftShoulderTurret = true;
+                                        Thread thread = new Thread(FireLeftShoulderTurret);
+                                        thread.Start();
+                                        LOG("Player is firing left shoulder turret.");
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        leftShoulderTurretShootVFX = null;
+                    }
+
+                    if (creature?.animator?.GetBoneTransform(HumanBodyBones.RightLowerLeg) != null && creature?.animator?.GetBoneTransform(HumanBodyBones.RightLowerLeg).childCount > 0)
+                    {
+                        for (int i = 0; i < creature.animator.GetBoneTransform(HumanBodyBones.RightLowerLeg).childCount; i++)
+                        {
+                            if (creature?.animator?.GetBoneTransform(HumanBodyBones.RightLowerLeg)?.GetChild(i)?.Find("Flames_vfx1")?.gameObject != null)
+                            {
+                                hoverJetVFX = creature.animator.GetBoneTransform(HumanBodyBones.RightLowerLeg).GetChild(i).Find("Flames_vfx1").gameObject.GetComponent<ParticleSystem>();
+                                if (hoverJetVFX != null && hoverJetVFX.isPlaying)
+                                {
+                                    if (!hoveringWithHoverJet)
+                                    {
+                                        hoveringWithHoverJet = true;
+                                        Thread thread = new Thread(FireHoverJet);
+                                        thread.Start();
+                                        LOG("Player is firing hover jet.");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        hoverJetVFX = null;
+                    }
                 }
 
                 #endregion
@@ -2682,7 +2799,7 @@ namespace TactsuitBS
                     }
                 }
             }
-
+            
             Imbue imbue = null;
             if (collisionstruct.sourceColliderGroup?.collisionHandler?.item?.imbues != null)
             {
@@ -2784,35 +2901,6 @@ namespace TactsuitBS
                 {
                     LOG("Player hit something...");
                     LOG("->Player hit something with " + collisionstruct.sourceCollider.name);
-                    float locationHeight = 0f;
-                    if (collisionstruct.sourceCollider.name.Contains("Head") || collisionstruct.targetCollider.name.Contains("Neck"))
-                    {
-                        locationHeight = 0.45f;
-                    }
-                    else if (collisionstruct.sourceCollider.name.Contains("Spine"))
-                    {
-                        locationHeight = (((float) (RandomNumber.Between(0, 6))) / 20.0f);
-                    }
-                    else if (collisionstruct.sourceCollider.name.Contains("Shoulder"))
-                    {
-                        locationHeight = 0.45f;
-                    }
-                    else if (collisionstruct.sourceCollider.name.Contains("Chest"))
-                    {
-                        locationHeight = (((float) (RandomNumber.Between(0, 5))) / 10.0f) - 0.20f;
-                    }
-                    else if (collisionstruct.sourceCollider.name.Contains("Hips"))
-                    {
-                        locationHeight = -0.25f;
-                    }
-                    else if (collisionstruct.sourceCollider.name.Contains("Leg"))
-                    {
-                        locationHeight = -0.40f;
-                    }
-                    else if (collisionstruct.sourceCollider.name.Contains("Foot"))
-                    {
-                        locationHeight = -0.50f;
-                    }
 
                     if ((bool) (UnityEngine.Object) collisionstruct.sourceColliderGroup.collisionHandler?.item?.rightPlayerHand)
                     {

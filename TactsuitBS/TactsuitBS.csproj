@@ -107,6 +107,18 @@
     <None Include="bHaptics\DamageHeadArrow_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageHeadBlasterStun_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBlasterStun_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBlaster_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBlaster_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageHeadBluntBladeLarge_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -159,6 +171,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageHeadBluntLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadBluntLightsaber_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageHeadBluntMetalLarge_1.tact">
@@ -239,6 +257,9 @@
     <None Include="bHaptics\DamageHeadPierceLightningSmall_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageHeadPierceLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageHeadSlashBladeLarge_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -287,7 +308,25 @@
     <None Include="bHaptics\DamageHeadSlashLightningSmall_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageHeadSlashLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageHeadSlashLightsaber_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageRightArmArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBlasterStun_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBlasterStun_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBlaster_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBlaster_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageRightArmBluntBladeLarge_1.tact">
@@ -344,7 +383,16 @@
     <None Include="bHaptics\DamageRightArmBluntLightningSmall_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageRightArmBluntLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntLightsaber_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageRightArmBluntMetalLarge_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmBluntMetalSmall_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageRightArmBluntStoneLarge_1.tact">
@@ -419,6 +467,9 @@
     <None Include="bHaptics\DamageRightArmLightningArrow_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageRightArmLightning_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageRightArmPierceBladeLarge_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -467,6 +518,9 @@
     <None Include="bHaptics\DamageRightArmPierceLightningSmall_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageRightArmPierceLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageRightArmSlashBladeLarge_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -491,7 +545,25 @@
     <None Include="bHaptics\DamageRightArmSlashLightningSmall_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageRightArmSlashLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageRightArmSlashLightsaber_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageVestArrow_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBlasterStun_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBlasterStun_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBlaster_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBlaster_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageVestBluntBladeLarge_1.tact">
@@ -546,6 +618,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageVestBluntLightningSmall_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestBluntLightsaber_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageVestBluntMetalLarge_1.tact">
@@ -659,6 +737,9 @@
     <None Include="bHaptics\DamageVestPierceLightningSmall_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageVestPierceLightsaber_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DamageVestSlashBladeLargeLRD_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -755,6 +836,18 @@
     <None Include="bHaptics\DamageVestSlashLightningSmallRLU_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\DamageVestSlashLightsaberLRD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightsaberLRU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightsaberRLD_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\DamageVestSlashLightsaberRLU_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\DefaultDamage_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -788,10 +881,18 @@
     <None Include="bHaptics\HolsterRightShoulder_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="bHaptics\HoverJetFeet_1.tact" />
-    <None Include="bHaptics\HoverJetFeet_2.tact" />
-    <None Include="bHaptics\HoverJetFeet_3.tact" />
-    <None Include="bHaptics\HoverJetFeet_4.tact" />
+    <None Include="bHaptics\HoverJetFeet_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HoverJetFeet_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HoverJetFeet_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\HoverJetFeet_4.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\KickbackPlayerGunBallisticLeft_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -822,7 +923,13 @@
     <None Include="bHaptics\KickbackPlayerGunPlasmaLeft_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\KickbackPlayerGunPlasmaLeft_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\KickbackPlayerGunPlasmaRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\KickbackPlayerGunPlasmaRight_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\KickbackPlayerGunRight_1.tact">
@@ -840,9 +947,15 @@
     <None Include="bHaptics\KickbackPlayerGunSprayRight_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="bHaptics\LeftShoulderTurret_1.tact" />
-    <None Include="bHaptics\LeftShoulderTurret_2.tact" />
-    <None Include="bHaptics\LeftShoulderTurret_3.tact" />
+    <None Include="bHaptics\LeftShoulderTurret_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\LeftShoulderTurret_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\LeftShoulderTurret_3.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\PlayerBowPullRight_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -856,6 +969,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\PlayerGunBlasterRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunBlasterRight_2.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\PlayerGunEnergyRight_1.tact">
@@ -883,6 +999,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\PlayerGunPlasmaRight_2.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerGunPlasmaRight_3.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\PlayerGunRifleRight_1.tact">
@@ -979,6 +1098,18 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\PlayerMeleeBladeWoodSlashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeLightsaberBluntRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeLightsaberClashRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeLightsaberPierceRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\PlayerMeleeLightsaberSlashRight_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\PlayerMeleeStoneFabricBluntRight_1.tact">

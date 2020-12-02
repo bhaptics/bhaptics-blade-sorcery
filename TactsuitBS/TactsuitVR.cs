@@ -39,6 +39,11 @@ namespace TactsuitBS
         public float IntensityPlayerMeleeStoneFabricBlunt = 1.0f;
         public float IntensityPlayerMeleeStoneFleshBlunt = 1.0f;
 
+        public float IntensityPlayerMeleeLightsaberClashRight = 1.0f;
+        public float IntensityPlayerMeleeLightsaberSlashRight = 1.0f;
+        public float IntensityPlayerMeleeLightsaberPierceRight = 1.0f;
+        public float IntensityPlayerMeleeLightsaberBluntRight = 1.0f;
+
         public float IntensityPlayerSpellFire = 1.0f;
         public float IntensityPlayerSpellLightning = 1.0f;
         public float IntensityPlayerSpellGravity = 1.0f;
@@ -126,6 +131,24 @@ namespace TactsuitBS
         public float IntensityDamageVestPierceIceLarge = 1.0f;
         public float IntensityDamageVestSlashIceLarge = 1.0f;
         public float IntensityDamageVestBluntIceLarge = 1.0f;
+
+        public float IntensityDamageVestBlaster = 1.0f;
+        public float IntensityDamageVestBlasterStun = 1.0f;
+        public float IntensityDamageArmBlaster = 1.0f;
+        public float IntensityDamageArmBlasterStun = 1.0f;
+        public float IntensityDamageHeadBlaster = 1.0f;
+        public float IntensityDamageHeadBlasterStun = 1.0f;
+        
+        public float IntensityDamageVestPierceLightsaber = 1.0f;
+        public float IntensityDamageVestSlashLightsaber = 1.0f;
+        public float IntensityDamageVestBluntLightsaber = 1.0f;
+        public float IntensityDamageRightArmBluntLightsaber = 1.0f;
+        public float IntensityDamageRightArmPierceLightsaber = 1.0f;
+        public float IntensityDamageRightArmSlashLightsaber = 1.0f;
+        public float IntensityDamageHeadPierceLightsaber = 1.0f;
+        public float IntensityDamageHeadSlashLightsaber = 1.0f;
+        public float IntensityDamageHeadBluntLightsaber = 1.0f;
+
         public float IntensityDamageArmPierceBladeSmall = 1.0f;
         public float IntensityDamageArmSlashBladeSmall = 1.0f;
         public float IntensityDamageArmBluntBladeSmall = 1.0f;
@@ -296,7 +319,12 @@ namespace TactsuitBS
             feedbackMap.Add(FeedbackType.PlayerMeleeStoneStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneStoneBluntRight, "PlayerMeleeStoneStoneBluntRight_", 0));
             feedbackMap.Add(FeedbackType.PlayerMeleeStoneFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneFabricBluntRight, "PlayerMeleeStoneFabricBluntRight_", 0));
             feedbackMap.Add(FeedbackType.PlayerMeleeStoneFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneFleshBluntRight, "PlayerMeleeStoneFleshBluntRight_", 0));
-            
+
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberClashRight, new Feedback(FeedbackType.PlayerMeleeLightsaberClashRight, "PlayerMeleeLightsaberClashRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberSlashRight, new Feedback(FeedbackType.PlayerMeleeLightsaberSlashRight, "PlayerMeleeLightsaberSlashRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberPierceRight, new Feedback(FeedbackType.PlayerMeleeLightsaberPierceRight, "PlayerMeleeLightsaberPierceRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberBluntRight, new Feedback(FeedbackType.PlayerMeleeLightsaberBluntRight, "PlayerMeleeLightsaberBluntRight_", 0));
+
             feedbackMap.Add(FeedbackType.PlayerSpellFireRight, new Feedback(FeedbackType.PlayerSpellFireRight, "PlayerSpellFireRight_", 0));
             feedbackMap.Add(FeedbackType.PlayerSpellLightningRight, new Feedback(FeedbackType.PlayerSpellLightningRight, "PlayerSpellLightningRight_", 0));
             feedbackMap.Add(FeedbackType.PlayerSpellGravityRight, new Feedback(FeedbackType.PlayerSpellGravityRight, "PlayerSpellGravityRight_", 0));
@@ -376,6 +404,27 @@ namespace TactsuitBS
             feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeRLD, new Feedback(FeedbackType.DamageVestSlashIceLargeRLD, "DamageVestSlashIceLargeRLD_", 0));
             feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeRLU, new Feedback(FeedbackType.DamageVestSlashIceLargeRLU, "DamageVestSlashIceLargeRLU_", 0));
             feedbackMap.Add(FeedbackType.DamageVestBluntIceLarge, new Feedback(FeedbackType.DamageVestBluntIceLarge, "DamageVestBluntIceLarge_", 0));
+
+            feedbackMap.Add(FeedbackType.DamageVestBlaster, new Feedback(FeedbackType.DamageVestBlaster, "DamageVestBlaster_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestBlasterStun, new Feedback(FeedbackType.DamageVestBlasterStun, "DamageVestBlasterStun_", 0));
+            feedbackMap.Add(FeedbackType.DamageRightArmBlaster, new Feedback(FeedbackType.DamageRightArmBlaster, "DamageRightArmBlaster_", 0));
+            feedbackMap.Add(FeedbackType.DamageRightArmBlasterStun, new Feedback(FeedbackType.DamageRightArmBlasterStun, "DamageRightArmBlasterStun_", 0));
+            feedbackMap.Add(FeedbackType.DamageHeadBlaster, new Feedback(FeedbackType.DamageHeadBlaster, "DamageHeadBlaster_", 0));
+            feedbackMap.Add(FeedbackType.DamageHeadBlasterStun, new Feedback(FeedbackType.DamageHeadBlasterStun, "DamageHeadBlasterStun_", 0));
+            
+            feedbackMap.Add(FeedbackType.DamageVestPierceLightsaber, new Feedback(FeedbackType.DamageVestPierceLightsaber, "DamageVestPierceLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberLRD, new Feedback(FeedbackType.DamageVestSlashLightsaberLRD, "DamageVestSlashLightsaberLRD_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberLRU, new Feedback(FeedbackType.DamageVestSlashLightsaberLRU, "DamageVestSlashLightsaberLRU_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberRLD, new Feedback(FeedbackType.DamageVestSlashLightsaberRLD, "DamageVestSlashLightsaberRLD_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberRLU, new Feedback(FeedbackType.DamageVestSlashLightsaberRLU, "DamageVestSlashLightsaberRLU_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestBluntLightsaber, new Feedback(FeedbackType.DamageVestBluntLightsaber, "DamageVestBluntLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightsaber, new Feedback(FeedbackType.DamageRightArmBluntLightsaber, "DamageRightArmBluntLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightsaber, new Feedback(FeedbackType.DamageRightArmPierceLightsaber, "DamageRightArmPierceLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightsaber, new Feedback(FeedbackType.DamageRightArmSlashLightsaber, "DamageRightArmSlashLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceLightsaber, new Feedback(FeedbackType.DamageHeadPierceLightsaber, "DamageHeadPierceLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashLightsaber, new Feedback(FeedbackType.DamageHeadSlashLightsaber, "DamageHeadSlashLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntLightsaber, new Feedback(FeedbackType.DamageHeadBluntLightsaber, "DamageHeadBluntLightsaber_", 0));
+
             feedbackMap.Add(FeedbackType.DamageRightArmPierceBladeSmall, new Feedback(FeedbackType.DamageRightArmPierceBladeSmall, "DamageRightArmPierceBladeSmall_", 0));
             feedbackMap.Add(FeedbackType.DamageRightArmSlashBladeSmall, new Feedback(FeedbackType.DamageRightArmSlashBladeSmall, "DamageRightArmSlashBladeSmall_", 0));
             feedbackMap.Add(FeedbackType.DamageRightArmBluntBladeSmall, new Feedback(FeedbackType.DamageRightArmBluntBladeSmall, "DamageRightArmBluntBladeSmall_", 0));
@@ -542,7 +591,7 @@ namespace TactsuitBS
         public bool systemInitialized = false;
         public HapticPlayer hapticPlayer;
 
-        Dictionary<FeedbackType, Feedback> feedbackMap = new Dictionary<FeedbackType, Feedback>();
+        public Dictionary<FeedbackType, Feedback> feedbackMap = new Dictionary<FeedbackType, Feedback>();
 
         public enum FeedbackType
         {
@@ -576,6 +625,12 @@ namespace TactsuitBS
             PlayerMeleeStoneStoneBluntRight,
             PlayerMeleeStoneFabricBluntRight,
             PlayerMeleeStoneFleshBluntRight,
+
+
+            PlayerMeleeLightsaberClashRight,
+            PlayerMeleeLightsaberSlashRight,
+            PlayerMeleeLightsaberPierceRight,
+            PlayerMeleeLightsaberBluntRight,
 
 
             //Player Spell Cast
@@ -695,6 +750,28 @@ namespace TactsuitBS
             DamageVestSlashIceLargeRLD,
             DamageVestSlashIceLargeRLU,
             DamageVestBluntIceLarge,
+
+            DamageVestBlaster,
+            DamageVestBlasterStun,
+            DamageRightArmBlaster,
+            DamageRightArmBlasterStun,
+            DamageHeadBlaster,
+            DamageHeadBlasterStun,
+
+            DamageVestPierceLightsaber,
+            DamageVestSlashLightsaberLRD,
+            DamageVestSlashLightsaberLRU,
+            DamageVestSlashLightsaberRLD,
+            DamageVestSlashLightsaberRLU,
+            DamageVestBluntLightsaber,
+            DamageRightArmBluntLightsaber,
+            DamageRightArmPierceLightsaber,
+            DamageRightArmSlashLightsaber,
+            DamageHeadPierceLightsaber,
+            DamageHeadSlashLightsaber,
+            DamageHeadBluntLightsaber,
+
+
             DamageRightArmPierceBladeSmall,
             DamageRightArmSlashBladeSmall,
             DamageRightArmBluntBladeSmall,
@@ -932,7 +1009,7 @@ namespace TactsuitBS
             {
                 if (sourceMaterial == "Blade" || sourceMaterial == "Metal")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalPierceRight;
                     }
@@ -955,7 +1032,7 @@ namespace TactsuitBS
                 }
                 else if (sourceMaterial == "Wood")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeWoodMetalBluntRight;
                     }
@@ -978,7 +1055,7 @@ namespace TactsuitBS
                 }
                 else if (sourceMaterial == "Flesh")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerPunchMetalRight;
                     }
@@ -1003,9 +1080,20 @@ namespace TactsuitBS
                         return FeedbackType.PlayerPunchOtherRight;
                     }
                 }
+                else if (sourceMaterial.Contains("Lightsaber"))
+                {
+                    if (targetMaterial == "Lightsaber")
+                    {
+                        return FeedbackType.PlayerMeleeLightsaberClashRight;
+                    }
+                    else
+                    {
+                        return FeedbackType.PlayerMeleeLightsaberPierceRight;
+                    }
+                }
                 else if (sourceMaterial.Contains("Fire"))
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalPierceRight;
                     }
@@ -1032,7 +1120,7 @@ namespace TactsuitBS
                 }
                 else
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalBluntRight;
                     }
@@ -1056,9 +1144,20 @@ namespace TactsuitBS
             }
             else if (damageType == DamageType.Slash)
             {
+                if (sourceMaterial == "Lightsaber")
+                {
+                    if (targetMaterial == "Lightsaber")
+                    {
+                        return FeedbackType.PlayerMeleeLightsaberClashRight;
+                    }
+                    else
+                    {
+                        return FeedbackType.PlayerMeleeLightsaberSlashRight;
+                    }
+                }
                 if (sourceMaterial == "Blade" || sourceMaterial == "Metal" || sourceMaterial == "SpellFire")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalSlashRight;
                     }
@@ -1081,7 +1180,7 @@ namespace TactsuitBS
                 }
                 else if (sourceMaterial == "Wood")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeWoodMetalBluntRight;
                     }
@@ -1104,7 +1203,7 @@ namespace TactsuitBS
                 }
                 else if (sourceMaterial == "Flesh")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerPunchMetalRight;
                     }
@@ -1131,7 +1230,7 @@ namespace TactsuitBS
                 }
                 else
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalBluntRight;
                     }
@@ -1157,7 +1256,7 @@ namespace TactsuitBS
             {
                 if (sourceMaterial == "Blade" || sourceMaterial == "Metal" || sourceMaterial == "SpellFire")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalBluntRight;
                     }
@@ -1178,9 +1277,20 @@ namespace TactsuitBS
                         return FeedbackType.PlayerMeleeBladeStoneBluntRight;
                     }
                 }
+                else if (sourceMaterial == "Lightsaber")
+                {
+                    if (targetMaterial == "Lightsaber")
+                    {
+                        return FeedbackType.PlayerMeleeLightsaberClashRight;
+                    }
+                    else
+                    {
+                        return FeedbackType.PlayerMeleeLightsaberBluntRight;
+                    }
+                }
                 else if (sourceMaterial == "Wood")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeWoodMetalBluntRight;
                     }
@@ -1203,7 +1313,7 @@ namespace TactsuitBS
                 }
                 else if (sourceMaterial == "Flesh")
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerPunchMetalRight;
                     }
@@ -1230,7 +1340,7 @@ namespace TactsuitBS
                 }
                 else
                 {
-                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate")
+                    if (targetMaterial == "Blade" || targetMaterial == "Metal" || targetMaterial == "Chainmail" || targetMaterial == "Plate" || targetMaterial == "Lightsaber")
                     {
                         return FeedbackType.PlayerMeleeBladeMetalBluntRight;
                     }
@@ -1255,7 +1365,7 @@ namespace TactsuitBS
             
         }
 
-        public static FeedbackType GetPlayerGotHitFeedbackType(DamageType damageType, MaterialData sourceMaterialData, MaterialData targetMaterialData, string spellId, DamagerData.PenetrationSize penetrationSize, string sourceColliderName, string targetColliderName, Direction direction, string imbueSpellId)
+        public static FeedbackType GetPlayerGotHitFeedbackType(DamageType damageType, MaterialData sourceMaterialData, MaterialData targetMaterialData, string spellId, DamagerData.PenetrationSize penetrationSize, string sourceColliderName, string targetColliderName, Direction direction, string imbueSpellId, string damagerId)
         {
             string sourceMaterial = "";
             string targetMaterial = "";
@@ -1271,7 +1381,15 @@ namespace TactsuitBS
 
             if (targetColliderName.Contains("Arm") && (targetColliderName.Contains("Left") || targetColliderName.Contains("Right")))
             {
-                if (sourceColliderName == "Tip" || sourceMaterial == "Arrow")
+                if (damagerId == "BlasterBolt")
+                {
+                    return FeedbackType.DamageRightArmBlaster;
+                }
+                else if (damagerId == "BlasterStun")
+                {
+                    return FeedbackType.DamageRightArmBlasterStun;
+                }
+                else if (sourceColliderName == "Tip" || sourceMaterial == "Arrow")
                 {
                     if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                     {
@@ -1294,7 +1412,11 @@ namespace TactsuitBS
                 {
                     if (penetrationSize == DamagerData.PenetrationSize.Small)
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageRightArmPierceLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageRightArmPierceFireSmall;
                         }
@@ -1333,7 +1455,11 @@ namespace TactsuitBS
                     }
                     else //Large
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageRightArmPierceLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageRightArmPierceFireLarge;
                         }
@@ -1375,7 +1501,11 @@ namespace TactsuitBS
                 {
                     if (penetrationSize == DamagerData.PenetrationSize.Small)
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageRightArmSlashLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageRightArmSlashFireSmall;
                         }
@@ -1414,7 +1544,11 @@ namespace TactsuitBS
                     }
                     else //Large
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageRightArmSlashLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageRightArmSlashFireLarge;
                         }
@@ -1455,7 +1589,15 @@ namespace TactsuitBS
                 else if (damageType == DamageType.Energy)
                 {
                     string lowerId = spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant();
-                    if (lowerId.Contains("fire"))
+                    if (sourceMaterial == "Lightsaber")
+                    {
+                        return FeedbackType.DamageRightArmSlashLightsaber;
+                    }
+                    else if (lowerId.Contains("fire"))
+                    {
+                        return FeedbackType.DamageRightArmFire;
+                    }
+                    else if (lowerId.Contains("blaster"))
                     {
                         return FeedbackType.DamageRightArmFire;
                     }
@@ -1484,7 +1626,11 @@ namespace TactsuitBS
                 {
                     if (penetrationSize == DamagerData.PenetrationSize.Small)
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageRightArmBluntLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageRightArmBluntFireSmall;
                         }
@@ -1523,7 +1669,11 @@ namespace TactsuitBS
                     }
                     else //Large
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageRightArmBluntLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageRightArmBluntFireLarge;
                         }
@@ -1566,7 +1716,15 @@ namespace TactsuitBS
             {
                 if (targetColliderName.Contains("Head")) //Head
                 {
-                    if (sourceColliderName == "Tip" || sourceMaterial == "Arrow")
+                    if (damagerId == "BlasterBolt")
+                    {
+                        return FeedbackType.DamageHeadBlaster;
+                    }
+                    else if (damagerId == "BlasterStun")
+                    {
+                        return FeedbackType.DamageHeadBlasterStun;
+                    }
+                    else if (sourceColliderName == "Tip" || sourceMaterial == "Arrow")
                     {
                         if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
@@ -1589,7 +1747,11 @@ namespace TactsuitBS
                     {
                         if (penetrationSize == DamagerData.PenetrationSize.Small)
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageHeadPierceLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageHeadPierceFireSmall;
                             }
@@ -1628,7 +1790,11 @@ namespace TactsuitBS
                         }
                         else //Large
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageHeadPierceLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageHeadPierceFireLarge;
                             }
@@ -1670,7 +1836,11 @@ namespace TactsuitBS
                     {
                         if (penetrationSize == DamagerData.PenetrationSize.Small)
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageHeadSlashLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageHeadSlashFireSmall;
                             }
@@ -1709,7 +1879,11 @@ namespace TactsuitBS
                         }
                         else //Large
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageHeadSlashLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageHeadSlashFireLarge;
                             }
@@ -1750,7 +1924,11 @@ namespace TactsuitBS
                     else if (damageType == DamageType.Energy)
                     {
                         string lowerId = spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant();
-                        if (lowerId.Contains("fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageHeadSlashLightsaber;
+                        }
+                        else if (lowerId.Contains("fire"))
                         {
                             return FeedbackType.DamageHeadFire;
                         }
@@ -1779,7 +1957,11 @@ namespace TactsuitBS
                     {
                         if (penetrationSize == DamagerData.PenetrationSize.Small)
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageHeadBluntLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageHeadBluntFireSmall;
                             }
@@ -1818,7 +2000,11 @@ namespace TactsuitBS
                         }
                         else //Large
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageHeadBluntLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageHeadBluntFireLarge;
                             }
@@ -1859,9 +2045,21 @@ namespace TactsuitBS
                 }
                 else //Vest
                 {
-                    if (sourceColliderName == "Tip" || sourceMaterial == "Arrow")
+                    if (damagerId == "BlasterBolt")
                     {
-                        if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                        return FeedbackType.DamageVestBlaster;
+                    }
+                    else if (damagerId == "BlasterStun")
+                    {
+                        return FeedbackType.DamageVestBlasterStun;
+                    }
+                    else if (sourceColliderName == "Tip" || sourceMaterial == "Arrow")
+                    {
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            return FeedbackType.DamageVestPierceLightsaber;
+                        }
+                        else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                         {
                             return FeedbackType.DamageVestFireArrow;
                         }
@@ -1882,7 +2080,11 @@ namespace TactsuitBS
                     {
                         if (penetrationSize == DamagerData.PenetrationSize.Small)
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageVestPierceLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageVestPierceFireSmall;
                             }
@@ -1921,7 +2123,11 @@ namespace TactsuitBS
                         }
                         else //Large
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageVestPierceLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageVestPierceFireLarge;
                             }
@@ -2001,6 +2207,19 @@ namespace TactsuitBS
                                     return FeedbackType.DamageVestSlashIceSmallRLU;
                                 else
                                     return FeedbackType.DamageVestSlashIceSmallLRD;
+                            }
+                            else if (sourceMaterial == "Lightsaber")
+                            {
+                                if (direction == Direction.LeftRightDown)
+                                    return FeedbackType.DamageVestSlashLightsaberLRD;
+                                else if (direction == Direction.LeftRightUp)
+                                    return FeedbackType.DamageVestSlashLightsaberLRU;
+                                else if (direction == Direction.RightLeftDown)
+                                    return FeedbackType.DamageVestSlashLightsaberRLD;
+                                else if (direction == Direction.RightLeftUp)
+                                    return FeedbackType.DamageVestSlashLightsaberRLU;
+                                else
+                                    return FeedbackType.DamageVestSlashLightsaberLRD;
                             }
                             else if (sourceMaterial == "Blade")
                             {
@@ -2086,6 +2305,19 @@ namespace TactsuitBS
                                 else
                                     return FeedbackType.DamageVestSlashLightningLargeLRD;
                             }
+                            else if (sourceMaterial == "Lightsaber")
+                            {
+                                if (direction == Direction.LeftRightDown)
+                                    return FeedbackType.DamageVestSlashLightsaberLRD;
+                                else if (direction == Direction.LeftRightUp)
+                                    return FeedbackType.DamageVestSlashLightsaberLRU;
+                                else if (direction == Direction.RightLeftDown)
+                                    return FeedbackType.DamageVestSlashLightsaberRLD;
+                                else if (direction == Direction.RightLeftUp)
+                                    return FeedbackType.DamageVestSlashLightsaberRLU;
+                                else
+                                    return FeedbackType.DamageVestSlashLightsaberLRD;
+                            }
                             else if (sourceMaterial == "Blade")
                             {
                                 if (direction == Direction.LeftRightDown)
@@ -2133,7 +2365,20 @@ namespace TactsuitBS
                     else if (damageType == DamageType.Energy)
                     {
                         string lowerId = spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant();
-                        if (lowerId.Contains("fire"))
+                        if (sourceMaterial == "Lightsaber")
+                        {
+                            if (direction == Direction.LeftRightDown)
+                                return FeedbackType.DamageVestSlashLightsaberLRD;
+                            else if (direction == Direction.LeftRightUp)
+                                return FeedbackType.DamageVestSlashLightsaberLRU;
+                            else if (direction == Direction.RightLeftDown)
+                                return FeedbackType.DamageVestSlashLightsaberRLD;
+                            else if (direction == Direction.RightLeftUp)
+                                return FeedbackType.DamageVestSlashLightsaberRLU;
+                            else
+                                return FeedbackType.DamageVestSlashLightsaberLRD;
+                        }
+                        else if (lowerId.Contains("fire"))
                         {
                             return FeedbackType.DamageVestFire;
                         }
@@ -2162,7 +2407,11 @@ namespace TactsuitBS
                     {
                         if (penetrationSize == DamagerData.PenetrationSize.Small)
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageVestBluntLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageVestBluntFireSmall;
                             }
@@ -2201,7 +2450,11 @@ namespace TactsuitBS
                         }
                         else //Large
                         {
-                            if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
+                            if (sourceMaterial == "Lightsaber")
+                            {
+                                return FeedbackType.DamageVestBluntLightsaber;
+                            }
+                            else if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
                                 return FeedbackType.DamageVestBluntFireLarge;
                             }
@@ -2245,7 +2498,7 @@ namespace TactsuitBS
             return FeedbackType.DefaultDamage;
         }
 
-        struct Feedback
+        public struct Feedback
         {
             public Feedback(FeedbackType _feedbackType, string _prefix, int _feedbackFileCount)
             {
@@ -2305,6 +2558,8 @@ namespace TactsuitBS
                     }
                 }
             }
+
+            
         }
 
         public void CreateSystem()
@@ -2363,6 +2618,12 @@ namespace TactsuitBS
                 case TactsuitVR.FeedbackType.PlayerMeleeStoneStoneBluntRight: return IntensityPlayerMeleeStoneStoneBlunt; break;
                 case TactsuitVR.FeedbackType.PlayerMeleeStoneFabricBluntRight: return IntensityPlayerMeleeStoneFabricBlunt; break;
                 case TactsuitVR.FeedbackType.PlayerMeleeStoneFleshBluntRight: return IntensityPlayerMeleeStoneFleshBlunt; break;
+
+                case TactsuitVR.FeedbackType.PlayerMeleeLightsaberClashRight: return IntensityPlayerMeleeLightsaberClashRight; break;
+                case TactsuitVR.FeedbackType.PlayerMeleeLightsaberSlashRight: return IntensityPlayerMeleeLightsaberSlashRight; break;
+                case TactsuitVR.FeedbackType.PlayerMeleeLightsaberPierceRight: return IntensityPlayerMeleeLightsaberPierceRight; break;
+                case TactsuitVR.FeedbackType.PlayerMeleeLightsaberBluntRight: return IntensityPlayerMeleeLightsaberBluntRight; break;
+
                 case TactsuitVR.FeedbackType.PlayerSpellFireRight: return IntensityPlayerSpellFire; break;
                 case TactsuitVR.FeedbackType.PlayerSpellLightningRight: return IntensityPlayerSpellLightning; break;
                 case TactsuitVR.FeedbackType.PlayerSpellGravityRight: return IntensityPlayerSpellGravity; break;
@@ -2470,6 +2731,27 @@ namespace TactsuitBS
                 case TactsuitVR.FeedbackType.DamageVestSlashIceLargeRLD: return IntensityDamageVestSlashIceLarge; break;
                 case TactsuitVR.FeedbackType.DamageVestSlashIceLargeRLU: return IntensityDamageVestSlashIceLarge; break;
                 case TactsuitVR.FeedbackType.DamageVestBluntIceLarge: return IntensityDamageVestBluntIceLarge; break;
+
+                case TactsuitVR.FeedbackType.DamageVestBlaster: return IntensityDamageVestBlaster; break;
+                case TactsuitVR.FeedbackType.DamageVestBlasterStun: return IntensityDamageVestBlasterStun; break;
+                case TactsuitVR.FeedbackType.DamageRightArmBlaster: return IntensityDamageArmBlaster; break;
+                case TactsuitVR.FeedbackType.DamageRightArmBlasterStun: return IntensityDamageArmBlasterStun; break;
+                case TactsuitVR.FeedbackType.DamageHeadBlaster: return IntensityDamageHeadBlaster; break;
+                case TactsuitVR.FeedbackType.DamageHeadBlasterStun: return IntensityDamageHeadBlasterStun; break;
+
+                case TactsuitVR.FeedbackType.DamageVestPierceLightsaber: return IntensityDamageVestPierceLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageVestSlashLightsaberLRD: return IntensityDamageVestSlashLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageVestSlashLightsaberRLD: return IntensityDamageVestSlashLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageVestSlashLightsaberLRU: return IntensityDamageVestSlashLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageVestSlashLightsaberRLU: return IntensityDamageVestSlashLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageVestBluntLightsaber: return IntensityDamageVestBluntLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageRightArmBluntLightsaber: return IntensityDamageRightArmBluntLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageRightArmPierceLightsaber: return IntensityDamageRightArmPierceLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageRightArmSlashLightsaber: return IntensityDamageRightArmSlashLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageHeadPierceLightsaber: return IntensityDamageHeadPierceLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageHeadSlashLightsaber: return IntensityDamageHeadSlashLightsaber; break;
+                case TactsuitVR.FeedbackType.DamageHeadBluntLightsaber: return IntensityDamageHeadBluntLightsaber; break;
+
                 case TactsuitVR.FeedbackType.DamageRightArmPierceBladeSmall: return IntensityDamageArmPierceBladeSmall; break;
                 case TactsuitVR.FeedbackType.DamageRightArmSlashBladeSmall: return IntensityDamageArmSlashBladeSmall; break;
                 case TactsuitVR.FeedbackType.DamageRightArmBluntBladeSmall: return IntensityDamageArmBluntBladeSmall; break;
@@ -2603,6 +2885,19 @@ namespace TactsuitBS
             return IntensityDefaultDamage;
         }
 
+        public void ProvideDotFeedback(PositionType position, int index, int intensity, int durationMillis)
+        {
+            if (intensity < 0.001f)
+                return;
+
+            if (!systemInitialized || hapticPlayer == null)
+                CreateSystem();
+            
+            List<DotPoint> points = new List<DotPoint>() { new DotPoint(index, intensity) };
+            
+            hapticPlayer.Submit("", position, points, durationMillis);
+        }
+
         public void ProvideHapticFeedbackThread(float locationAngle, float locationHeight, FeedbackType effect, float intensityMultiplier, bool waitToPlay, bool reflected, float duration = 1.0f)
         {
             if (intensityMultiplier < 0.001f)
@@ -2680,12 +2975,12 @@ namespace TactsuitBS
             }
         }
 
-        public static FeedbackType GetPlayerGunShootFeedback(string itemName, string displayName)
+        public static FeedbackType GetPlayerGunShootFeedback(string itemName, string displayName, bool stun)
         {
             string lower = itemName.ToLowerInvariant() + " " + displayName.ToLowerInvariant();
 
             if(lower.Contains("blaster") || lower.Contains("starwars") || lower.Contains("peace") || lower.Contains("keeper"))
-                return FeedbackType.PlayerGunBlasterRight;
+                return stun ? FeedbackType.PlayerGunPlasmaRight : FeedbackType.PlayerGunBlasterRight;
             else if (lower.Contains("spray") || lower.Contains("flame"))
                 return FeedbackType.PlayerGunSprayRight;
             else if (lower.Contains("bazooka") || lower.Contains("launcher") || lower.Contains("mortar"))
@@ -2704,7 +2999,7 @@ namespace TactsuitBS
                 return FeedbackType.PlayerGunShotgunRight;
             else if (lower.Contains("revolver") || lower.Contains("beretta") || lower.Contains("pistol") || lower.Contains("kitchen") || lower.Contains("glock") || lower.Contains("hamada") || lower.Contains("luger") || lower.Contains("mustang") || lower.Contains("m1911"))
                 return FeedbackType.PlayerGunPistolRight;
-            else if (lower.Contains("auto") || lower.Contains("sentinel") || lower.Contains("smg") || lower.Contains("machine") ||lower.Contains("s2200"))
+            else if (lower.Contains("auto") || lower.Contains("sentinel") || lower.Contains("smg") || lower.Contains("modular") || lower.Contains("mp5") || lower.Contains("ump") || lower.Contains("alternator") || lower.Contains("machine") ||lower.Contains("s2200"))
                 return FeedbackType.PlayerGunAutomaticRight;
             else if (lower.Contains("ball") || lower.Contains("grapple") || lower.Contains("flint"))
                 return FeedbackType.PlayerGunBallisticRight;

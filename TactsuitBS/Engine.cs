@@ -4,6 +4,7 @@ using ThunderRoad;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -11,6 +12,7 @@ using Bhaptics.Tact;
 using CustomWebSocketSharp;
 using Newtonsoft.Json.Linq;
 using TLGFPowerBooks;
+using UnityEngine.SceneManagement;
 
 namespace TactsuitBS
 {
@@ -26,7 +28,18 @@ namespace TactsuitBS
         public bool GravityEffectOnHead = false;
         public bool PlayFallbackEffectsForArmHead = true;
         public bool NoFallEffectWhenFallDamageIsDisabled = false;
-        
+
+
+        //Rain
+        public int RainVestSleepDuration = 700;
+        public int RainHeadSleepDuration = 1000;
+        public int RainArmSleepDuration = 1000;
+        public int RainEffectDuration = 50;
+
+        public float IntensityRaindropVest = 1.15f;
+        public float IntensityRaindropArm = 0.8f;
+        public float IntensityRaindropHead = 0.7f;
+
 
         //Sleep Durations
         public int SleepDurationHeartBeat = 900;
@@ -69,6 +82,11 @@ namespace TactsuitBS
         public float IntensityPlayerMeleeStoneStoneBlunt = 1.0f;
         public float IntensityPlayerMeleeStoneFabricBlunt = 1.0f;
         public float IntensityPlayerMeleeStoneFleshBlunt = 1.0f;
+
+        public float IntensityPlayerMeleeLightsaberClashRight = 1.0f;
+        public float IntensityPlayerMeleeLightsaberSlashRight = 1.0f;
+        public float IntensityPlayerMeleeLightsaberPierceRight = 1.0f;
+        public float IntensityPlayerMeleeLightsaberBluntRight = 1.0f;
 
         public float IntensityPlayerSpellFire = 1.0f;
         public float IntensityPlayerSpellLightning = 1.0f;
@@ -157,6 +175,14 @@ namespace TactsuitBS
         public float IntensityDamageVestPierceIceLarge = 1.0f;
         public float IntensityDamageVestSlashIceLarge = 1.0f;
         public float IntensityDamageVestBluntIceLarge = 1.0f;
+
+        public float IntensityDamageVestBlaster = 1.0f;
+        public float IntensityDamageVestBlasterStun = 1.0f;
+        public float IntensityDamageArmBlaster = 1.0f;
+        public float IntensityDamageArmBlasterStun = 1.0f;
+        public float IntensityDamageHeadBlaster = 1.0f;
+        public float IntensityDamageHeadBlasterStun = 1.0f;
+
         public float IntensityDamageArmPierceBladeSmall = 1.0f;
         public float IntensityDamageArmSlashBladeSmall = 1.0f;
         public float IntensityDamageArmBluntBladeSmall = 1.0f;
@@ -321,6 +347,14 @@ namespace TactsuitBS
 
         private AudioSource rightItemShootSFX = null;
 
+        private AudioSource leftItemChargeSFX = null;
+
+        private AudioSource rightItemChargeSFX = null;
+
+        private AudioSource leftItemChargeReadySFX = null;
+
+        private AudioSource rightItemChargeReadySFX = null;
+
         private float deltaTime = 0.0f;
         private float shootGunCheckTimeLeft = 0.0f;
         private float climbingCheckTimeLeft = 0.0f;
@@ -348,6 +382,10 @@ namespace TactsuitBS
         private bool rightItemUseStarted = false;
         private bool rightItemAltUseStarted = false;
 
+        private bool leftModularGunFiring = false;
+        private bool rightModularGunFiring = false;
+
+
         private bool shootingLeftGun = false;
         private bool shootingRightGun = false;
         private bool altShootingLeftGun = false;
@@ -356,6 +394,11 @@ namespace TactsuitBS
         private bool shootingLeftShoulderTurret = false;
         private bool hoveringWithHoverJet = false;
 
+        private GameObject rainController;
+
+        private bool raining = false;
+        private float rainIntensity = 0.52f;
+        private float rainDensity = 7.0f; 
 
         private Vector3 lastFrameVelocity = Vector3.zero;
         private bool noExplosionFeedback = false;
@@ -365,7 +408,6 @@ namespace TactsuitBS
 
         Dictionary<string, bool> GunUseMultipleShotMap = new Dictionary<string, bool>();
         Dictionary<string, bool> GunAltUseMultipleShotMap = new Dictionary<string, bool>();
-
         #endregion
 
         void LOG(string logStr)
@@ -380,6 +422,7 @@ namespace TactsuitBS
 
         public override void OnLevelLoaded(LevelDefinition levelDefinition)
         {
+
             tactsuitVr = new TactsuitVR();
             tactsuitVr.CreateSystem();
 
@@ -410,6 +453,11 @@ namespace TactsuitBS
             tactsuitVr.IntensityPlayerMeleeStoneStoneBlunt = IntensityPlayerMeleeStoneStoneBlunt;
             tactsuitVr.IntensityPlayerMeleeStoneFabricBlunt = IntensityPlayerMeleeStoneFabricBlunt;
             tactsuitVr.IntensityPlayerMeleeStoneFleshBlunt = IntensityPlayerMeleeStoneFleshBlunt;
+
+            tactsuitVr.IntensityPlayerMeleeLightsaberClashRight = IntensityPlayerMeleeLightsaberClashRight;
+            tactsuitVr.IntensityPlayerMeleeLightsaberSlashRight = IntensityPlayerMeleeLightsaberSlashRight;
+            tactsuitVr.IntensityPlayerMeleeLightsaberPierceRight = IntensityPlayerMeleeLightsaberPierceRight;
+            tactsuitVr.IntensityPlayerMeleeLightsaberBluntRight = IntensityPlayerMeleeLightsaberBluntRight;
 
             tactsuitVr.IntensityPlayerSpellFire = IntensityPlayerSpellFire;
             tactsuitVr.IntensityPlayerSpellLightning = IntensityPlayerSpellLightning;
@@ -498,6 +546,14 @@ namespace TactsuitBS
             tactsuitVr.IntensityDamageVestPierceIceLarge = IntensityDamageVestPierceIceLarge;
             tactsuitVr.IntensityDamageVestSlashIceLarge = IntensityDamageVestSlashIceLarge;
             tactsuitVr.IntensityDamageVestBluntIceLarge = IntensityDamageVestBluntIceLarge;
+
+            tactsuitVr.IntensityDamageVestBlaster = IntensityDamageVestBlaster;
+            tactsuitVr.IntensityDamageVestBlasterStun = IntensityDamageVestBlasterStun;
+            tactsuitVr.IntensityDamageArmBlaster = IntensityDamageArmBlaster;
+            tactsuitVr.IntensityDamageArmBlasterStun = IntensityDamageArmBlasterStun;
+            tactsuitVr.IntensityDamageHeadBlaster = IntensityDamageHeadBlaster;
+            tactsuitVr.IntensityDamageHeadBlasterStun = IntensityDamageHeadBlasterStun;
+
             tactsuitVr.IntensityDamageArmPierceBladeSmall = IntensityDamageArmPierceBladeSmall;
             tactsuitVr.IntensityDamageArmSlashBladeSmall = IntensityDamageArmSlashBladeSmall;
             tactsuitVr.IntensityDamageArmBluntBladeSmall = IntensityDamageArmBluntBladeSmall;
@@ -624,6 +680,17 @@ namespace TactsuitBS
 
             LOG("Loaded.");
 
+            foreach (TactsuitVR.FeedbackType f in Enum.GetValues(typeof(TactsuitVR.FeedbackType)))
+            {
+                if (f == TactsuitVR.FeedbackType.NoFeedback)
+                    continue;
+
+                if (!tactsuitVr.feedbackMap.ContainsKey(f) || tactsuitVr.feedbackMap[f].feedbackFileCount == 0)
+                {
+                    LOG("Tact file NOT found: " + f.ToString());
+                }
+            }
+
             FillFXLists();
 
             string materials = "";
@@ -637,7 +704,23 @@ namespace TactsuitBS
 
             LOG("Game materials: " + materials);
 
+            SceneManager.sceneLoaded += this.OnSceneLoadedFunc;
+            SceneManager.sceneUnloaded += this.OnSceneUnloadedFunc;
+
             base.OnLevelLoaded(levelDefinition);
+        }
+
+        private void OnSceneUnloadedFunc(Scene scene)
+        {
+            gamePaused = true;
+            LOG("Scene unloaded: " + scene.name);
+        }
+
+        private void OnSceneLoadedFunc(Scene scene, LoadSceneMode mode)
+        {
+            gamePaused = false;
+
+            LOG("Scene loaded: " + scene.name);
         }
 
         private void FillFXLists()
@@ -661,85 +744,100 @@ namespace TactsuitBS
                             continue;
 
                         string jsonFileStr = File.ReadAllText(fullName);
-                        if (!jsonFileStr.IsNullOrEmpty() && jsonFileStr.Contains("Shooter"))
+                        if (!jsonFileStr.IsNullOrEmpty())
                         {
-                            JObject obj = JObject.Parse(jsonFileStr);
-                            if (obj != null)
+                            if (jsonFileStr.Contains("Shooter"))
                             {
-                                string displayName = (string) obj["displayName"];
-
-                                foreach (var module in obj.SelectTokens("modules[*]"))
+                                JObject obj = JObject.Parse(jsonFileStr);
+                                if (obj != null)
                                 {
-                                    if (module != null)
-                                    {
-                                        bool shotWithAltUse = false;
+                                    string displayName = (string) obj["displayName"];
 
-                                        if (module["shootWithAltUse"] != null)
+                                    foreach (var module in obj.SelectTokens("modules[*]"))
+                                    {
+                                        if (module != null)
                                         {
-                                            shotWithAltUse = (bool) module["shootWithAltUse"];
-                                            bool multipleShots = false;
-                                            if (module["multipleShotsWithoutReleasingTrigger"] != null)
+                                            bool shotWithAltUse = false;
+
+                                            if (module["shootWithAltUse"] != null)
                                             {
-                                                multipleShots = (bool)module["multipleShotsWithoutReleasingTrigger"];
-                                                
-                                                if (shotWithAltUse)
+                                                shotWithAltUse = (bool) module["shootWithAltUse"];
+                                                bool multipleShots = false;
+                                                if (module["multipleShotsWithoutReleasingTrigger"] != null)
                                                 {
-                                                    GunAltUseMultipleShotMap[displayName] = multipleShots;
-                                                    LOG("Gun " + displayName + " alt fire: " + (multipleShots ? "multiple" : "single"));
-                                                }
-                                                else
-                                                {
-                                                    GunUseMultipleShotMap[displayName] = multipleShots;
-                                                    LOG("Gun " + displayName + " fire: " + (multipleShots ? "multiple" : "single"));
+                                                    multipleShots = (bool) module["multipleShotsWithoutReleasingTrigger"];
+
+                                                    if (shotWithAltUse)
+                                                    {
+                                                        GunAltUseMultipleShotMap[displayName] = multipleShots;
+                                                        LOG("Gun " + displayName + " alt fire: " + (multipleShots ? "multiple" : "single"));
+                                                    }
+                                                    else
+                                                    {
+                                                        GunUseMultipleShotMap[displayName] = multipleShots;
+                                                        LOG("Gun " + displayName + " fire: " + (multipleShots ? "multiple" : "single"));
+                                                    }
                                                 }
                                             }
-                                        }
 
-                                        string shootSfx = (string) module["shootSFX"];
-                                        string shootVfx = (string) module["shootVFX"];
-                                        if (!shootSfx.IsNullOrEmpty())
-                                        {
-                                            if (!SFXList.Contains(shootSfx))
-                                                SFXList.Add(shootSfx);
-                                        }
+                                            string shootSfx = (string) module["shootSFX"];
+                                            string shootVfx = (string) module["shootVFX"];
+                                            if (!shootSfx.IsNullOrEmpty())
+                                            {
+                                                if (!SFXList.Contains(shootSfx))
+                                                    SFXList.Add(shootSfx);
+                                            }
 
-                                        if (!shootVfx.IsNullOrEmpty())
-                                        {
-                                            if (!VFXList.Contains(shootVfx))
-                                                VFXList.Add(shootVfx);
+                                            if (!shootVfx.IsNullOrEmpty())
+                                            {
+                                                if (!VFXList.Contains(shootVfx))
+                                                    VFXList.Add(shootVfx);
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else if (!jsonFileStr.IsNullOrEmpty() && jsonFileStr.Contains("SimpleBallistics"))
-                        {
-                            JObject obj = JObject.Parse(jsonFileStr);
-                            if (obj != null)
+                            else if (jsonFileStr.Contains("SimpleBallistics"))
                             {
-                                string displayName = (string)obj["displayName"];
-
-                                foreach (var module in obj.SelectTokens("modules[*]"))
+                                JObject obj = JObject.Parse(jsonFileStr);
+                                if (obj != null)
                                 {
-                                    if (module != null)
+                                    string displayName = (string) obj["displayName"];
+
+                                    foreach (var module in obj.SelectTokens("modules[*]"))
                                     {
-                                        GunUseMultipleShotMap[displayName] = false;
-                                        LOG("Gun " + displayName + " fire: single");
-
-                                        string shootSfx = (string)module["fireSoundRef"];
-                                        string shootVfx = (string)module["muzzleFlashRef"];
-                                        if (!shootSfx.IsNullOrEmpty())
+                                        if (module != null)
                                         {
-                                            if (!SFXList.Contains(shootSfx))
-                                                SFXList.Add(shootSfx);
-                                        }
+                                            GunUseMultipleShotMap[displayName] = false;
+                                            LOG("Gun " + displayName + " fire: single");
 
-                                        if (!shootVfx.IsNullOrEmpty())
-                                        {
-                                            if (!VFXList.Contains(shootVfx))
-                                                VFXList.Add(shootVfx);
+                                            string shootSfx = (string) module["fireSoundRef"];
+                                            string shootVfx = (string) module["muzzleFlashRef"];
+                                            if (!shootSfx.IsNullOrEmpty())
+                                            {
+                                                if (!SFXList.Contains(shootSfx))
+                                                    SFXList.Add(shootSfx);
+                                            }
+
+                                            if (!shootVfx.IsNullOrEmpty())
+                                            {
+                                                if (!VFXList.Contains(shootVfx))
+                                                    VFXList.Add(shootVfx);
+                                            }
                                         }
                                     }
+                                }
+                            }
+                            else if (jsonFileStr.Contains("TheOuterRim"))
+                            {
+                                JObject obj = JObject.Parse(jsonFileStr);
+                                if (obj != null)
+                                {
+                                    string displayName = (string) obj["displayName"];
+
+                                    GunUseMultipleShotMap[displayName] = false;
+                                    GunAltUseMultipleShotMap[displayName] = false;
+
                                 }
                             }
                         }
@@ -747,7 +845,10 @@ namespace TactsuitBS
                 }
             }
 
-            SFXList.Add("GrappleSound"); //Support fur ButtersAndSorcery's Batman Grapple Mod
+            SFXList.Add("GrappleSound"); //Support for ButtersAndSorcery's Batman Grapple Mod
+            SFXList.Add("FireSounds"); //Support for The Outer Rim
+            SFXList.Add("FireSounds2"); //Support for The Outer Rim
+            SFXList.Add("FireSounds3"); //Support for The Outer Rim
             GunUseMultipleShotMap["GrappleGun"] = false;
             GunUseMultipleShotMap["BatmanGrapple"] = false;
 
@@ -805,6 +906,7 @@ namespace TactsuitBS
                     if (Player.local != null && Player.local.body != null && Player.local.body.creature != null && Player.local.body.creature.initialized)
                     {
                         CheckStates(Player.local.body.creature);
+                        CheckStatesRarest(Player.local.body.creature);
                     }
                     else
                     {
@@ -958,6 +1060,27 @@ namespace TactsuitBS
                     LOG("Adding collision event to: " + part.collisionHandler.name);
                     part.collisionHandler.OnCollisionStartEvent += TorsoCollisionFunc;
                 }
+            }
+
+            foreach (GameObject gameObject in (GameObject[])UnityEngine.Object.FindObjectsOfType<GameObject>())
+            {
+                if (gameObject != null)
+                {
+                    if (gameObject.GetComponent("RainController"))
+                    {
+                        rainController = gameObject;
+                        break;
+                    }
+                }
+            }
+
+            if (rainController != null)
+            {
+                LOG("Rain Controller found in scene.");
+            }
+            else
+            {
+                LOG("Rain Controller not found in scene.");
             }
         }
 
@@ -1860,47 +1983,134 @@ namespace TactsuitBS
             }
         }
 
-        private void FireGun(string name, string displayname, bool altFire, bool leftHand)
+        private void FireGun(string name, string displayname, bool altFire, bool leftHand, bool starwarsBlasterStun, bool burst, bool chargedFire)
         {
             if (tactsuitVr != null)
             {
-                TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(name, displayname);
+                TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(name, displayname, starwarsBlasterStun);
                 TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.FeedbackType.NoFeedback;
                 if (!name.Contains("Grapple"))
                 {
                     feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, leftHand ? Side.Left : Side.Right);
                 }
+                int burstCount = 2;
 
                 if (leftHand)
                 {
                     while (!gamePaused && !GameManager.timeStopped 
-                                       && ((leftItemUseStarted && !altFire && (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying)))) 
+                                       && ((leftItemUseStarted && !altFire && (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying)))) 
                                            ||(leftItemAltUseStarted && altFire && (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))))))
                     {
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                        Thread.Sleep(SleepDurationShootGun);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, chargedFire ? 0.5f:1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, chargedFire ? 0.5f : 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        Thread.Sleep(!starwarsBlasterStun ? SleepDurationShootGun : SleepDurationShootGun*10 / 6);
+                        if (burst)
+                        {
+                            burstCount--;
+                            if (burstCount <= 0)
+                            {
+                                leftItemUseStarted = false;
+                                break;
+                            }
+                        }
                     }
                     LOG("Player stopped " + (altFire ? "alt" : "") + " firing left gun: " + name);
 
                     if (altFire) altShootingLeftGun = false;
                     else shootingLeftGun = false;
+
+                    if (chargedFire)
+                    {
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.2f, TactsuitVR.FeedbackType.NoFeedback, true);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.2f, TactsuitVR.FeedbackType.NoFeedback, false);
+                    }
                 }
                 else
                 {
                     while (!gamePaused && !GameManager.timeStopped
-                                       && ((rightItemUseStarted && !altFire && (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying))))
+                                       && ((rightItemUseStarted && !altFire && (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))))
                                             || (rightItemAltUseStarted && altFire && (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying))))))
                     {
                         
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                        Thread.Sleep(SleepDurationShootGun);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, chargedFire ? 0.5f : 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, chargedFire ? 0.5f : 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        Thread.Sleep(!starwarsBlasterStun ? SleepDurationShootGun : SleepDurationShootGun * 10 / 6);
+
+                        if (burst)
+                        {
+                            burstCount--;
+                            if (burstCount <= 0)
+                            {
+                                rightItemUseStarted = false;
+                                break;
+                            }
+                        }
                     }
                     LOG("Player stopped " + (altFire ? "alt" : "") + " firing right gun: " + name);
 
                     if (altFire) altShootingRightGun = false;
                     else shootingRightGun = false;
+
+                    if (chargedFire)
+                    {
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.2f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.2f, TactsuitVR.FeedbackType.NoFeedback, false);
+                    }
+                }
+            }
+        }
+
+        private void FireGunModularFireArms(string name, string displayname, bool leftHand, bool burst)
+        {
+            if (tactsuitVr != null)
+            {
+                TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(name, displayname, false);
+                TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, leftHand ? Side.Left : Side.Right);
+
+                int burstCount = 2;
+
+                if (leftHand)
+                {
+                    while (!gamePaused && !GameManager.timeStopped && (leftItemUseStarted || leftModularGunFiring))
+                    {
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        Thread.Sleep(SleepDurationShootGun);
+                        if (burst)
+                        {
+                            burstCount--;
+                            if (burstCount <= 0)
+                            {
+                                leftItemUseStarted = false;
+                                break;
+                            }
+                        }
+
+                    }
+                    LOG("Player stopped firing left gun: " + name);
+
+                    shootingLeftGun = false;
+                }
+                else
+                {
+                    while (!gamePaused && !GameManager.timeStopped && (rightItemUseStarted || rightModularGunFiring))
+                    {
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        Thread.Sleep(SleepDurationShootGun);
+                        if (burst)
+                        {
+                            burstCount--;
+                            if (burstCount <= 0)
+                            {
+                                rightItemUseStarted = false;
+                                break;
+                            }
+                        }
+                    }
+                    LOG("Player stopped firing right gun: " + name);
+
+                    shootingRightGun = false;
                 }
             }
         }
@@ -2013,32 +2223,108 @@ namespace TactsuitBS
             }
         }
 
-        private void CheckStates(Creature creature)
+        private void RaindropVestEffect()
+        {
+            float minsleepduration = 100.0f;
+            int minsleepDurationInt = 100;
+            int sleepDuration = 100;
+
+            while (raining)
+            {
+                minsleepduration = (float)RainVestSleepDuration / rainDensity;
+                minsleepDurationInt = (int) minsleepduration;
+
+                sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
+
+                int index = RandomNumber.RandomBetweenLowerMoreProbable(0, 7, 8, 15, 4);
+                int pos = RandomNumber.Between(0, 1);
+                int durationOffset = RandomNumber.Between(0, 30) - 15;
+                tactsuitVr.ProvideDotFeedback(pos == 1 ? PositionType.VestFront : PositionType.VestBack, index, (int)(30.0f * rainIntensity * IntensityRaindropVest), RainEffectDuration + durationOffset);
+            
+                Thread.Sleep(sleepDuration);
+            }
+        }
+
+        private void RaindropArmEffect(bool left)
+        {
+            float minsleepduration = 100.0f;
+            int minsleepDurationInt = 100;
+            int sleepDuration = 100;
+
+            while (raining)
+            {
+                minsleepduration = (float)RainArmSleepDuration / rainDensity;
+                minsleepDurationInt = (int)(minsleepduration);
+
+                sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
+
+                int index = RandomNumber.Between(0, 5);
+                int durationOffset = RandomNumber.Between(0, 30) - 15;
+                tactsuitVr.ProvideDotFeedback(left ? PositionType.ForearmL : PositionType.ForearmR, index, (int)(30.0f * rainIntensity * IntensityRaindropArm), RainEffectDuration + durationOffset);
+
+                Thread.Sleep(sleepDuration);
+            }
+        }
+
+        private void RaindropHeadEffect()
+        {
+            float minsleepduration = 100.0f;
+            int minsleepDurationInt = 100;
+            int sleepDuration = 1;
+
+            while (raining)
+            {
+                minsleepduration = (float)RainHeadSleepDuration / rainDensity;
+                minsleepDurationInt = (int)(minsleepduration);
+
+                sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
+
+                int index = RandomNumber.Between(0, 5);
+                int durationOffset = RandomNumber.Between(0, 30) - 15;
+                tactsuitVr.ProvideDotFeedback(PositionType.Head, index, (int)(30.0f * rainIntensity * IntensityRaindropHead), RainEffectDuration + durationOffset);
+
+                Thread.Sleep(sleepDuration);
+            }
+        }
+
+        private int checkFunction2 = 80;
+
+        private void CheckStatesRarest(Creature creature)
         {
             if (creature != null)
             {
-                #region Heartbeat Check
-
-                if (creature.health != null)
+                if(checkFunction2 <= 0)
                 {
-                    if (!gamePaused && creature.state != Creature.State.Dead && !creature.health.isKilled && creature.health.currentHealth <= creature.health.maxHealth * 0.1f && creature.health.currentHealth > 0.01f)
+                    checkFunction2 = (int) (1.0f / Time.fixedDeltaTime);
+
+                    #region Heartbeat Check
+
+                    if (creature.health != null)
                     {
-                        Heartbeating = false;
-                        if (!HeartbeatingFast)
+                        if (!gamePaused && creature.state != Creature.State.Dead && !creature.health.isKilled && creature.health.currentHealth <= creature.health.maxHealth * 0.1f && creature.health.currentHealth > 0.01f)
                         {
-                            HeartbeatingFast = true;
-                            Thread thread = new Thread(HeartBeatFastFunc);
-                            thread.Start();
+                            Heartbeating = false;
+                            if (!HeartbeatingFast)
+                            {
+                                HeartbeatingFast = true;
+                                Thread thread = new Thread(HeartBeatFastFunc);
+                                thread.Start();
+                            }
                         }
-                    }
-                    else if (!gamePaused && creature.state != Creature.State.Dead && !creature.health.isKilled && creature.health.currentHealth <= creature.health.maxHealth * 0.2f && creature.health.currentHealth > 0.01f)
-                    {
-                        HeartbeatingFast = false;
-                        if (!Heartbeating)
+                        else if (!gamePaused && creature.state != Creature.State.Dead && !creature.health.isKilled && creature.health.currentHealth <= creature.health.maxHealth * 0.2f && creature.health.currentHealth > 0.01f)
                         {
-                            Heartbeating = true;
-                            Thread thread = new Thread(HeartBeatFunc);
-                            thread.Start();
+                            HeartbeatingFast = false;
+                            if (!Heartbeating)
+                            {
+                                Heartbeating = true;
+                                Thread thread = new Thread(HeartBeatFunc);
+                                thread.Start();
+                            }
+                        }
+                        else
+                        {
+                            HeartbeatingFast = false;
+                            Heartbeating = false;
                         }
                     }
                     else
@@ -2046,15 +2332,72 @@ namespace TactsuitBS
                         HeartbeatingFast = false;
                         Heartbeating = false;
                     }
+
+                    #endregion
+                    
+                    #region Rain Effect (The Outer Rim)
+
+                    bool tempRaining = false;
+
+                    if (rainController != null && rainController.activeSelf)
+                    {
+                        ParticleSystem[] particleSystems = rainController.GetComponentsInChildren<ParticleSystem>();
+
+                        foreach (var ps in particleSystems)
+                        {
+                            if (ps.isPlaying && ps.isEmitting && !ps.isStopped && !ps.isPaused)
+                            {
+                                tempRaining = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (raining && tempRaining == false)
+                    {
+                        raining = false;
+                        LOG("Rain effect is ending.");
+                    }
+                    else if (!raining && tempRaining)
+                    {
+                        raining = true;
+                        if (IntensityRaindropVest > TOLERANCE)
+                        {
+                            Thread t55 = new Thread(() => RaindropVestEffect());
+                            t55.Start();
+                        }
+
+                        if (IntensityRaindropArm > TOLERANCE)
+                        {
+                            Thread t56 = new Thread(() => RaindropArmEffect(false));
+                            t56.Start();
+                            Thread t57 = new Thread(() => RaindropArmEffect(true));
+                            t57.Start();
+                        }
+
+                        if (IntensityRaindropHead > TOLERANCE)
+                        {
+                            Thread t58 = new Thread(() => RaindropHeadEffect());
+                            t58.Start();
+                        }
+
+                        LOG("Rain effect is starting.");
+                    }
+
+                    #endregion
                 }
                 else
                 {
-                    HeartbeatingFast = false;
-                    Heartbeating = false;
+                    checkFunction2--;
                 }
+            }
+        }
 
-                #endregion
-
+        private void CheckStates(Creature creature)
+        {
+            if (creature != null)
+            {
+               
                 #region Slow Motion
 
                 if (slowMotionActive)
@@ -2096,8 +2439,8 @@ namespace TactsuitBS
                     Item rightItem = creature.GetHeldobject(Side.Right);
 
                     if (!noExplosionFeedback && Player.local.locomotion.isGrounded && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude > 5f && Player.local.locomotion.rb.velocity.y>=-TOLERANCE
-                     && (leftItem == null || (leftItem != null && !leftItemUseStarted) || (leftItem != null && leftItemUseStarted && !leftItem.name.Contains("Grapple")))
-                     && (rightItem == null || (rightItem != null && !rightItemUseStarted) || (rightItem != null && rightItemUseStarted && !rightItem.name.Contains("Grapple"))))
+                        && (leftItem == null || (leftItem != null && !leftItemUseStarted) || (leftItem != null && leftItemUseStarted && !leftItem.name.Contains("Grapple")))
+                        && (rightItem == null || (rightItem != null && !rightItemUseStarted) || (rightItem != null && rightItemUseStarted && !rightItem.name.Contains("Grapple"))))
                     {
                         if (!beingPushedOther)
                         {
@@ -2417,7 +2760,7 @@ namespace TactsuitBS
                     }
 
                     if ((rightObject == null && Player.local?.handRight?.link != null && Player.local?.handRight?.link.isActive == true && Player.local?.handRight?.link.playerJointActive == true && Player.local?.handRight?.itemHand != null && Player.local.handRight.itemHand.isGripping)
-                      || (creature.body.bodyIk != null && creature.body.bodyIk.handRightEnabled && creature.body.bodyIk.handRightTarget != null && rightObject == null && creature.GetHeldHandle(Side.Right) != null && Math.Abs(creature.body.bodyIk.GetHandPositionWeight(Side.Right) - 1f) < TOLERANCE))
+                        || (creature.body.bodyIk != null && creature.body.bodyIk.handRightEnabled && creature.body.bodyIk.handRightTarget != null && rightObject == null && creature.GetHeldHandle(Side.Right) != null && Math.Abs(creature.body.bodyIk.GetHandPositionWeight(Side.Right) - 1f) < TOLERANCE))
                     {
                         if (!rightHandClimbing)
                         {
@@ -2465,7 +2808,7 @@ namespace TactsuitBS
                             }
                             else if (leftItem.definition?.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
                             {
-                                temp_leftItemShootVFX = (ParticleSystem) ((Component) ((ItemDefinition)leftItem.definition).GetCustomReference(vfx)).GetComponent<ParticleSystem>();
+                                temp_leftItemShootVFX = (ParticleSystem)((Component)((ItemDefinition)leftItem.definition).GetCustomReference(vfx)).GetComponent<ParticleSystem>();
                                 if (temp_leftItemShootVFX != null)
                                     break;
                             }
@@ -2492,30 +2835,154 @@ namespace TactsuitBS
                             }
                             else if (leftItem.definition?.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
                             {
-                                leftItemShootSFX = (AudioSource) ((Component) ((ItemDefinition) leftItem.definition).GetCustomReference(sfx)).GetComponent<AudioSource>();
+                                leftItemShootSFX = (AudioSource)((Component)((ItemDefinition)leftItem.definition).GetCustomReference(sfx)).GetComponent<AudioSource>();
                                 if (leftItemShootSFX != null)
                                     break;
                             }
                         }
 
-                        if ((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))
+                        if (leftItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
                         {
-                            if (!GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))
+                            leftItemChargeReadySFX = leftItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (leftItem.definition?.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemChargeReadySFX = (AudioSource)((Component)((ItemDefinition)leftItem.definition).GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
+                        }
+
+                        if (leftItem.transform?.Find("ChargeStartSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = leftItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (leftItem.definition?.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = (AudioSource)((Component)((ItemDefinition)leftItem.definition).GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
+                        }
+                        else if (leftItem.transform?.Find("ChargeSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = leftItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (leftItem.definition?.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = (AudioSource)((Component)((ItemDefinition)leftItem.definition).GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
+                        }
+
+                        int fireMode = 0;
+                        bool stunMode = false;
+                        bool isChargedFire = false;
+                        bool charging = false;
+                        Component itemBlasterComponent = leftItem.GetComponent("ItemBlaster");
+                        if (itemBlasterComponent != null)
+                        {
+                            fireMode = Utility.GetValue<int>(itemBlasterComponent, "currentFiremode");
+                            stunMode = Utility.GetValuePrivate<bool>(itemBlasterComponent, "altFireEnabled");
+                            isChargedFire = Utility.GetValuePrivate<bool>(itemBlasterComponent, "isChargedFire");
+
+                            ParticleSystem chargeEffect = Utility.GetValuePrivateParticleSystem(itemBlasterComponent, "chargeEffect");
+                            if (chargeEffect != null && stunMode == false)
                             {
-                                LOG("ERROR: GunUseMultipleShotMap doesn't contain key for " + leftItem.data.displayName);
+                                charging = true;
                             }
-                            if (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying))
-                                && (leftItemUseStarted && GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))) // Item allows use and use started
+                            if (leftItemChargeReadySFX == null)
                             {
-                                bool value = false;
-                                if (GunUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value))
+                                leftItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound");
+                            }
+                            if (leftItemChargeReadySFX == null)
+                            {
+                                leftItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound2");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound2");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound2");
+                            }
+                        }
+
+                        bool modularFireArmIsFiring = false;
+                        bool modularFireArmIsRoundChambered = false;
+                        int modularFireArmFireMode = 1;
+                        Component itemModularFireArmBaseComponent = leftItem.GetComponent("ItemFirearmBase");
+                        if (itemModularFireArmBaseComponent != null)
+                        {
+                            modularFireArmIsFiring = Utility.GetValue<bool>(itemModularFireArmBaseComponent, "isFiring");
+                            modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
+                            modularFireArmIsRoundChambered = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "roundChambered");
+                        }
+
+                        if (itemModularFireArmBaseComponent == null)
+                        {
+                            itemModularFireArmBaseComponent = leftItem.GetComponent("ItemMagicFirearm");
+                            if (itemModularFireArmBaseComponent != null)
+                            {
+                                modularFireArmIsFiring = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "triggerPressed");
+                                modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
+                                modularFireArmIsRoundChambered = modularFireArmIsFiring && leftItemUseStarted;
+                            }
+                        }
+
+                        leftModularGunFiring = modularFireArmIsFiring;
+
+                        if ((modularFireArmIsFiring && modularFireArmIsRoundChambered) || (charging && leftItemUseStarted) || (leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying))
+                        {
+                            //if (!GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))
+                            //{
+                            //    LOG("ERROR: GunUseMultipleShotMap doesn't contain key for " + leftItem.data.displayName);
+                            //}
+
+
+                            if (itemModularFireArmBaseComponent != null && modularFireArmIsFiring && modularFireArmIsRoundChambered && modularFireArmFireMode != 0)
+                            {
+                                if (itemModularFireArmBaseComponent != null)
+                                    LOG("Left gun fireMode:" + modularFireArmFireMode.ToString());
+
+                                if (modularFireArmFireMode == 3 || modularFireArmFireMode == 2) //This item allows multi shots
                                 {
-                                    if (value) //This item allows multi shots
+                                    if (!shootingLeftGun)
+                                    {
+                                        shootingLeftGun = true;
+                                        Thread thread = new Thread(() => FireGunModularFireArms(leftItem.name, leftItem.data.displayName, true, modularFireArmFireMode == 2));
+                                        thread.Start();
+                                        LOG("Player is firing left gun: " + leftItem.data.displayName);
+                                    }
+                                }
+                                else //This item doesn't allow multi shot. Don't play the effect until leftitemusestarted is first false, then true again.
+                                {
+                                    leftItemUseStarted = false;
+                                    TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, false);
+                                    tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
+                                    TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Left);
+                                    tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+
+                                    LOG("Fired left gun: " + leftItem.data.displayName);
+                                }
+                            }
+
+                            if (itemModularFireArmBaseComponent == null && ((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying))
+                                                                        && ((leftItemUseStarted || (charging && leftItemUseStarted)) && GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))) // Item allows use and use started
+                            {
+                                if (itemBlasterComponent != null)
+                                    LOG("Left gun fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
+
+                                bool value = false;
+                                if (GunUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value) || itemBlasterComponent != null)
+                                {
+                                    if ((itemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && leftItemUseStarted)) //This item allows multi shots
                                     {
                                         if (!shootingLeftGun)
                                         {
                                             shootingLeftGun = true;
-                                            Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, false, true));
+                                            Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, false, true, itemBlasterComponent != null && stunMode, fireMode == 3, (charging && leftItemUseStarted)));
                                             thread.Start();
                                             LOG("Player is firing left gun: " + leftItem.data.displayName);
                                         }
@@ -2523,7 +2990,8 @@ namespace TactsuitBS
                                     else //This item doesn't allow multi shot. Don't play the effect until leftitemusestarted is first false, then true again.
                                     {
                                         leftItemUseStarted = false;
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName);
+
+                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, itemBlasterComponent != null && stunMode);
                                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
                                         if (!leftItem.name.Contains("Grapple"))
                                         {
@@ -2535,8 +3003,8 @@ namespace TactsuitBS
                                     }
                                 }
                             }
-                            if (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))
-                                && (leftItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(leftItem.data.displayName))) // Item allows alt use and use started
+                            if (itemModularFireArmBaseComponent == null && ((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))
+                                                                        && (leftItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(leftItem.data.displayName)) && itemBlasterComponent == null) // Item allows alt use and use started
                             {
                                 bool value = false;
                                 if (GunAltUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value))
@@ -2546,7 +3014,7 @@ namespace TactsuitBS
                                         if (!altShootingLeftGun)
                                         {
                                             altShootingLeftGun = true;
-                                            Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, true, true));
+                                            Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, true, true, false, false, false));
                                             thread.Start();
                                             LOG("Player is alt firing left gun: " + leftItem.data.displayName);
                                         }
@@ -2554,7 +3022,7 @@ namespace TactsuitBS
                                     else //This item doesn't allow multi shot. Don't play the effect until leftitemaltusestarted is first false, then true again.
                                     {
                                         leftItemAltUseStarted = false;
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName);
+                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, false);
                                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
                                         if (!leftItem.name.Contains("Grapple"))
                                         {
@@ -2572,12 +3040,12 @@ namespace TactsuitBS
                     if (rightItem != null)
                     {
                         ParticleSystem temp_rightItemShootVFX = null;
-                        
+
                         if (rightItem.definition?.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
                         {
                             temp_rightItemShootVFX = rightItem.definition.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
                         }
-                        else 
+                        else
                         {
                             foreach (var vfx in VFXList)
                             {
@@ -2612,6 +3080,8 @@ namespace TactsuitBS
                             if (rightItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
                             {
                                 rightItemShootSFX = rightItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
+                                if (rightItemShootSFX != null)
+                                    break;
                             }
                             else if (rightItem.definition?.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
                             {
@@ -2621,24 +3091,146 @@ namespace TactsuitBS
                             }
                         }
 
-                        if ((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying))
+                        if (rightItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
                         {
-                            if (!GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))
+                            rightItemChargeReadySFX = rightItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (rightItem.definition?.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            rightItemChargeReadySFX = (AudioSource)((Component)((ItemDefinition)rightItem.definition).GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
+                        }
+
+                        if (rightItem.transform?.Find("ChargeStartSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            rightItemChargeSFX = rightItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (rightItem.definition?.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            rightItemChargeSFX = (AudioSource)((Component)((ItemDefinition)rightItem.definition).GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
+                        }
+                        else if (rightItem.transform?.Find("ChargeSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            rightItemChargeSFX = rightItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (rightItem.definition?.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            rightItemChargeSFX = (AudioSource)((Component)((ItemDefinition)rightItem.definition).GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
+                        }
+
+                        int fireMode = 0;
+                        bool stunMode = false;
+                        bool isChargedFire = false;
+                        Component itemBlasterComponent = rightItem.GetComponent("ItemBlaster");
+                        bool charging = false;
+                        if (itemBlasterComponent != null)
+                        {
+                            fireMode = Utility.GetValue<int>(itemBlasterComponent, "currentFiremode");
+                            stunMode = Utility.GetValuePrivate<bool>(itemBlasterComponent, "altFireEnabled");
+                            isChargedFire = Utility.GetValuePrivate<bool>(itemBlasterComponent, "isChargedFire");
+
+                            ParticleSystem chargeEffect = Utility.GetValuePrivateParticleSystem(itemBlasterComponent, "chargeEffect");
+                            if (chargeEffect != null && stunMode == false)
                             {
-                                LOG("ERROR: GunUseMultipleShotMap doesn't contain key for " + rightItem.data.displayName);
+                                charging = true;
                             }
-                            if (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying)) 
-                                && (rightItemUseStarted && GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))) // Item allows use and use started
+                            if (rightItemChargeReadySFX == null)
                             {
-                                bool value = false;
-                                if (GunUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value))
+                                rightItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound");
+                            }
+                            if (rightItemChargeReadySFX == null)
+                            {
+                                rightItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound2");
+                            }
+                            if (rightItemChargeSFX == null)
+                            {
+                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound");
+                            }
+                            if (rightItemChargeSFX == null)
+                            {
+                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound2");
+                            }
+                            if (rightItemChargeSFX == null)
+                            {
+                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound");
+                            }
+                            if (rightItemChargeSFX == null)
+                            {
+                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound2");
+                            }
+                        }
+
+                        bool modularFireArmIsFiring = false;
+                        bool modularFireArmIsRoundChambered = false;
+                        int modularFireArmFireMode = 1;
+                        Component itemModularFireArmBaseComponent = rightItem.GetComponent("ItemFirearmBase");
+                        if (itemModularFireArmBaseComponent != null)
+                        {
+                            modularFireArmIsFiring = Utility.GetValue<bool>(itemModularFireArmBaseComponent, "isFiring");
+                            modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
+                            modularFireArmIsRoundChambered = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "roundChambered");
+                        }
+
+                        if (itemModularFireArmBaseComponent == null)
+                        {
+                            itemModularFireArmBaseComponent = rightItem.GetComponent("ItemMagicFirearm");
+                            if (itemModularFireArmBaseComponent != null)
+                            {
+                                modularFireArmIsFiring = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "triggerPressed");
+                                modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
+                                modularFireArmIsRoundChambered = modularFireArmIsFiring && rightItemUseStarted;
+                            }
+                        }
+                        rightModularGunFiring = modularFireArmIsFiring;
+
+                        if ((modularFireArmIsFiring && modularFireArmIsRoundChambered) || (charging && rightItemUseStarted) || (rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))
+                        {
+                            //if (!GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))
+                            //{
+                            //    LOG("ERROR: GunUseMultipleShotMap doesn't contain key for " + rightItem.data.displayName);
+                            //}
+
+                            if (itemModularFireArmBaseComponent != null && modularFireArmIsFiring && modularFireArmIsRoundChambered && modularFireArmFireMode != 0)
+                            {
+                                if (itemModularFireArmBaseComponent != null)
+                                    LOG("Right fireMode:" + modularFireArmFireMode.ToString());
+
+                                if (modularFireArmFireMode == 3 || modularFireArmFireMode == 2) //This item allows multi shots
                                 {
-                                    if (value) //This item allows multi shots
+                                    if (!shootingRightGun)
+                                    {
+                                        shootingRightGun = true;
+                                        Thread thread = new Thread(() => FireGunModularFireArms(rightItem.name, rightItem.data.displayName, false, modularFireArmFireMode == 2));
+                                        thread.Start();
+                                        LOG("Player is firing right gun: " + rightItem.data.displayName);
+                                    }
+                                }
+                                else //This item doesn't allow multi shot. Don't play the effect until leftitemusestarted is first false, then true again.
+                                {
+                                    rightItemUseStarted = false;
+                                    TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, false);
+                                    tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                    TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Right);
+                                    tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+
+                                    LOG("Fired right gun: " + rightItem.data.displayName);
+                                }
+                            }
+
+                            if (itemModularFireArmBaseComponent == null && ((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))
+                                                                        && ((rightItemUseStarted || (charging && rightItemUseStarted)) && GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))) // Item allows use and use started
+                            {
+                                if (itemBlasterComponent != null)
+                                    LOG("Right blaster fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
+
+                                bool value = false;
+                                if (GunUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value) || itemBlasterComponent != null)
+                                {
+                                    if ((itemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && rightItemUseStarted)) //This item allows multi shots
                                     {
                                         if (!shootingRightGun)
                                         {
                                             shootingRightGun = true;
-                                            Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, false, false));
+                                            Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, false, false, itemBlasterComponent != null && stunMode, fireMode == 3, (charging && rightItemUseStarted)));
                                             thread.Start();
                                             LOG("Player is firing right gun: " + rightItem.data.displayName);
                                         }
@@ -2646,20 +3238,22 @@ namespace TactsuitBS
                                     else //This item doesn't allow multi shot. Don't play the effect until rightitemusestarted is first false, then true again.
                                     {
                                         rightItemUseStarted = false;
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName);
+
+                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, itemBlasterComponent != null && stunMode);
                                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                                         if (!rightItem.name.Contains("Grapple"))
                                         {
                                             TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Right);
                                             tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                                         }
-                                        
+
                                         LOG("Fired right gun: " + rightItem.data.displayName);
                                     }
                                 }
                             }
-                            if (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying)) 
-                                && (rightItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(rightItem.data.displayName))) // Item allows alt use and use started
+
+                            if (itemModularFireArmBaseComponent == null && ((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying))
+                                                                        && (rightItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(rightItem.data.displayName)) && itemBlasterComponent == null) // Item allows alt use and use started
                             {
                                 bool value = false;
                                 if (GunAltUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value))
@@ -2669,7 +3263,7 @@ namespace TactsuitBS
                                         if (!altShootingRightGun)
                                         {
                                             altShootingRightGun = true;
-                                            Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, true, false));
+                                            Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, true, false, false, false, false));
                                             thread.Start();
                                             LOG("Player is alt firing right gun: " + rightItem.data.displayName);
                                         }
@@ -2677,7 +3271,7 @@ namespace TactsuitBS
                                     else //This item doesn't allow multi shot. Don't play the effect until rightitemaltusestarted is first false, then true again.
                                     {
                                         rightItemAltUseStarted = false;
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName);
+                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, false);
                                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                                         if (!rightItem.name.Contains("Grapple"))
                                         {
@@ -2746,6 +3340,8 @@ namespace TactsuitBS
                 }
 
                 #endregion
+
+
             }
             else
             {
@@ -2824,7 +3420,7 @@ namespace TactsuitBS
             }
 
             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGotHitFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial, collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "", 
-                (collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? collisionstruct.damageStruct.damager.data.penetrationSize : DamagerData.PenetrationSize.Small, (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown"), modifiedTargetColliderName, direction, imbueSpellId);
+                (collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? collisionstruct.damageStruct.damager.data.penetrationSize : DamagerData.PenetrationSize.Small, (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown"), modifiedTargetColliderName, direction, imbueSpellId, (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : ""));
             
             if (!heightCalculated && Math.Abs(fixedLocationHeight) < TOLERANCE && collisionstruct.targetCollider != null)
             {
@@ -2873,7 +3469,7 @@ namespace TactsuitBS
             }
 
             if(Logging)
-                LOG("Player got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationSize == DamagerData.PenetrationSize.Small ? "Small" : "Large") : ""));
+                LOG("Player got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " DamagerDataId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : "") + " DamagerDataMaterialDamageId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.materialDamageId : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationSize == DamagerData.PenetrationSize.Small ? "Small" : "Large") : ""));
 
             bool reflected = modifiedTargetColliderName.Contains("Arm") && modifiedTargetColliderName.Contains("Left");
             

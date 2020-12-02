@@ -30,5 +30,19 @@ namespace TactsuitBS
 
             return (int)(minimumValue + randomValueInRange);
         }
+
+        public static int RandomBetweenLowerMoreProbable(int lowermin, int lowermax, int highermin, int highermax, int probability)
+        {
+            int prob = Between(1, probability);
+
+            if (prob == 1)
+            {
+                return Between(highermin, highermax);
+            }
+            else
+            {
+                return Between(lowermin, lowermax);
+            }
+        }
     }
 }

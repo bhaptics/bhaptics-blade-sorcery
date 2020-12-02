@@ -32,6 +32,17 @@
 					"SleepDurationClimb": 300, //Wait duration between climbing feedback effects in milliseconds. 		  
 					"SleepDurationSlowMotion": 1500, //Wait duration between slow motion heartbeat effects in milliseconds. 
 
+					//Rain
+					"RainVestSleepDuration": 500, //Wait duration between vest raindrop effects in milliseconds. 
+					"RainHeadSleepDuration": 1000, //Wait duration between head raindrop effects in milliseconds. 
+					"RainArmSleepDuration": 1000, //Wait duration between arm raindrop effects in milliseconds. 
+					"RainEffectDuration": 60, //This is the duration of the raindrop effect.
+
+					"IntensityRaindropVest": 1.25, //Intensity of raindrop effect on vest.
+					"IntensityRaindropArm": 0.85, //Intensity of raindrop effect on arms.
+					"IntensityRaindropHead": 0.75, //Intensity of raindrop effect on head.
+
+
 					//Intensities of feedback effects:		  
 					"IntensityPlayerBowPull": 0.5,
 
@@ -58,6 +69,11 @@
 					"IntensityPlayerMeleeStoneStoneBlunt": 2.0,
 					"IntensityPlayerMeleeStoneFabricBlunt": 1.5,
 					"IntensityPlayerMeleeStoneFleshBlunt": 1.5,
+
+					"IntensityPlayerMeleeLightsaberClashRight": 1.0,
+					"IntensityPlayerMeleeLightsaberSlashRight": 1.5,
+					"IntensityPlayerMeleeLightsaberPierceRight": 1.5,
+					"IntensityPlayerMeleeLightsaberBluntRight": 1.5,
 
 					"IntensityPlayerSpellFire": 0.5,
 					"IntensityPlayerSpellLightning": 0.5,
@@ -215,6 +231,23 @@
 					"IntensityDamageHeadSlashIceLarge": 1.0,
 					"IntensityDamageHeadBluntIceLarge": 1.0,
 
+					"IntensityDamageVestBlaster": 2.0, 
+          "IntensityDamageVestBlasterStun": 2.0,
+					"IntensityDamageArmBlaster": 2.0, 
+          "IntensityDamageArmBlasterStun": 2.0,
+					"IntensityDamageHeadBlaster": 2.0,
+          "IntensityDamageHeadBlasterStun": 2.0,
+
+					"IntensityDamageVestPierceLightsaber": 2.0,
+          "IntensityDamageVestSlashLightsaber": 2.0,
+					"IntensityDamageVestBluntLightsaber": 2.0,
+          "IntensityDamageRightArmBluntLightsaber": 2.0,
+					"IntensityDamageRightArmPierceLightsaber": 2.0,
+          "IntensityDamageRightArmSlashLightsaber": 2.0,
+					"IntensityDamageHeadPierceLightsaber": 2.0,
+          "IntensityDamageHeadSlashLightsaber": 2.0,
+          "IntensityDamageHeadBluntLightsaber": 2.0,
+
 					"IntensityHeartBeat": 0.5,
 					"IntensityHeartBeatFast": 0.5,
 
@@ -250,7 +283,7 @@
 					"IntensityPlayerPunchFabric": 5.0,
 
 					"IntensityPlayerGun": 1.0,
-					"IntensityPlayerGunBlaster": 1.0,
+					"IntensityPlayerGunBlaster": 1.2,
 					"IntensityPlayerGunAutomatic": 1.5,
 					"IntensityPlayerGunBallistic": 1.3,
 					"IntensityPlayerGunSpray": 1.0,
@@ -268,7 +301,7 @@
 					"IntensityKickbackPlayerGunPistol": 1.0,
 					"IntensityKickbackPlayerGunBallistic": 1.5,
 					"IntensityKickbackPlayerGunLaser": 1.0,
-					"IntensityKickbackPlayerGunPlasma": 1.0,
+					"IntensityKickbackPlayerGunPlasma": 1.5,
 					"IntensityKickbackPlayerGunSpray": 1.0,
 					"IntensityKickbackPlayerGunHeavy": 2.0,
 

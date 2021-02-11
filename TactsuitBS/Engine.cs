@@ -923,7 +923,7 @@ namespace TactsuitBS
             LiquidReceiver lr = Player.local.creature.GetComponentInChildren<LiquidReceiver>();
             if ((bool) (UnityEngine.Object) lr)
             {
-                lr.OnReceptionEvent += new LiquidReceiver.ReceptionEvent(OnLiquidReceptionFunc);
+                lr.OnReceptionEvent += LrOnOnReceptionEvent;
                 LOG("Liquid reception function added.");
             }
             else
@@ -959,9 +959,9 @@ namespace TactsuitBS
                         holder.UnSnapped += UnHolsterRightShoulderFunc;
                     }
 
-                    foreach (Item holdObject in holder.holdObjects)
+                    foreach (Item holdObject in holder.items)
                     {
-                        if (holdObject.data.type == ItemPhysic.Type.Quiver)
+                        if (holdObject.data.type == ItemData.Type.Quiver)
                         {
                             ItemQuiver quiver = holdObject.GetComponent<ItemQuiver>();
                             if (quiver?.holder != null)
@@ -1070,7 +1070,7 @@ namespace TactsuitBS
                 LOG("Rain Controller not found in scene.");
             }
         }
-
+        
         private TactsuitVR.FeedbackType GetPlayerPunchFeedback(string material)
         {
             if (!material.IsNullOrEmpty())
@@ -1118,7 +1118,7 @@ namespace TactsuitBS
         }
 
 
-        private void BodyPartCollisionStopFunc(ref CollisionStruct collisionInstance)
+        private void BodyPartCollisionStopFunc(CollisionInstance collisionInstance)
         {
             if (collisionInstance.sourceColliderGroup != null && collisionInstance.targetColliderGroup == null && (collisionInstance.sourceColliderGroup.collisionHandler != null ? collisionInstance.sourceColliderGroup.collisionHandler.name : "").Contains("Hand") && (bool)(UnityEngine.Object)collisionInstance.sourceColliderGroup.collisionHandler?.item?.leftPlayerHand)
             {
@@ -1131,7 +1131,7 @@ namespace TactsuitBS
             }
         }
 
-        private void LeftHandCollisionStartFunc(ref CollisionStruct collisionInstance)
+        private void LeftHandCollisionStartFunc(CollisionInstance collisionInstance)
         {
             string material = (collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id + " " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "") : "");
 
@@ -1142,7 +1142,7 @@ namespace TactsuitBS
             LOG("Left hand collides with something with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : ""));
         }
 
-        private void RightHandCollisionStartFunc(ref CollisionStruct collisionInstance)
+        private void RightHandCollisionStartFunc(CollisionInstance collisionInstance)
         {
             string material = (collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id + " " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "") : "");
             material = Utility.ReplaceFirst(material, "Flesh", "");
@@ -1152,7 +1152,7 @@ namespace TactsuitBS
             LOG("Right hand collides with something with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : ""));
         }
 
-        private void LeftFootCollisionStartFunc(ref CollisionStruct collisionInstance)
+        private void LeftFootCollisionStartFunc(CollisionInstance collisionInstance)
         {
             string material = (collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id + " " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "") : "");
             material = Utility.ReplaceFirst(material, "Flesh", "");
@@ -1162,7 +1162,7 @@ namespace TactsuitBS
             LOG("Left foot collides with something with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : ""));
        }
 
-        private void RightFootCollisionStartFunc(ref CollisionStruct collisionInstance)
+        private void RightFootCollisionStartFunc(CollisionInstance collisionInstance)
         {
             string material = (collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id + " " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "") : "");
             material = Utility.ReplaceFirst(material, "Flesh", "");
@@ -1172,7 +1172,7 @@ namespace TactsuitBS
             LOG("Right foot collides with something with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : ""));
         }
 
-        private void TorsoCollisionFunc(ref CollisionStruct collisionInstance)
+        private void TorsoCollisionFunc(CollisionInstance collisionInstance)
         {
             if (collisionInstance.damageStruct.hitRagdollPart?.ragdoll?.creature != null || collisionInstance.damageStruct.damage > TOLERANCE || collisionInstance.impactVelocity.magnitude < 7.0f)
                 return;
@@ -1245,7 +1245,7 @@ namespace TactsuitBS
             tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestBluntStoneLarge, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
         }
 
-        private void HeldItemRightCollisionStartFunc(ref CollisionStruct collisionInstance)
+        private void HeldItemRightCollisionStartFunc(CollisionInstance collisionInstance)
         {
             if (collisionInstance.damageStruct.hitRagdollPart?.ragdoll?.creature != null)
                 return;
@@ -1259,17 +1259,17 @@ namespace TactsuitBS
 
             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionInstance.damageStruct.damageType, collisionInstance.sourceMaterial, collisionInstance.targetMaterial);
             tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
-            LOG("Right hand item (" + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "") + ") collides with something (" + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "") + ") with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") + " MaterialEffect:" + (collisionInstance.damageStruct.materialEffectData != null ? collisionInstance.damageStruct.materialEffectData.id : "") + " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType));
+            LOG("Right hand item (" + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "") + ") collides with something (" + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "") + ") with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType));
         }
 
-        private void HeldItemLeftCollisionStartFunc(ref CollisionStruct collisionInstance)
+        private void HeldItemLeftCollisionStartFunc(CollisionInstance collisionInstance)
         {
             if (collisionInstance.damageStruct.hitRagdollPart?.ragdoll?.creature != null)
                 return;
 
             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionInstance.damageStruct.damageType, collisionInstance.sourceMaterial, collisionInstance.targetMaterial);
             tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
-            LOG("Left hand item with (" + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "") + ") collides with something (" + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "") + ") with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") + " MaterialEffect:" + (collisionInstance.damageStruct.materialEffectData != null ? collisionInstance.damageStruct.materialEffectData.id : "") + " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType));
+            LOG("Left hand item with (" + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "") + ") collides with something (" + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "") + ") with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") +  " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType));
         }
 
         private void RightProjectileRemovedFunc(Item item)
@@ -1313,7 +1313,7 @@ namespace TactsuitBS
             if (!gamePaused && !GameManager.timeStopped && item != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemPhysic.Type.Quiver)
+                if (item.data.type == ItemData.Type.Quiver)
                 {
                     ItemQuiver quiver = item.GetComponent<ItemQuiver>();
                     if (quiver?.holder != null)
@@ -1332,7 +1332,7 @@ namespace TactsuitBS
             if (!gamePaused && !GameManager.timeStopped && item != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemPhysic.Type.Quiver)
+                if (item.data.type == ItemData.Type.Quiver)
                 {
                     ItemQuiver quiver = item.GetComponent<ItemQuiver>();
                     if (quiver?.holder != null)
@@ -1351,7 +1351,7 @@ namespace TactsuitBS
             if (!gamePaused && !GameManager.timeStopped && item != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemPhysic.Type.Quiver)
+                if (item.data.type == ItemData.Type.Quiver)
                 {
                     ItemQuiver quiver = item.GetComponent<ItemQuiver>();
                     if (quiver?.holder != null)
@@ -1370,7 +1370,7 @@ namespace TactsuitBS
             if (!gamePaused && !GameManager.timeStopped && item != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemPhysic.Type.Quiver)
+                if (item.data.type == ItemData.Type.Quiver)
                 {
                     ItemQuiver quiver = item.GetComponent<ItemQuiver>();
                     if (quiver?.holder != null)
@@ -1748,14 +1748,14 @@ namespace TactsuitBS
             }
         }
 
-        private void OnDamageFunc(ref CollisionStruct collisionstruct)
+        private void OnDamageFunc(CollisionInstance collisionInstance)
         {
-            if (collisionstruct.targetCollider == null && collisionstruct.sourceCollider == null)
+            if (collisionInstance.targetCollider == null && collisionInstance.sourceCollider == null)
             {
-                if (collisionstruct.damageStruct.damage > TOLERANCE)
+                if (collisionInstance.damageStruct.damage > TOLERANCE)
                 {
-                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.DefaultDamage, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
-                    LOG("Player other damage by Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " Imbue: " + (collisionstruct.damageStruct.damager?.damagerImbue != null ? collisionstruct.damageStruct.damager.damagerImbue.name : " None") + " Amount: " + collisionstruct.damageStruct.damage.ToString(CultureInfo.InvariantCulture) + " Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionstruct.sourceMaterial != null && collisionstruct.targetMaterial != null) ? ("Materials: " + collisionstruct.sourceMaterial.id + " > " + collisionstruct.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationSize == DamagerData.PenetrationSize.Small ? "Small" : "Large") : ""));
+                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.DefaultDamage, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                    LOG("Player other damage by Damager: " + (collisionInstance.damageStruct.damager != null ? collisionInstance.damageStruct.damager.name : "") + " Imbue: " + (collisionInstance.damageStruct.damager?.damagerImbue != null ? collisionInstance.damageStruct.damager.damagerImbue.name : " None") + " Amount: " + collisionInstance.damageStruct.damage.ToString(CultureInfo.InvariantCulture) + " Source: " + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "Unknown") + " on " + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "whole body") + " with Intensity:" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType) + " Penetration: " + ((collisionInstance.damageStruct.damager != null && collisionInstance.damageStruct.damager.data != null) ? (collisionInstance.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
                 }
             }
         }
@@ -1802,19 +1802,17 @@ namespace TactsuitBS
             }
         }
 
-        private void OnLiquidReceptionFunc(ItemModulePotion.Content content)
+        private void LrOnOnReceptionEvent(LiquidData liquid, float dilution, LiquidContainer liquidcontainer)
         {
-            if (content.liquid.type != ItemModulePotion.Liquid.Type.Poison)
+            if (liquid.GetType() != typeof(LiquidPoison))
             {
                 //Play just drinking effect
                 tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PotionDrinking, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                LOG("Player potion drinking. Amount: " + content.liquid.value.ToString(CultureInfo.InvariantCulture) + " Level: " + content.level.ToString(CultureInfo.InvariantCulture));
             }
             else //Poison
             {
                 //Play drinking effect and poisoned effect
                 tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PoisonDrinking, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                LOG("Player poison drinking. Amount: " + content.liquid.value.ToString(CultureInfo.InvariantCulture) + " Level: " + content.level.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -3277,7 +3275,7 @@ namespace TactsuitBS
 
         #region Events
 
-        private void PlayerGotHit(CollisionStruct collisionstruct, bool kill, float fixedLocationHeight)
+        private void PlayerGotHit(CollisionInstance collisionstruct, bool kill, float fixedLocationHeight)
         {
             LOG("Player got hit by something. ImpactVelocity:" + collisionstruct.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture));
 
@@ -3326,9 +3324,19 @@ namespace TactsuitBS
 
             string imbueSpellId = "";
 
-            if (imbue?.spellCastBase?.imbueMaterialId != null && (imbue.spellCastBase.imbueMaterialId != ""))
+            if (imbue?.spellCastBase?.imbueMetalEffectId != null && (imbue.spellCastBase.imbueMetalEffectId != ""))
             {
-                var imbueMaterialData = Catalog.GetData<MaterialData>(imbue.spellCastBase.imbueMaterialId, false);
+                var imbueMaterialData = Catalog.GetData<MaterialData>(imbue.spellCastBase.imbueMetalEffectId, false);
+                imbueSpellId = imbueMaterialData != null ? imbueMaterialData.id : "";
+            }
+            else if (imbue?.spellCastBase?.imbueCrystalEffectId != null && (imbue.spellCastBase.imbueCrystalEffectId != ""))
+            {
+                var imbueMaterialData = Catalog.GetData<MaterialData>(imbue.spellCastBase.imbueCrystalEffectId, false);
+                imbueSpellId = imbueMaterialData != null ? imbueMaterialData.id : "";
+            }
+            else if (imbue?.spellCastBase?.imbueBladeEffectId != null && (imbue.spellCastBase.imbueBladeEffectId != ""))
+            {
+                var imbueMaterialData = Catalog.GetData<MaterialData>(imbue.spellCastBase.imbueBladeEffectId, false);
                 imbueSpellId = imbueMaterialData != null ? imbueMaterialData.id : "";
             }
 
@@ -3338,10 +3346,12 @@ namespace TactsuitBS
                     imbueSpellId = "Lightning";
                 else if (imbue.spellCastBase is SpellCastGravity)
                     imbueSpellId = "Gravity";
+                else if (imbue.spellCastBase is SpellCastProjectile)
+                    imbueSpellId = "Fire";
             }
 
             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGotHitFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial, collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "", 
-                (collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? collisionstruct.damageStruct.damager.data.penetrationSize : DamagerData.PenetrationSize.Small, (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown"), modifiedTargetColliderName, direction, imbueSpellId, (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : ""));
+                (collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? TactsuitVR.PenetrationSize.Small : TactsuitVR.PenetrationSize.Large) : TactsuitVR.PenetrationSize.Small, (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown"), modifiedTargetColliderName, direction, imbueSpellId, (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : ""));
             
             if (!heightCalculated && Math.Abs(fixedLocationHeight) < TOLERANCE && collisionstruct.targetCollider != null)
             {
@@ -3390,7 +3400,7 @@ namespace TactsuitBS
             }
 
             if(Logging)
-                LOG("Player got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " DamagerDataId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : "") + " DamagerDataMaterialDamageId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.materialDamageId : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationSize == DamagerData.PenetrationSize.Small ? "Small" : "Large") : ""));
+                LOG("Player got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " DamagerDataId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : "") + " DamagerDataMaterialDamageId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.damageModifierId : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
 
             bool reflected = modifiedTargetColliderName.Contains("Arm") && modifiedTargetColliderName.Contains("Left");
             
@@ -3403,7 +3413,7 @@ namespace TactsuitBS
 
         }
 
-        private void OnCreatureHitFunc(Creature creature, ref CollisionStruct collisionstruct)
+        private void OnCreatureHitFunc(Creature creature, CollisionInstance collisionstruct)
         {
             if (creature && Player.local && Player.local.creature && Player.local.creature == creature)
             {
@@ -3414,7 +3424,7 @@ namespace TactsuitBS
             else if (creature && Player.local && Player.local.creature && Player.local.creature != creature)
             {
                 //For debug purposes
-                LOG("------------------------>An NPC got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Source:" + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + collisionstruct.targetCollider.name + " with Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionstruct.sourceMaterial != null && collisionstruct.targetMaterial != null) ? ("Materials: " + collisionstruct.sourceMaterial.id + " > " + collisionstruct.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationSize == DamagerData.PenetrationSize.Small ? "Small" : "Large") : ""));
+                LOG("------------------------>An NPC got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Source:" + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + collisionstruct.targetCollider.name + " with Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionstruct.sourceMaterial != null && collisionstruct.targetMaterial != null) ? ("Materials: " + collisionstruct.sourceMaterial.id + " > " + collisionstruct.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
             }
 
             if (collisionstruct.intensity > 0.01f)
@@ -3426,7 +3436,7 @@ namespace TactsuitBS
 
                     if ((bool) (UnityEngine.Object) collisionstruct.sourceColliderGroup.collisionHandler?.item?.rightPlayerHand)
                     {
-                        if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemPhysic.Type.Body) //punch
+                        if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemData.Type.Body) //punch
                         {
                             TactsuitVR.FeedbackType feedback = GetPlayerPunchFeedback(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "");
                             tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
@@ -3442,7 +3452,7 @@ namespace TactsuitBS
 
                     if ((bool) (UnityEngine.Object) collisionstruct.sourceColliderGroup.collisionHandler?.item?.leftPlayerHand)
                     {
-                        if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemPhysic.Type.Body) //punch
+                        if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemData.Type.Body) //punch
                         {
                             TactsuitVR.FeedbackType feedback = GetPlayerPunchFeedback(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "");
                             tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
@@ -3476,7 +3486,7 @@ namespace TactsuitBS
             }
         }
 
-        private void OnCreatureParryFunc(Creature creature, ref CollisionStruct collisionstruct)
+        private void OnCreatureParryFunc(Creature creature, CollisionInstance collisionstruct)
         {
             if (collisionstruct.damageStruct.damage <= 0.00001f)
                 return;
@@ -3518,7 +3528,7 @@ namespace TactsuitBS
             }
         }
         
-        private void OnKillFunc(ref CollisionStruct collisionstruct, EventTime eventTime)
+        private void OnKillFunc(CollisionInstance collisionstruct, EventTime eventTime)
         {
             if (eventTime != EventTime.OnStart)
                 return;
@@ -3531,7 +3541,7 @@ namespace TactsuitBS
             lastFrameVelocity = Vector3.zero;
         }
 
-        private void OnCreatureKillFunc(Creature creature, Player player, ref CollisionStruct collisionstruct, EventTime eventTime)
+        private void OnCreatureKillFunc(Creature creature, Player player, CollisionInstance collisionstruct, EventTime eventTime)
         {
             if (creature && Player.local && Player.local.creature && Player.local.creature == creature)
             {

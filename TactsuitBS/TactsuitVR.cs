@@ -12,6 +12,7 @@ namespace TactsuitBS
 {
     public class TactsuitVR
     {
+        #region intensities
         public float IntensityDefaultDamage = 1.0f;
         public float IntensityPlayerBowPull = 1.0f;
 
@@ -268,8 +269,13 @@ namespace TactsuitBS
 
         public float IntensityShoulderTurret = 1.0f;
         public float IntensityHoverJetFeet = 1.0f;
+        #endregion
 
-
+        public enum PenetrationSize
+        {
+            Small,
+            Large
+        }
 
         public bool Logging = false;
         
@@ -1365,7 +1371,7 @@ namespace TactsuitBS
             
         }
 
-        public static FeedbackType GetPlayerGotHitFeedbackType(DamageType damageType, MaterialData sourceMaterialData, MaterialData targetMaterialData, string spellId, DamagerData.PenetrationSize penetrationSize, string sourceColliderName, string targetColliderName, Direction direction, string imbueSpellId, string damagerId)
+        public static FeedbackType GetPlayerGotHitFeedbackType(DamageType damageType, MaterialData sourceMaterialData, MaterialData targetMaterialData, string spellId, PenetrationSize penetrationSize, string sourceColliderName, string targetColliderName, Direction direction, string imbueSpellId, string damagerId)
         {
             string sourceMaterial = "";
             string targetMaterial = "";
@@ -1410,7 +1416,7 @@ namespace TactsuitBS
                 }
                 else if (damageType == DamageType.Pierce)
                 {
-                    if (penetrationSize == DamagerData.PenetrationSize.Small)
+                    if (penetrationSize == PenetrationSize.Small)
                     {
                         if (sourceMaterial == "Lightsaber")
                         {
@@ -1499,7 +1505,7 @@ namespace TactsuitBS
                 }
                 else if (damageType == DamageType.Slash)
                 {
-                    if (penetrationSize == DamagerData.PenetrationSize.Small)
+                    if (penetrationSize == PenetrationSize.Small)
                     {
                         if (sourceMaterial == "Lightsaber")
                         {
@@ -1624,7 +1630,7 @@ namespace TactsuitBS
                 }
                 else //Blunt
                 {
-                    if (penetrationSize == DamagerData.PenetrationSize.Small)
+                    if (penetrationSize == PenetrationSize.Small)
                     {
                         if (sourceMaterial == "Lightsaber")
                         {
@@ -1745,7 +1751,7 @@ namespace TactsuitBS
                     }
                     else if (damageType == DamageType.Pierce)
                     {
-                        if (penetrationSize == DamagerData.PenetrationSize.Small)
+                        if (penetrationSize == PenetrationSize.Small)
                         {
                             if (sourceMaterial == "Lightsaber")
                             {
@@ -1834,7 +1840,7 @@ namespace TactsuitBS
                     }
                     else if (damageType == DamageType.Slash)
                     {
-                        if (penetrationSize == DamagerData.PenetrationSize.Small)
+                        if (penetrationSize == PenetrationSize.Small)
                         {
                             if (sourceMaterial == "Lightsaber")
                             {
@@ -1955,7 +1961,7 @@ namespace TactsuitBS
                     }
                     else //Blunt
                     {
-                        if (penetrationSize == DamagerData.PenetrationSize.Small)
+                        if (penetrationSize == PenetrationSize.Small)
                         {
                             if (sourceMaterial == "Lightsaber")
                             {
@@ -2078,7 +2084,7 @@ namespace TactsuitBS
                     }
                     else if (damageType == DamageType.Pierce)
                     {
-                        if (penetrationSize == DamagerData.PenetrationSize.Small)
+                        if (penetrationSize == PenetrationSize.Small)
                         {
                             if (sourceMaterial == "Lightsaber")
                             {
@@ -2167,7 +2173,7 @@ namespace TactsuitBS
                     }
                     else if (damageType == DamageType.Slash)
                     {
-                        if (penetrationSize == DamagerData.PenetrationSize.Small)
+                        if (penetrationSize == PenetrationSize.Small)
                         {
                             if (sourceMaterial.Contains("Fire") || imbueSpellId.Contains("Fire"))
                             {
@@ -2405,7 +2411,7 @@ namespace TactsuitBS
                     }
                     else //Blunt
                     {
-                        if (penetrationSize == DamagerData.PenetrationSize.Small)
+                        if (penetrationSize == PenetrationSize.Small)
                         {
                             if (sourceMaterial == "Lightsaber")
                             {

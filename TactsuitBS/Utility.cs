@@ -23,7 +23,7 @@ namespace TactsuitBS
         {
             try
             {
-                using (StreamWriter w = File.AppendText("BladeAndSorcery_Data\\StreamingAssets\\TactsuitBS\\TactsuitBSLog.log"))
+                using (StreamWriter w = File.AppendText("BladeAndSorcery_Data\\StreamingAssets\\Mods\\TactsuitBS\\TactsuitBSLog_" + DateTime.Now.ToString("yyyyMMdd") + ".log"))
                 {
                     w.WriteLine(logStr);
                 }
@@ -80,9 +80,9 @@ namespace TactsuitBS
         {
             float angle = 0.0f;
 
-            if (Player.local != null && Player.local.body != null && Player.local.body.creature != null && Player.local.body.creature.initialized)
+            if (Player.local != null && Player.local.creature != null && Player.local.creature.initialized)
             {
-                angle = UnityEngine.Vector3.SignedAngle(Player.local.body.creature.transform.forward.ToXZ(), pos.ToXZ() - Player.local.body.creature.transform.position.ToXZ(), Vector3.up);
+                angle = UnityEngine.Vector3.SignedAngle(Player.local.creature.transform.forward.ToXZ(), pos.ToXZ() - Player.local.creature.transform.position.ToXZ(), Vector3.up);
                 if (angle < 0)
                 {
                     angle = -180 - angle;
@@ -211,6 +211,16 @@ namespace TactsuitBS
             }
 
             return ret;
+        }
+
+        public static string ReplaceFirst(string text, string search, string replace)
+        {
+            int pos = text.IndexOf(search, StringComparison.Ordinal);
+            if (pos < 0)
+            {
+                return text;
+            }
+            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
         }
     }
 }

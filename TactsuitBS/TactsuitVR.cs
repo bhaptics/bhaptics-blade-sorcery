@@ -2536,7 +2536,7 @@ namespace TactsuitBS
 
         void RegisterFeedbackFiles()
         {
-            string configPath = Directory.GetCurrentDirectory() + "\\BladeAndSorcery_Data\\StreamingAssets";
+            string configPath = Directory.GetCurrentDirectory() + "\\BladeAndSorcery_Data\\StreamingAssets\\Mods";
 
             DirectoryInfo d = new DirectoryInfo(configPath);
             FileInfo[] Files = d.GetFiles("*.tact", SearchOption.AllDirectories);
@@ -2946,13 +2946,18 @@ namespace TactsuitBS
                 float intensityMultiplier = GetIntensityMultiplier(effect)*intensity;
                 if (intensityMultiplier > 0.01f)
                 {
-                    Thread thread = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
-                    thread.Start();
+                    ThreadPool.QueueUserWorkItem(state => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
                     if (secondEffect != FeedbackType.NoFeedback)
                     {
-                        Thread thread2 = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
-                        thread2.Start();
+                        ThreadPool.QueueUserWorkItem(state => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
                     }
+                    //Thread thread = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
+                    //thread.Start();
+                    //if (secondEffect != FeedbackType.NoFeedback)
+                    //{
+                    //    Thread thread2 = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
+                    //    thread2.Start();
+                    //}
                 }
             }
         }

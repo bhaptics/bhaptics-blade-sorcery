@@ -595,7 +595,7 @@ namespace TactsuitBS
         }
 
         public bool systemInitialized = false;
-        public HapticPlayer hapticPlayer;
+        //public HapticPlayer hapticPlayer;
 
         public Dictionary<FeedbackType, Feedback> feedbackMap = new Dictionary<FeedbackType, Feedback>();
 
@@ -2526,7 +2526,7 @@ namespace TactsuitBS
                 feedbackMap[feedback.feedbackType] = f;
 
                 string tactFileStr = File.ReadAllText(fullname);
-                hapticPlayer.RegisterTactFileStr(feedback.prefix + (feedbackMap[feedback.feedbackType].feedbackFileCount).ToString(), tactFileStr);
+                Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().RegisterTactFileStr(feedback.prefix + (feedbackMap[feedback.feedbackType].feedbackFileCount).ToString(), tactFileStr);
                 if (feedback.prefix.Contains("Right"))
                 {
                     string reflectedStr = tactFileStr;
@@ -2535,7 +2535,7 @@ namespace TactsuitBS
                     if (reflectedStr.Contains("Foot"))
                         reflectedStr = reflectedStr.Replace("\"FootR\"", "\"FootM\"").Replace("\"FootL\"", "\"FootR\"").Replace("\"FootM\"", "\"FootL\"");
 
-                    hapticPlayer.RegisterTactFileStr("Reflected_" + feedback.prefix + (feedbackMap[feedback.feedbackType].feedbackFileCount).ToString(), reflectedStr);
+                    Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().RegisterTactFileStr("Reflected_" + feedback.prefix + (feedbackMap[feedback.feedbackType].feedbackFileCount).ToString(), reflectedStr);
                 }
             }
         }
@@ -2568,16 +2568,25 @@ namespace TactsuitBS
             
         }
 
+        private readonly object syncLock = new object();
+
         public void CreateSystem()
         {
-            if (!systemInitialized)
+            lock (syncLock)
             {
-                hapticPlayer = new Bhaptics.Tact.HapticPlayer("mod_blade_sorcery", "mod_blade_sorcery");
-
-                if (hapticPlayer != null)
+                if (!systemInitialized || Bhaptics.Tact.HapticPlayerManager.Instance() == null || Bhaptics.Tact.HapticPlayerManager.Instance().Connected == false)
                 {
-                    RegisterFeedbackFiles();
-                    systemInitialized = true;
+                    if (Bhaptics.Tact.HapticPlayerManager.Instance() == null || Bhaptics.Tact.HapticPlayerManager.Instance().Connected == false)
+                    {
+                        LOG("No connection to bHaptics Player. Reconnecting.");
+                    }
+                    Bhaptics.Tact.HapticPlayerManager.SetAppInfo("mod_blade_sorcery", "mod_blade_sorcery");
+
+                    if (Bhaptics.Tact.HapticPlayerManager.Instance() != null || Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer()!=null)
+                    {
+                        RegisterFeedbackFiles();
+                        systemInitialized = true;
+                    }
                 }
             }
         }
@@ -2587,7 +2596,7 @@ namespace TactsuitBS
             for (int i = 1; i <= feedbackFileCount; i++)
             {
                 string key = (reflected ? "Reflected_" : "") + prefix + i.ToString();
-                if (hapticPlayer.IsPlaying(key))
+                if (Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsPlaying(key))
                 {
                     return true;
                 }
@@ -2896,23 +2905,23 @@ namespace TactsuitBS
             if (intensity < 0.001f)
                 return;
 
-            if (!systemInitialized || hapticPlayer == null)
+            if (!systemInitialized || Bhaptics.Tact.HapticPlayerManager.Instance() == null || Bhaptics.Tact.HapticPlayerManager.Instance().Connected == false)
                 CreateSystem();
             
             List<DotPoint> points = new List<DotPoint>() { new DotPoint(index, intensity) };
-            
-            hapticPlayer.Submit("", position, points, durationMillis);
+
+            Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().Submit("", position, points, durationMillis);
         }
 
         public void ProvideHapticFeedbackThread(float locationAngle, float locationHeight, FeedbackType effect, float intensityMultiplier, bool waitToPlay, bool reflected, float duration = 1.0f)
         {
             if (intensityMultiplier < 0.001f)
                 return;
-
-            if (!systemInitialized || hapticPlayer == null)
+            
+            if (!systemInitialized || Bhaptics.Tact.HapticPlayerManager.Instance()==null || Bhaptics.Tact.HapticPlayerManager.Instance().Connected == false)
                 CreateSystem();
 
-            if (hapticPlayer != null)
+            if (Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer() != null)
             {
                 if (feedbackMap.ContainsKey(effect))
                 {
@@ -2938,7 +2947,7 @@ namespace TactsuitBS
                         Bhaptics.Tact.ScaleOption scaleOption = new ScaleOption(intensityMultiplier, duration);
 
                         //hapticPlayer.SubmitRegistered(key, scaleOption);
-                        hapticPlayer.SubmitRegisteredVestRotation(key, key, RotOption, scaleOption);
+                        Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().SubmitRegisteredVestRotation(key, key, RotOption, scaleOption);
                         LOG("===> Submitted Feedback: " + key + " Intensity: " + intensityMultiplier + " Height: " + locationHeight + " Angle: " + locationAngle);
                     }
                 }
@@ -2952,25 +2961,25 @@ namespace TactsuitBS
                 float intensityMultiplier = GetIntensityMultiplier(effect)*intensity;
                 if (intensityMultiplier > 0.01f)
                 {
-                    ThreadPool.QueueUserWorkItem(state => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
-                    if (secondEffect != FeedbackType.NoFeedback)
-                    {
-                        ThreadPool.QueueUserWorkItem(state => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
-                    }
-                    //Thread thread = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
-                    //thread.Start();
+                    //ThreadPool.QueueUserWorkItem(state => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
                     //if (secondEffect != FeedbackType.NoFeedback)
                     //{
-                    //    Thread thread2 = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
-                    //    thread2.Start();
+                    //    ThreadPool.QueueUserWorkItem(state => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
                     //}
+                    Thread thread = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, effect, intensityMultiplier, waitToPlay, reflected, duration));
+                    thread.Start();
+                    if (secondEffect != FeedbackType.NoFeedback)
+                    {
+                        Thread thread2 = new Thread(() => ProvideHapticFeedbackThread(locationAngle, locationHeight, secondEffect, intensityMultiplier, waitToPlay, reflected, duration));
+                        thread2.Start();
+                    }
                 }
             }
         }
 
         public void StopHapticFeedback(FeedbackType effect)
         {
-            if (hapticPlayer != null)
+            if (Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer() != null)
             {
                 if (feedbackMap.ContainsKey(effect))
                 {
@@ -2979,7 +2988,7 @@ namespace TactsuitBS
                         for (int i = 1; i <= feedbackMap[effect].feedbackFileCount; i++)
                         {
                             string key = feedbackMap[effect].prefix + i.ToString();
-                            hapticPlayer.TurnOff(key);
+                            Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().TurnOff(key);
                         }
                     }
                 }
@@ -3075,7 +3084,7 @@ namespace TactsuitBS
         {
             for (int i = 1; i <= feedbackMap[effect].feedbackFileCount; i++)
             {
-                hapticPlayer.TurnOff(feedbackMap[effect].prefix + i.ToString());
+                Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().TurnOff(feedbackMap[effect].prefix + i.ToString());
             }
         }
     }

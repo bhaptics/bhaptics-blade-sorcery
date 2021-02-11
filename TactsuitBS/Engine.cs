@@ -424,6 +424,7 @@ namespace TactsuitBS
         public override IEnumerator OnLoadCoroutine(Level level)
         {
             tactsuitVr = new TactsuitVR();
+            Bhaptics.Tact.HapticPlayerManager.SetAppInfo("mod_blade_sorcery", "mod_blade_sorcery");
             tactsuitVr.CreateSystem();
 
             #region Intensities
@@ -859,15 +860,6 @@ namespace TactsuitBS
 
         public override void Update(Level level)
         {
-            if (GameManager.isQuitting)
-            {
-                if (tactsuitVr != null && tactsuitVr.hapticPlayer != null)
-                {
-                    tactsuitVr.hapticPlayer.Disable();
-                    tactsuitVr.hapticPlayer.Dispose();
-                }
-            }
-
             gamePaused = MenuBook.local.book.GetBookState() == PBook.BookState.OPEN;
             
             if (level.loaded)
@@ -1106,7 +1098,7 @@ namespace TactsuitBS
                     return TactsuitVR.FeedbackType.PlayerKickMetalRight;
                 else if (material.Contains("Fabric"))
                     return TactsuitVR.FeedbackType.PlayerKickFabricRight;
-                else if (material.Contains("Flesh") || material.Contains("Sand"))
+                else if (material.Contains("Flesh") || material.Contains("Sand") || material.Contains("Leather"))
                     return TactsuitVR.FeedbackType.PlayerKickFleshRight;
                 else
                     return TactsuitVR.FeedbackType.PlayerKickOtherRight;
@@ -3290,7 +3282,7 @@ namespace TactsuitBS
             bool heightCalculated = false;
             if (PlayFallbackEffectsForArmHead && !targetColliderName.IsNullOrEmpty())
             {
-                if (targetColliderName.Contains("Head") && !tactsuitVr.hapticPlayer.IsActive(PositionType.Head))
+                if (targetColliderName.Contains("Head") && !Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.Head))
                 {
                     modifiedTargetColliderName = "Neck";
                     if (hitAngle > 90f && hitAngle < 270f) hitAngle = 180f;
@@ -3298,14 +3290,14 @@ namespace TactsuitBS
                 }
                 else if(targetColliderName.Contains("Arm"))
                 {
-                    if (targetColliderName.Contains("Left") && !tactsuitVr.hapticPlayer.IsActive(PositionType.ForearmL))
+                    if (targetColliderName.Contains("Left") && !Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.ForearmL))
                     {
                         modifiedTargetColliderName = "Part_LeftShoulder";
                         locationHeight = 0.45f;
                         hitAngle = 90f;
                         heightCalculated = true;
                     }
-                    else if (targetColliderName.Contains("Right") && !tactsuitVr.hapticPlayer.IsActive(PositionType.ForearmR))
+                    else if (targetColliderName.Contains("Right") && !Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.ForearmR))
                     {
                         modifiedTargetColliderName = "Part_RightShoulder";
                         locationHeight = 0.45f;

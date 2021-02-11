@@ -10,7 +10,7 @@
 					"$type": "TactsuitBS.Engine, TactsuitBS",
 
 					//General settings:
-					"Logging": false, //Enables logging which creates a TactsuitBSLog.log file in Blade & Sorcery\BladeAndSorcery_Data\StreamingAssets\TactsuitBS folder. Appends the previous log file.
+					"Logging": false, //Enables logging which creates a TactsuitBSLog.log file in Blade & Sorcery\BladeAndSorcery_Data\StreamingAssets\Mods\TactsuitBS folder. Appends the previous log file.
 
 					//Disable/Enable effects
 					"GravityEffectOnArms": false, //Enables Gravity spell effect on arms when hit.
@@ -256,17 +256,17 @@
 					"IntensityPotionDrinking": 0.8,
 					"IntensityPoisonDrinking": 1.0,
 
-					"IntensityFallDamage": 1.2,
-					"IntensityFallDamageFeet": 1.0,
+					"IntensityFallDamage": 1.7,
+					"IntensityFallDamageFeet": 1.7,
 
 					"IntensitySlowMotion": 0.8,
 
-					"IntensityHolster": 0.9,
-					"IntensityUnholster": 0.9,
-					"IntensityHolsterArrow": 0.9,
-					"IntensityUnholsterArrow": 0.9,
+					"IntensityHolster": 1.0,
+					"IntensityUnholster": 1.0,
+					"IntensityHolsterArrow": 1.0,
+					"IntensityUnholsterArrow": 1.0,
 
-					"IntensityClimbing": 1.2,
+					"IntensityClimbing": 1.1,
 
 					"IntensityPlayerKickOther": 3.0,
 					"IntensityPlayerKickWood": 3.0,
@@ -275,12 +275,12 @@
 					"IntensityPlayerKickMetal": 3.0,
 					"IntensityPlayerKickFabric": 3.0,
 
-					"IntensityPlayerPunchOther": 3.0,
-					"IntensityPlayerPunchWood": 3.0,
-					"IntensityPlayerPunchFlesh": 3.0,
-					"IntensityPlayerPunchStone": 3.0,
-					"IntensityPlayerPunchMetal": 3.0,
-					"IntensityPlayerPunchFabric": 3.0,
+					"IntensityPlayerPunchOther": 4.0,
+					"IntensityPlayerPunchWood": 4.0,
+					"IntensityPlayerPunchFlesh": 4.0,
+					"IntensityPlayerPunchStone": 4.0,
+					"IntensityPlayerPunchMetal": 4.0,
+					"IntensityPlayerPunchFabric": 4.0,
 
 					"IntensityPlayerGun": 1.0,
 					"IntensityPlayerGunBlaster": 1.2,

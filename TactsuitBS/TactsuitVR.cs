@@ -1384,8 +1384,9 @@ namespace TactsuitBS
             {
                 targetMaterial = targetMaterialData.id;
             }
+            
 
-            if (targetColliderName.Contains("Arm") && (targetColliderName.Contains("Left") || targetColliderName.Contains("Right")))
+            if ((targetColliderName.Contains("Arm") || targetColliderName.Contains("Hand")) && (targetColliderName.Contains("Left") || targetColliderName.Contains("Right")))
             {
                 if (damagerId == "BlasterBolt")
                 {

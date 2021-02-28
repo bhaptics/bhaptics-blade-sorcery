@@ -3274,7 +3274,7 @@ namespace TactsuitBS
             float hitAngle = Utility.GetAngleForPosition(collisionstruct.contactPoint);
             Direction direction = Utility.GetDirectionFromVector(collisionstruct.impactVelocity, collisionstruct.contactPoint, hitAngle);
 
-            string targetColliderName = collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "";
+            string targetColliderName = (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "") + " " + (collisionstruct.targetColliderGroup?.collisionHandler != null ? collisionstruct.targetColliderGroup.collisionHandler.name : "");
 
             float locationHeight = fixedLocationHeight;
 
@@ -3342,6 +3342,10 @@ namespace TactsuitBS
                     imbueSpellId = "Fire";
             }
 
+            if (Logging)
+                LOG("Player got hit: TargetCollider: " + modifiedTargetColliderName + " TargetColliderGroup: " + (collisionstruct.targetColliderGroup?.collisionHandler != null ? collisionstruct.targetColliderGroup.collisionHandler.name : "null") + " SourceCollider:" + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " TargetMaterial: " +(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "null") + " SourceMaterial:" + (collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "null"));
+
+
             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGotHitFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial, collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "", 
                 (collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? TactsuitVR.PenetrationSize.Small : TactsuitVR.PenetrationSize.Large) : TactsuitVR.PenetrationSize.Small, (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown"), modifiedTargetColliderName, direction, imbueSpellId, (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : ""));
             
@@ -3394,7 +3398,7 @@ namespace TactsuitBS
             if(Logging)
                 LOG("Player got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " DamagerDataId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : "") + " DamagerDataMaterialDamageId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.damageModifierId : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
 
-            bool reflected = modifiedTargetColliderName.Contains("Arm") && modifiedTargetColliderName.Contains("Left");
+            bool reflected = (modifiedTargetColliderName.Contains("Arm") || modifiedTargetColliderName.Contains("Hand")) && modifiedTargetColliderName.Contains("Left");
             
             tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, kill ? intensity * 5f : intensity, TactsuitVR.FeedbackType.NoFeedback, reflected);
             if (kill)

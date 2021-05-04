@@ -2938,10 +2938,10 @@ namespace TactsuitBS
 
                         string key = (reflected ? "Reflected_" : "") + feedbackMap[effect].prefix + (RandomNumber.Between(1, feedbackMap[effect].feedbackFileCount)).ToString();
 
-                        if (locationHeight < -0.5f)
-                            locationHeight = -0.5f;
-                        else if (locationHeight > 0.5f)
-                            locationHeight = 0.5f;
+                        if (locationHeight < -0.485f)
+                            locationHeight = -0.485f;
+                        else if (locationHeight > 0.485f)
+                            locationHeight = 0.485f;
 
                         Bhaptics.Tact.RotationOption RotOption = new RotationOption(locationAngle, locationHeight);
 

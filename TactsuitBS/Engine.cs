@@ -942,11 +942,13 @@ namespace TactsuitBS
                     //Holder found on Player: BackLeft
                     if (holder.name == "BackLeft")
                     {
+                        LOG("BackLeft holder. Adding snap unsnap.");
                         holder.Snapped += HolsterLeftShoulderFunc;
                         holder.UnSnapped += UnHolsterLeftShoulderFunc;
                     }
                     else if (holder.name == "BackRight")
                     {
+                        LOG("BackRight holder. Adding snap unsnap.");
                         holder.Snapped += HolsterRightShoulderFunc;
                         holder.UnSnapped += UnHolsterRightShoulderFunc;
                     }
@@ -955,25 +957,34 @@ namespace TactsuitBS
                     {
                         if (holdObject.data.type == ItemData.Type.Quiver)
                         {
-                            ItemQuiver quiver = holdObject.GetComponent<ItemQuiver>();
-                            if (quiver?.holder != null)
+                            Holder[] otherholders = holdObject.GetComponentsInChildren<Holder>();
+                            foreach (Holder otherholder in otherholders)
                             {
-                                if (holder.name == "BackLeft")
+                                if (otherholder != null)
                                 {
-                                    quiver.holder.Snapped += new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                                    quiver.holder.UnSnapped += new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                                    if (holder.name == "BackLeft")
+                                    {
+                                        LOG("BackLeft Quiver has holder. Adding snap unsnap for: " + otherholder.name);
+                                        otherholder.Snapped -= new Holder.HolderDelegate(LeftProjectileAddedFunc);
+                                        otherholder.Snapped += new Holder.HolderDelegate(LeftProjectileAddedFunc);
+                                        otherholder.UnSnapped -= new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                                        otherholder.UnSnapped += new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                                    }
+                                    else if (holder.name == "BackRight")
+                                    {
+                                        LOG("BackRight Quiver has holder. Adding snap unsnap for: " + otherholder.name);
+                                        otherholder.Snapped -= new Holder.HolderDelegate(RightProjectileAddedFunc);
+                                        otherholder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
+                                        otherholder.UnSnapped -= new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                                        otherholder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                                    }
                                 }
-                                else if (holder.name == "BackRight")
-                                {
-                                    quiver.holder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
-                                    quiver.holder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
-                                }
-
                             }
                         }
                     }
                 }
             }
+            LOG("Shoulder events added.");
 
             List<CollisionHandler> playerCollisionHandlersList = new List<CollisionHandler>((IEnumerable<CollisionHandler>)Player.local.GetComponentsInChildren<CollisionHandler>());
 
@@ -1305,13 +1316,17 @@ namespace TactsuitBS
             if (!gamePaused && !GameManager.timeStopped && item != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                
                 if (item.data.type == ItemData.Type.Quiver)
                 {
-                    ItemQuiver quiver = item.GetComponent<ItemQuiver>();
-                    if (quiver?.holder != null)
+                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
+                    foreach (Holder otherholder in otherholders)
                     {
-                        quiver.holder.Snapped -= new Holder.HolderDelegate(RightProjectileAddedFunc);
-                        quiver.holder.UnSnapped -= new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                        if (otherholder != null)
+                        {
+                            otherholder.Snapped -= new Holder.HolderDelegate(RightProjectileAddedFunc);
+                            otherholder.UnSnapped -= new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                        }
                     }
                 }
 
@@ -1326,11 +1341,14 @@ namespace TactsuitBS
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                 if (item.data.type == ItemData.Type.Quiver)
                 {
-                    ItemQuiver quiver = item.GetComponent<ItemQuiver>();
-                    if (quiver?.holder != null)
+                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
+                    foreach (Holder otherholder in otherholders)
                     {
-                        quiver.holder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
-                        quiver.holder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                        if (otherholder != null)
+                        {
+                            otherholder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
+                            otherholder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                        }
                     }
                 }
 
@@ -1345,11 +1363,14 @@ namespace TactsuitBS
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                 if (item.data.type == ItemData.Type.Quiver)
                 {
-                    ItemQuiver quiver = item.GetComponent<ItemQuiver>();
-                    if (quiver?.holder != null)
+                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
+                    foreach (Holder otherholder in otherholders)
                     {
-                        quiver.holder.Snapped -= new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                        quiver.holder.UnSnapped -= new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                        if (otherholder != null)
+                        {
+                            otherholder.Snapped -= new Holder.HolderDelegate(LeftProjectileAddedFunc);
+                            otherholder.UnSnapped -= new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                        }
                     }
                 }
 
@@ -1364,11 +1385,14 @@ namespace TactsuitBS
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                 if (item.data.type == ItemData.Type.Quiver)
                 {
-                    ItemQuiver quiver = item.GetComponent<ItemQuiver>();
-                    if (quiver?.holder != null)
+                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
+                    foreach (Holder otherholder in otherholders)
                     {
-                        quiver.holder.Snapped += new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                        quiver.holder.UnSnapped += new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                        if (otherholder != null)
+                        {
+                            otherholder.Snapped += new Holder.HolderDelegate(LeftProjectileAddedFunc);
+                            otherholder.UnSnapped += new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                        }
                     }
                 }
 

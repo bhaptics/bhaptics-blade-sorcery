@@ -14,6 +14,7 @@ using CustomWebSocketSharp;
 using Newtonsoft.Json.Linq;
 using TLGFPowerBooks;
 using UnityEngine.SceneManagement;
+using HarmonyLib;
 
 namespace TactsuitBS
 {
@@ -25,10 +26,10 @@ namespace TactsuitBS
 
         public bool Logging = true;
 
-        public bool GravityEffectOnArms = false;
-        public bool GravityEffectOnHead = false;
-        public bool PlayFallbackEffectsForArmHead = true;
-        public bool NoFallEffectWhenFallDamageIsDisabled = false;
+        public static bool GravityEffectOnArms = false;
+        public static bool GravityEffectOnHead = false;
+        public static bool PlayFallbackEffectsForArmHead = true;
+        public static bool NoFallEffectWhenFallDamageIsDisabled = false;
 
 
         //Rain
@@ -43,14 +44,16 @@ namespace TactsuitBS
 
 
         //Sleep Durations
-        public int SleepDurationHeartBeat = 900;
-        public int SleepDurationHeartBeatFast = 500;
-        public int SleepDurationSpellCast = 500;
-        public int SleepDurationBowString = 500;
-        public int SleepDurationShootGun = 200;
-        public int SleepDurationClimb = 500;
-        public int SleepDurationSlowMotion = 1500;
-        public int SleepDurationSpellHit = 300;
+        public static int SleepDurationHeartBeat = 900;
+        public static int SleepDurationHeartBeatFast = 500;
+        public static int SleepDurationSpellCast = 500;
+        public static int SleepDurationBowString = 500;
+        public static int SleepDurationShootGun = 200;
+        public static int SleepDurationClimb = 500;
+        public static int SleepDurationSlowMotion = 1500;
+        public static int SleepDurationSpellHit = 300;
+        public static int SleepDurationStuckArrow = 50;
+
 
         //public float StuckArrowIntensityMultiplier = 0.4f;
         //public float StuckArrowDurationMultiplier = 4.0f;
@@ -304,6 +307,9 @@ namespace TactsuitBS
         public float IntensityShoulderTurret = 1.0f;
         public float IntensityHoverJetFeet = 1.0f;
 
+        public float IntensityMultiplierStuckArrow = 0.05f;
+
+
         #endregion
 
         //Private parameters
@@ -313,14 +319,11 @@ namespace TactsuitBS
         private bool eventsCreated = false;
 
         //private bool playerEventsCreated = false;
-        private TactsuitVR tactsuitVr;
+        private static TactsuitVR tactsuitVr;
         private bool Heartbeating = false;
         private bool HeartbeatingFast = false;
-        private bool gamePaused = false;
-        private bool CastingLeft = false;
-        private bool CastingRight = false;
-        private string CastingLeftSpellId = "";
-        private string CastingRightSpellId = "";
+        private static bool gamePaused = false;
+        
 
         private bool TelekinesisPullLeft = false;
         private bool TelekinesisPullRight = false;
@@ -359,8 +362,6 @@ namespace TactsuitBS
         private float deltaTime = 0.0f;
         private float shootGunCheckTimeLeft = 0.0f;
         private float climbingCheckTimeLeft = 0.0f;
-        private float hapticCheckTimeLeft = 0.0f;
-        private float hapticCheckTimeRight = 0.0f;
 
         private bool bowStringHeld = false;
 
@@ -409,6 +410,9 @@ namespace TactsuitBS
 
         Dictionary<string, bool> GunUseMultipleShotMap = new Dictionary<string, bool>();
         Dictionary<string, bool> GunAltUseMultipleShotMap = new Dictionary<string, bool>();
+
+        private Harmony harmony;
+
         #endregion
 
         void LOG(string logStr)
@@ -421,7 +425,7 @@ namespace TactsuitBS
 
         #region Overrides
 
-        public override IEnumerator OnLoadCoroutine(Level level)
+        public override IEnumerator OnLoadCoroutine()
         {
             tactsuitVr = new TactsuitVR();
             Bhaptics.Tact.HapticPlayerManager.SetAppInfo("mod_blade_sorcery", "mod_blade_sorcery");
@@ -679,6 +683,9 @@ namespace TactsuitBS
 
             #endregion
 
+            this.harmony = new Harmony("com.shizof.bhaptics");
+            this.harmony.PatchAll(Assembly.GetExecutingAssembly());
+
             LOG("Loaded.");
 
             foreach (TactsuitVR.FeedbackType f in Enum.GetValues(typeof(TactsuitVR.FeedbackType)))
@@ -708,7 +715,16 @@ namespace TactsuitBS
             SceneManager.sceneLoaded += this.OnSceneLoadedFunc;
             SceneManager.sceneUnloaded += this.OnSceneUnloadedFunc;
 
-            return base.OnLoadCoroutine(level);
+            Player.onSpawn += new Player.SpawnEvent(this.OnPlayerSpawned);
+
+
+            return base.OnLoadCoroutine();
+        }
+
+        private void OnPlayerSpawned(Player player)
+        {            
+            Thread thread = new Thread(CheckPlayerSpawn);
+            thread.Start();
         }
 
         private void OnSceneUnloadedFunc(Scene scene)
@@ -829,7 +845,7 @@ namespace TactsuitBS
                                     }
                                 }
                             }
-                            else if (jsonFileStr.Contains("TheOuterRim"))
+                            else if (jsonFileStr.Contains("TheOuterRim") || jsonFileStr.Contains("GunScript") || jsonFileStr.Contains("Shoot"))
                             {
                                 JObject obj = JObject.Parse(jsonFileStr);
                                 if (obj != null)
@@ -853,44 +869,43 @@ namespace TactsuitBS
             GunUseMultipleShotMap["GrappleGun"] = false;
             GunUseMultipleShotMap["BatmanGrapple"] = false;
 
+            
+
+            //Support for Piepop101's Glock and Gun Framework
+            VFXList.Add("bulletShotVFX");
+            SFXList.Add("bulletShotSFX"); 
+
             LOG("Found Gun VFX count: " + VFXList.Count + " Gun SFX count: " + SFXList.Count);
             LOG("Found Gun VFXs: " + String.Join(", ", VFXList));
             LOG("Found Gun SFXs: " + String.Join(", ", SFXList));
         }
 
-        public override void Update(Level level)
+        public override void Update()
         {
             gamePaused = MenuBook.local.book.GetBookState() == PBook.BookState.OPEN;
-            
-            if (level.loaded)
+                        
+            if (!eventsCreated)
             {
-                if (!eventsCreated)
+                EventManager.onCreatureHit += OnCreatureHitFunc;
+                EventManager.onCreatureHeal += OnCreatureHealFunc;
+                EventManager.onCreatureKill += OnCreatureKillFunc;
+                EventManager.onCreatureParry += OnCreatureParryFunc;
+                EventManager.onDeflect += OnDeflectFunc;
+
+
+                //Locomotion.OnGroundEvent 
+                eventsCreated = true;
+                LOG("Events are created.");
+            }
+
+            deltaTime = Time.deltaTime * 1000f;
+
+            if (!GameManager.timeStopped)
+            {
+                if (Player.local != null && Player.local.creature != null && Player.local.creature.initialized)
                 {
-                    EventManager.onCreatureHit += OnCreatureHitFunc;
-                    EventManager.onCreatureHeal += OnCreatureHealFunc;
-                    EventManager.onCreatureKill += OnCreatureKillFunc;
-                    EventManager.onCreatureParry += OnCreatureParryFunc;
-                    EventManager.onDeflect += OnDeflectFunc;
-                    EventManager.onPlayerSpawn += OnPlayerSpawnFunc;
-
-                    //Locomotion.OnGroundEvent 
-                    eventsCreated = true;
-                    LOG("Events are created.");
-                }
-
-                deltaTime = Time.deltaTime * 1000f;
-
-                if (!GameManager.timeStopped)
-                {
-                    if (Player.local != null && Player.local.creature != null && Player.local.creature.initialized)
-                    {
-                        CheckStates(Player.local.creature);
-                        CheckStatesRarest(Player.local.creature);
-                    }
-                    else
-                    {
-                        lastFrameVelocity = Vector3.zero;
-                    }
+                    CheckStates(Player.local.creature);
+                    CheckStatesRarest(Player.local.creature);
                 }
                 else
                 {
@@ -901,90 +916,49 @@ namespace TactsuitBS
             {
                 lastFrameVelocity = Vector3.zero;
             }
-            base.Update(level);
+
+            base.Update();
         }
 
         private void CheckPlayerSpawn()
         {
+            Thread.Sleep(1000);
             while (Player.local == null || Player.local.creature == null || Player.local.locomotion == null || Player.local.creature.initialized == false || Player.local.creature.ragdoll == null)
             {
                 Thread.Sleep(1000);
             }
 
             LOG("Player spawned.");
-            LiquidReceiver lr = Player.local.creature.GetComponentInChildren<LiquidReceiver>();
-            if ((bool) (UnityEngine.Object) lr)
-            {
-                lr.OnReceptionEvent += LrOnOnReceptionEvent;
-                LOG("Liquid reception function added.");
-            }
-            else
-            {
-                LOG("Can't find Liquid Receiver on player.");
-            }
-
+            
+            Player.local.locomotion.OnGroundEvent -= OnGroundFunc;
             Player.local.locomotion.OnGroundEvent += OnGroundFunc;
             LOG("OnGround function added.");
 
+            Player.local.creature.OnDamageEvent -= OnDamageFunc;
             Player.local.creature.OnDamageEvent += OnDamageFunc;
+            Player.local.creature.OnKillEvent -= OnKillFunc;
             Player.local.creature.OnKillEvent += OnKillFunc;
 
-            if (Player.local.GetHand(Side.Left)?.ragdollHand != null) Player.local.GetHand(Side.Left).ragdollHand.OnGrabEvent += new RagdollHand.GrabEvent(GrabFunc);
-            if (Player.local.GetHand(Side.Right)?.ragdollHand != null) Player.local.GetHand(Side.Right).ragdollHand.OnGrabEvent += new RagdollHand.GrabEvent(GrabFunc);
-            if (Player.local.GetHand(Side.Left)?.ragdollHand != null) Player.local.GetHand(Side.Left).ragdollHand.OnUnGrabEvent += new RagdollHand.UnGrabEvent(UnGrabFunc);
-            if (Player.local.GetHand(Side.Right)?.ragdollHand != null) Player.local.GetHand(Side.Right).ragdollHand.OnUnGrabEvent += new RagdollHand.UnGrabEvent(UnGrabFunc);
-
-            foreach (Holder holder in Player.local.creature.equipment.holders)
+            if (Player.local.GetHand(Side.Left)?.ragdollHand != null)
             {
-                if (holder != null)
-                {
-                    //Holder found on Player: BackRight
-                    //Holder found on Player: BackLeft
-                    if (holder.name == "BackLeft")
-                    {
-                        LOG("BackLeft holder. Adding snap unsnap.");
-                        holder.Snapped += HolsterLeftShoulderFunc;
-                        holder.UnSnapped += UnHolsterLeftShoulderFunc;
-                    }
-                    else if (holder.name == "BackRight")
-                    {
-                        LOG("BackRight holder. Adding snap unsnap.");
-                        holder.Snapped += HolsterRightShoulderFunc;
-                        holder.UnSnapped += UnHolsterRightShoulderFunc;
-                    }
-
-                    foreach (Item holdObject in holder.items)
-                    {
-                        if (holdObject.data.type == ItemData.Type.Quiver)
-                        {
-                            Holder[] otherholders = holdObject.GetComponentsInChildren<Holder>();
-                            foreach (Holder otherholder in otherholders)
-                            {
-                                if (otherholder != null)
-                                {
-                                    if (holder.name == "BackLeft")
-                                    {
-                                        LOG("BackLeft Quiver has holder. Adding snap unsnap for: " + otherholder.name);
-                                        otherholder.Snapped -= new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                                        otherholder.Snapped += new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                                        otherholder.UnSnapped -= new Holder.HolderDelegate(LeftProjectileRemovedFunc);
-                                        otherholder.UnSnapped += new Holder.HolderDelegate(LeftProjectileRemovedFunc);
-                                    }
-                                    else if (holder.name == "BackRight")
-                                    {
-                                        LOG("BackRight Quiver has holder. Adding snap unsnap for: " + otherholder.name);
-                                        otherholder.Snapped -= new Holder.HolderDelegate(RightProjectileAddedFunc);
-                                        otherholder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
-                                        otherholder.UnSnapped -= new Holder.HolderDelegate(RightProjectileRemovedFunc);
-                                        otherholder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                Player.local.GetHand(Side.Left).ragdollHand.OnGrabEvent -= new RagdollHand.GrabEvent(GrabFunc);
+                Player.local.GetHand(Side.Left).ragdollHand.OnGrabEvent += new RagdollHand.GrabEvent(GrabFunc);
             }
-            LOG("Shoulder events added.");
+            if (Player.local.GetHand(Side.Right)?.ragdollHand != null)
+            {
+                Player.local.GetHand(Side.Right).ragdollHand.OnGrabEvent -= new RagdollHand.GrabEvent(GrabFunc);
+                Player.local.GetHand(Side.Right).ragdollHand.OnGrabEvent += new RagdollHand.GrabEvent(GrabFunc);
+            }
+            if (Player.local.GetHand(Side.Left)?.ragdollHand != null)
+            {
+                Player.local.GetHand(Side.Left).ragdollHand.OnUnGrabEvent -= new RagdollHand.UnGrabEvent(UnGrabFunc);
+                Player.local.GetHand(Side.Left).ragdollHand.OnUnGrabEvent += new RagdollHand.UnGrabEvent(UnGrabFunc);
+            }
+            if (Player.local.GetHand(Side.Right)?.ragdollHand != null)
+            {
+                Player.local.GetHand(Side.Right).ragdollHand.OnUnGrabEvent -= new RagdollHand.UnGrabEvent(UnGrabFunc);
+                Player.local.GetHand(Side.Right).ragdollHand.OnUnGrabEvent += new RagdollHand.UnGrabEvent(UnGrabFunc);
+            }
 
             List<CollisionHandler> playerCollisionHandlersList = new List<CollisionHandler>((IEnumerable<CollisionHandler>)Player.local.GetComponentsInChildren<CollisionHandler>());
 
@@ -999,26 +973,41 @@ namespace TactsuitBS
 
             if (Player.local.handLeft?.ragdollHand.collisionHandler != null)
             {
+                Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStartEvent -= LeftHandCollisionStartFunc;
                 Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStartEvent += LeftHandCollisionStartFunc;
+                Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStopEvent -= BodyPartCollisionStopFunc;
+                Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStopEvent += BodyPartCollisionStopFunc;
+                LOG("Adding collision event to: Left Hand");
+            }
+
+            if (Player.local.handLeft?.ragdollHand.collisionHandler != null)
+            {
+                Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStartEvent -= LeftHandCollisionStartFunc;
+                Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStartEvent += LeftHandCollisionStartFunc;
+                Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStopEvent -= BodyPartCollisionStopFunc;
                 Player.local.handLeft.ragdollHand.collisionHandler.OnCollisionStopEvent += BodyPartCollisionStopFunc;
                 LOG("Adding collision event to: Left Hand");
             }
 
             if (Player.local.handRight?.ragdollHand.collisionHandler != null)
             {
+                Player.local.handRight.ragdollHand.collisionHandler.OnCollisionStartEvent -= RightHandCollisionStartFunc;
                 Player.local.handRight.ragdollHand.collisionHandler.OnCollisionStartEvent += RightHandCollisionStartFunc;
+                Player.local.handRight.ragdollHand.collisionHandler.OnCollisionStopEvent -= BodyPartCollisionStopFunc;
                 Player.local.handRight.ragdollHand.collisionHandler.OnCollisionStopEvent += BodyPartCollisionStopFunc;
                 LOG("Adding collision event to: Right Hand");
             }
 
             if (Player.local.footLeft?.ragdollFoot?.collisionHandler != null)
             {
+                Player.local.footLeft.ragdollFoot.collisionHandler.OnCollisionStartEvent -= LeftFootCollisionStartFunc;
                 Player.local.footLeft.ragdollFoot.collisionHandler.OnCollisionStartEvent += LeftFootCollisionStartFunc;
                 LOG("Adding collision event to: Left Foot");
             }
 
             if (Player.local.footRight?.ragdollFoot?.collisionHandler != null)
             {
+                Player.local.footRight.ragdollFoot.collisionHandler.OnCollisionStartEvent -= RightFootCollisionStartFunc;
                 Player.local.footRight.ragdollFoot.collisionHandler.OnCollisionStartEvent += RightFootCollisionStartFunc;
                 LOG("Adding collision event to: Right Foot");
             }
@@ -1028,28 +1017,45 @@ namespace TactsuitBS
                 if (part.type == RagdollPart.Type.Torso)
                 {
                     LOG("Adding collision event to: " + part.collisionHandler.name);
+                    part.collisionHandler.OnCollisionStartEvent -= TorsoCollisionFunc;
                     part.collisionHandler.OnCollisionStartEvent += TorsoCollisionFunc;
                 }
                 else if(part.collisionHandler.name == "LeftForeArm")
                 {
+                    part.collisionHandler.OnCollisionStartEvent -= LeftHandCollisionStartFunc;
                     part.collisionHandler.OnCollisionStartEvent += LeftHandCollisionStartFunc;
                     LOG("Adding collision event to: " + part.collisionHandler.name);
                 }
                 else if (part.collisionHandler.name == "LeftArm")
                 {
+                    part.collisionHandler.OnCollisionStartEvent -= LeftHandCollisionStartFunc;
                     part.collisionHandler.OnCollisionStartEvent += LeftHandCollisionStartFunc;
                     LOG("Adding collision event to: " + part.collisionHandler.name);
                 }
                 else if (part.collisionHandler.name == "RightForeArm")
                 {
+                    part.collisionHandler.OnCollisionStartEvent -= RightHandCollisionStartFunc;
                     part.collisionHandler.OnCollisionStartEvent += RightHandCollisionStartFunc;
                     LOG("Adding collision event to: " + part.collisionHandler.name);
                 }
                 else if (part.collisionHandler.name == "RightArm")
                 {
+                    part.collisionHandler.OnCollisionStartEvent -= RightHandCollisionStartFunc;
                     part.collisionHandler.OnCollisionStartEvent += RightHandCollisionStartFunc;
                     LOG("Adding collision event to: " + part.collisionHandler.name);
                 }
+            }
+
+            LiquidReceiver lr = Player.local.creature.GetComponentInChildren<LiquidReceiver>();
+            if (lr != null)
+            {
+                lr.OnReceptionEvent -= LrOnOnReceptionEvent;
+                lr.OnReceptionEvent += LrOnOnReceptionEvent;
+                LOG("Liquid reception function added.");
+            }
+            else
+            {
+                LOG("Can't find Liquid Receiver on player.");
             }
 
             foreach (GameObject gameObject in (GameObject[])UnityEngine.Object.FindObjectsOfType<GameObject>())
@@ -1073,7 +1079,184 @@ namespace TactsuitBS
                 LOG("Rain Controller not found in scene.");
             }
         }
-        
+
+        //[HarmonyPatch("OnCollisionEnter")]
+        //[HarmonyPatch(typeof(CollisionHandler))]
+        //private static class CollisionHandlerOnCollisionEnterPatch
+        //{
+        //    [HarmonyPostfix]
+        //    private static void Postfix(CollisionHandler __instance, UnityEngine.Collision collision)
+        //    {
+        //        if (__instance != null && Player.local?.creature !=null && __instance.active && __instance.isActive && __instance.ragdollPart?.ragdoll?.creature != null && __instance.ragdollPart.ragdoll.creature == Player.local.creature)
+        //        {
+        //            if (__instance.name == "Spine" || __instance.name == "Spine1" || __instance.name == "Hips")
+        //            {
+        //                if (collision!=null && collision.contactCount > 0)
+        //                {
+        //                    float impulse = (collision.impulse.magnitude / Time.fixedDeltaTime) / 1000.0f;
+
+        //                    if (impulse > 0.01f)
+        //                    {
+        //                        ContactPoint cp = collision.GetContact(0);
+        //                        if (cp.otherCollider.gameObject != null && cp.otherCollider.gameObject.isStatic)
+        //                        {
+        //                            float hitAngle = Utility.GetAngleForPosition(cp.point);
+
+        //                            float locationHeight = 0.0f;
+
+        //                            if (__instance.name == "Spine" || __instance.name == "Spine1")
+        //                            {
+        //                                locationHeight = (((float)(RandomNumber.Between(0, 5))) / 10.0f) - 0.20f;
+        //                            }
+        //                            else if (__instance.name == "Hips")
+        //                            {
+        //                                locationHeight = -0.40f;
+        //                            }
+
+        //                            tactsuitVr.ProvideHapticFeedback(hitAngle, locationHeight, TactsuitVR.FeedbackType.DamageVestBluntStoneLarge, false, impulse*0.05f, TactsuitVR.FeedbackType.NoFeedback, false);
+
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        [HarmonyPatch("PushPlayer")]
+        [HarmonyPatch(typeof(SpellCastGravity))]
+        private static class SpellCastGravityPushPlayerPatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(PlayerControl __instance, RagdollPart ragdollPart, UnityEngine.Vector3 velocity)
+            {
+                Vector3 contactPoint = Player.local.locomotion.transform.position - velocity;
+                float hitAngle = Utility.GetAngleForPosition(contactPoint);
+
+                float intensity = Player.local.locomotion.rb.velocity.magnitude / 5f;
+                tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestGravity, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                if (GravityEffectOnHead)
+                {
+                    tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageHeadGravity, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                }
+                if (GravityEffectOnArms)
+                {
+                    tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageRightArmGravity, false, intensity, TactsuitVR.FeedbackType.NoFeedback, true);
+                    tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageRightArmGravity, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                }
+            }
+        }
+
+        private static void RightProjectileRemovedFunc(Item item)
+        {
+            if (!gamePaused && !GameManager.timeStopped)
+            {
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterArrowRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            }
+        }
+
+        private static void RightProjectileAddedFunc(Item item)
+        {
+            if (!gamePaused && !GameManager.timeStopped)
+            {
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterArrowRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            }
+        }
+
+        private static void LeftProjectileRemovedFunc(Item item)
+        {
+            if (!gamePaused && !GameManager.timeStopped && Player.local != null)
+            {
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterArrowLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            }
+        }
+
+        private static void LeftProjectileAddedFunc(Item item)
+        {
+            if (!gamePaused && !GameManager.timeStopped && Player.local != null)
+            {
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterArrowLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            }
+        }
+
+        [HarmonyPatch("UnSnap")]
+        [HarmonyPatch(typeof(Holder))]
+        private static class HolderUnSnapPatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(Holder __instance, Item item, bool silent = false)
+            {
+                if (!gamePaused && !GameManager.timeStopped && item != null && __instance != null && Player.local.creature != null && __instance.creature == Player.local.creature)
+                {
+                    if (!silent)
+                    {
+                        bool arrow = (item.data?.moduleAI != null && item.data.moduleAI.weaponClass == ItemModuleAI.WeaponClass.Arrow);
+
+                        if (__instance.drawSlot == Holder.DrawSlot.BackRight)
+                        {
+                            tactsuitVr?.ProvideHapticFeedback(0, 0, arrow ? TactsuitVR.FeedbackType.UnholsterArrowRightShoulder : TactsuitVR.FeedbackType.UnholsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        }
+                        else if (__instance.drawSlot == Holder.DrawSlot.BackLeft)
+                        {
+                            tactsuitVr?.ProvideHapticFeedback(0, 0, arrow ? TactsuitVR.FeedbackType.UnholsterArrowLeftShoulder : TactsuitVR.FeedbackType.UnholsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        }
+                    }
+
+                    if (item.data.type == ItemData.Type.Quiver)
+                    {
+                        Holder[] otherholders = item.GetComponentsInChildren<Holder>();
+                        foreach (Holder otherholder in otherholders)
+                        {
+                            if (otherholder != null)
+                            {
+                                otherholder.Snapped -= new Holder.HolderDelegate(LeftProjectileAddedFunc);
+                                otherholder.UnSnapped -= new Holder.HolderDelegate(LeftProjectileRemovedFunc);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [HarmonyPatch("Snap")]
+        [HarmonyPatch(typeof(Holder))]
+        private static class HolderSnapPatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(Holder __instance, Item item, bool silent = false)
+            {
+                if (!gamePaused && !GameManager.timeStopped && item != null && __instance != null && Player.local.creature!=null && __instance.creature == Player.local.creature)
+                {
+                    if (!silent)
+                    {
+                        bool arrow = (item.data?.moduleAI != null && item.data.moduleAI.weaponClass == ItemModuleAI.WeaponClass.Arrow);
+
+                        if (__instance.drawSlot == Holder.DrawSlot.BackRight)
+                        {
+                            tactsuitVr?.ProvideHapticFeedback(0, 0, arrow ? TactsuitVR.FeedbackType.HolsterArrowRightShoulder : TactsuitVR.FeedbackType.HolsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        }
+                        else if (__instance.drawSlot == Holder.DrawSlot.BackLeft)
+                        {
+                            tactsuitVr?.ProvideHapticFeedback(0, 0, arrow ? TactsuitVR.FeedbackType.HolsterArrowLeftShoulder : TactsuitVR.FeedbackType.HolsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                        }
+                    }
+
+                    if (item.data.type == ItemData.Type.Quiver)
+                    {
+                        Holder[] otherholders = item.GetComponentsInChildren<Holder>();
+                        foreach (Holder otherholder in otherholders)
+                        {
+                            if (otherholder != null)
+                            {
+                                otherholder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
+                                otherholder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private TactsuitVR.FeedbackType GetPlayerPunchFeedback(string material)
         {
             if (!material.IsNullOrEmpty())
@@ -1253,13 +1436,6 @@ namespace TactsuitBS
             if (collisionInstance.damageStruct.hitRagdollPart?.ragdoll?.creature != null)
                 return;
 
-            Imbue imbue = null;
-            if (collisionInstance.sourceColliderGroup?.collisionHandler?.item?.imbues != null)
-            {
-                if (collisionInstance.sourceColliderGroup?.collisionHandler?.item?.imbues.Count > 0)
-                    imbue = collisionInstance.sourceColliderGroup?.collisionHandler?.item?.imbues[0];
-            }
-
             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionInstance.damageStruct.damageType, collisionInstance.sourceMaterial, collisionInstance.targetMaterial);
             tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
             LOG("Right hand item (" + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "") + ") collides with something (" + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "") + ") with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType));
@@ -1274,135 +1450,10 @@ namespace TactsuitBS
             tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
             LOG("Left hand item with (" + (collisionInstance.sourceCollider != null ? collisionInstance.sourceCollider.name : "") + ") collides with something (" + (collisionInstance.targetCollider != null ? collisionInstance.targetCollider.name : "") + ") with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionInstance.sourceMaterial != null && collisionInstance.targetMaterial != null) ? ("Materials: " + collisionInstance.sourceMaterial.id + " > " + collisionInstance.targetMaterial.id) : "") +  " DamageType: " + Utility.GetDamageTypeName(collisionInstance.damageStruct.damageType));
         }
-
-        private void RightProjectileRemovedFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterArrowRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                LOG("Arrow unholstered on right shoulder: " + item.name);
-            }
-        }
-
-        private void RightProjectileAddedFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterArrowRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                LOG("Arrow holstered on right shoulder: " + item.name);
-            }
-        }
-
-        private void LeftProjectileRemovedFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterArrowLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                LOG("Arrow unholstered on right shoulder: " + item.name);
-            }
-        }
-
-        private void LeftProjectileAddedFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterArrowLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                LOG("Arrow holstered on right shoulder: " + item.name);
-            }
-        }
-
-        private void UnHolsterRightShoulderFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                
-                if (item.data.type == ItemData.Type.Quiver)
-                {
-                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
-                    foreach (Holder otherholder in otherholders)
-                    {
-                        if (otherholder != null)
-                        {
-                            otherholder.Snapped -= new Holder.HolderDelegate(RightProjectileAddedFunc);
-                            otherholder.UnSnapped -= new Holder.HolderDelegate(RightProjectileRemovedFunc);
-                        }
-                    }
-                }
-
-                LOG("Item unholstered on right shoulder: " + item.name);
-            }
-        }
-
-        private void HolsterRightShoulderFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemData.Type.Quiver)
-                {
-                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
-                    foreach (Holder otherholder in otherholders)
-                    {
-                        if (otherholder != null)
-                        {
-                            otherholder.Snapped += new Holder.HolderDelegate(RightProjectileAddedFunc);
-                            otherholder.UnSnapped += new Holder.HolderDelegate(RightProjectileRemovedFunc);
-                        }
-                    }
-                }
-
-                LOG("Item holstered on right shoulder: " + item.name);
-            }
-        }
-
-        private void UnHolsterLeftShoulderFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemData.Type.Quiver)
-                {
-                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
-                    foreach (Holder otherholder in otherholders)
-                    {
-                        if (otherholder != null)
-                        {
-                            otherholder.Snapped -= new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                            otherholder.UnSnapped -= new Holder.HolderDelegate(LeftProjectileRemovedFunc);
-                        }
-                    }
-                }
-
-                LOG("Item unholstered on left shoulder: " + item.name);
-            }
-        }
-
-        private void HolsterLeftShoulderFunc(Item item)
-        {
-            if (!gamePaused && !GameManager.timeStopped && item != null)
-            {
-                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                if (item.data.type == ItemData.Type.Quiver)
-                {
-                    Holder[] otherholders = item.GetComponentsInChildren<Holder>();
-                    foreach (Holder otherholder in otherholders)
-                    {
-                        if (otherholder != null)
-                        {
-                            otherholder.Snapped += new Holder.HolderDelegate(LeftProjectileAddedFunc);
-                            otherholder.UnSnapped += new Holder.HolderDelegate(LeftProjectileRemovedFunc);
-                        }
-                    }
-                }
-
-                LOG("Item holstered on left shoulder: " + item.name);
-            }
-        }
-        
+                        
         private void BeingPushedFunc()
         {
-            while (!gamePaused && !GameManager.timeStopped && Player.local.creature.state != Creature.State.Dead && !Player.local.locomotion.isEnabled && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f)
+            while (!gamePaused && !GameManager.timeStopped && Player.local.creature.state != Creature.State.Dead && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f)
             {
                 Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.rb.velocity;
                 float hitAngle = Utility.GetAngleForPosition(contactPoint);
@@ -1431,7 +1482,7 @@ namespace TactsuitBS
             {
                 if (side == Side.Left)
                 {
-                    Item leftItem = Player.local.creature.equipment.GetHeldobject(Side.Left);
+                    Item leftItem = Player.local.creature.equipment.GetHeldItem(Side.Left);
                     while (!beingPushed && !gamePaused && !GameManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
                     {
                         float intensity = Player.local.locomotion.rb.velocity.magnitude / 3f;
@@ -1444,7 +1495,7 @@ namespace TactsuitBS
                 }
                 else
                 {
-                    Item rightItem = Player.local.creature.equipment.GetHeldobject(Side.Right);
+                    Item rightItem = Player.local.creature.equipment.GetHeldItem(Side.Right);
 
                     while (!beingPushed && !gamePaused && !GameManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && rightItem != null && rightItem.name.Contains("Grapple") && rightItemUseStarted)
                     {
@@ -1505,7 +1556,9 @@ namespace TactsuitBS
 
                 if (leftItem == rightItem && bowString.isPulling)
                 {
-                    float intensity = Utility.GetCurrentPull(bowString) + 0.1f / bowString.maxPull;
+                    float currentPull = Utility.GetCurrentPull(bowString);
+                    float intensity = Utility.GetCurrentPull(bowString) + 0.1f / bowString.animationClipLength;
+                    //LOG("Pulling bow CurrentPull:" + currentPull.ToString() + " AnimationClipLength:" + bowString.animationClipLength.ToString() + " MaxDistance:" + bowString.maxDrawDistance);
                     if (intensity >= 0.1f && intensity < 0.2f)
                         intensity = 0.2f;
 
@@ -1576,6 +1629,11 @@ namespace TactsuitBS
                     {
                         if (side == Side.Left)
                         {
+                            if(throwing)
+                            {
+                                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerThrowRight, true, (PlayerControl.input.GetHandVelocity(side).magnitude / Catalog.gameData.throwVelocity)*0.1f, TactsuitVR.FeedbackType.NoFeedback, true);
+                            }
+
                             ItemHeldInLeftHand = false;
                             foreach (var collisionHandler in handle.item.collisionHandlers)
                             {
@@ -1590,6 +1648,11 @@ namespace TactsuitBS
                         }
                         else
                         {
+                            if (throwing)
+                            {
+                                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerThrowRight, true, (PlayerControl.input.GetHandVelocity(side).magnitude / Catalog.gameData.throwVelocity) * 0.1f, TactsuitVR.FeedbackType.NoFeedback, false);
+                            }
+
                             ItemHeldInRightHand = false;
                             foreach (var collisionHandler in handle.item.collisionHandlers)
                             {
@@ -1617,7 +1680,7 @@ namespace TactsuitBS
 
                 if (Player.local?.creature != null)
                 {
-                    Item rightItem = Player.local?.creature.equipment.GetHeldobject(Side.Right);
+                    Item rightItem = Player.local?.creature.equipment.GetHeldItem(Side.Right);
 
                     if (rightItem != null && rightItem.name.Contains("Grapple"))
                     {
@@ -1657,7 +1720,7 @@ namespace TactsuitBS
 
                 if(Player.local?.creature != null)
                 {
-                    Item leftItem = Player.local?.creature.equipment.GetHeldobject(Side.Left);
+                    Item leftItem = Player.local?.creature.equipment.GetHeldItem(Side.Left);
 
                     if (leftItem != null && leftItem.name.Contains("Grapple"))
                     {
@@ -1776,27 +1839,14 @@ namespace TactsuitBS
             }
         }
 
-        private void OnPlayerSpawnFunc(Player player)
+        private void OnGroundFunc(Vector3 groundPoint, Vector3 velocity, Collider groundCollider) 
         {
-            if (player.isLocal)
-            {
-                //if(!playerEventsCreated)
-                //{
-                //    playerEventsCreated = true;
-                Thread thread = new Thread(CheckPlayerSpawn);
-                thread.Start();
-                //}
-            }
-        }
-
-        private void OnGroundFunc(bool grounded, Vector3 velocity)
-        {
-            if (NoFallEffectWhenFallDamageIsDisabled && !Creature.playerFallDamage)
+            if (NoFallEffectWhenFallDamageIsDisabled && !Player.fallDamage)
             {
                 return;
             }
 
-            if (grounded && Player.local?.creature?.data != null)
+            if (Player.local?.locomotion != null && Player.local.locomotion.isGrounded && Player.local?.creature?.data != null)
             {
                 //Play default damage effect
                 float damage = Player.local.creature.data.playerFallDamageCurve.Evaluate(velocity.magnitude);
@@ -1823,7 +1873,7 @@ namespace TactsuitBS
             if (liquid.GetType() != typeof(LiquidPoison))
             {
                 //Play just drinking effect
-                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PotionDrinking, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PotionDrinking, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);                
             }
             else //Poison
             {
@@ -1869,14 +1919,14 @@ namespace TactsuitBS
                 Thread.Sleep(5000);
                 if (Player.local?.creature != null && Player.local?.locomotion != null)
                 {
-                    Item rightItem = Player.local?.creature.equipment.GetHeldobject(Side.Right);
+                    Item rightItem = Player.local?.creature.equipment.GetHeldItem(Side.Right);
 
                     if (rightItem != null && rightItem.name.Contains("Grapple") && rightItemUseStarted)
                     {
                         continue;
                     }
 
-                    Item leftItem = Player.local?.creature.equipment.GetHeldobject(Side.Left);
+                    Item leftItem = Player.local?.creature.equipment.GetHeldItem(Side.Left);
 
                     if (leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
                     {
@@ -2058,79 +2108,7 @@ namespace TactsuitBS
             }
         }
 
-        private void SpellCastFunc(string spellId, bool leftHand)
-        {
-            if (tactsuitVr != null)
-            {
-                TactsuitVR.FeedbackType feedback = TactsuitVR.GetSpellFeedbackFromId(spellId);
-                if (leftHand)
-                {
-                    while (!GameManager.timeStopped && CastingLeft && spellId == CastingLeftSpellId)
-                    {
-                        if (Player.local != null && Player.local.creature != null
-                            && Player.local.creature.mana != null && Player.local.creature.mana.casterLeft != null)
-                        {
-                            float intensity = 1.0f;
-                            if (Player.local.creature.mana.casterLeft.spellInstance is SpellCastCharge)
-                            {
-                                SpellCastCharge scc = (Player.local.creature.mana.casterLeft.spellInstance as SpellCastCharge);
-                                if (scc != null)
-                                {
-                                    intensity = scc.currentCharge;
-                                    if (intensity < 0.2f)
-                                        intensity = 0.2f;
-                                }
-                            }
-
-                            if ((bool) (UnityEngine.Object) Player.local.creature.mana.casterLeft.ragdollHand.grabbedHandle)
-                            {
-                                intensity *= 0.5f;
-                            }
-
-                            tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, intensity, TactsuitVR.FeedbackType.NoFeedback, true);
-                            Thread.Sleep(SleepDurationSpellCast);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    while (!GameManager.timeStopped && CastingRight && spellId == CastingRightSpellId)
-                    {
-                        if (Player.local != null && Player.local.creature != null
-                            && Player.local.creature.mana != null && Player.local.creature.mana.casterRight != null)
-                        {
-                            float intensity = 1.0f;
-                            if (Player.local.creature.mana.casterRight.spellInstance is SpellCastCharge)
-                            {
-                                SpellCastCharge scc = (Player.local.creature.mana.casterRight.spellInstance as SpellCastCharge);
-                                if (scc != null)
-                                {
-                                    intensity = scc.currentCharge;
-                                    if (intensity < 0.2f)
-                                        intensity = 0.2f;
-                                }
-                            }
-
-                            if ((bool) (UnityEngine.Object) Player.local.creature.mana.casterRight.ragdollHand.grabbedHandle)
-                            {
-                                intensity *= 0.5f;
-                            }
-
-                            tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
-                            Thread.Sleep(SleepDurationSpellCast);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        
 
         private void TelekinesisActivateFunc(bool leftHand)
         {
@@ -2138,7 +2116,7 @@ namespace TactsuitBS
             {
                 while (!GameManager.timeStopped && ((TelekinesisActiveLeft && leftHand) || (TelekinesisActiveRight && !leftHand)))
                 {
-                    if ((leftHand && Player.local.creature.equipment.GetHeldobject(Side.Left)) || (!leftHand && Player.local.creature.equipment.GetHeldobject(Side.Right)))
+                    if ((leftHand && Player.local.creature.equipment.GetHeldItem(Side.Left)) || (!leftHand && Player.local.creature.equipment.GetHeldItem(Side.Right)))
                         break;
 
                     tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerTelekinesisActiveRight, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, leftHand ? true : false);
@@ -2156,7 +2134,7 @@ namespace TactsuitBS
                 
                 while (!GameManager.timeStopped && ((TelekinesisPullRight && pull) || (TelekinesisRepelRight && !pull)))
                 {
-                    if ((leftHand && Player.local.creature.equipment.GetHeldobject(Side.Left)) || (!leftHand && Player.local.creature.equipment.GetHeldobject(Side.Right)))
+                    if ((leftHand && Player.local.creature.equipment.GetHeldItem(Side.Left)) || (!leftHand && Player.local.creature.equipment.GetHeldItem(Side.Right)))
                         break;
 
                     tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, leftHand ? true : false);
@@ -2328,11 +2306,137 @@ namespace TactsuitBS
             }
         }
 
+        [HarmonyPatch("Fire")]
+        [HarmonyPatch(typeof(SpellCaster))]
+        private static class SpellCasterFirePatch
+        {
+            private static bool CastingLeft = false;
+            private static bool CastingRight = false;
+            private static string CastingLeftSpellId = "";
+            private static string CastingRightSpellId = "";
+            private static void SpellCastFunc(string spellId, bool leftHand)
+            {
+                if (tactsuitVr != null)
+                {
+                    TactsuitVR.FeedbackType feedback = TactsuitVR.GetSpellFeedbackFromId(spellId);
+                    if (leftHand)
+                    {
+                        while (!GameManager.timeStopped && CastingLeft && spellId == CastingLeftSpellId)
+                        {
+                            if (Player.local != null && Player.local.creature != null
+                                && Player.local.creature.mana != null && Player.local.creature.mana.casterLeft != null)
+                            {
+                                float intensity = 1.0f;
+                                if (Player.local.creature.mana.casterLeft.spellInstance is SpellCastCharge)
+                                {
+                                    SpellCastCharge scc = (Player.local.creature.mana.casterLeft.spellInstance as SpellCastCharge);
+                                    if (scc != null)
+                                    {
+                                        intensity = scc.currentCharge;
+                                        if (intensity < 0.2f)
+                                            intensity = 0.2f;
+                                    }
+                                }
+
+                                if ((bool)(UnityEngine.Object)Player.local.creature.mana.casterLeft.ragdollHand.grabbedHandle)
+                                {
+                                    intensity *= 0.5f;
+                                }
+
+                                tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, intensity, TactsuitVR.FeedbackType.NoFeedback, true);
+                                Thread.Sleep(SleepDurationSpellCast);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        while (!GameManager.timeStopped && CastingRight && spellId == CastingRightSpellId)
+                        {
+                            if (Player.local != null && Player.local.creature != null
+                                && Player.local.creature.mana != null && Player.local.creature.mana.casterRight != null)
+                            {
+                                float intensity = 1.0f;
+                                if (Player.local.creature.mana.casterRight.spellInstance is SpellCastCharge)
+                                {
+                                    SpellCastCharge scc = (Player.local.creature.mana.casterRight.spellInstance as SpellCastCharge);
+                                    if (scc != null)
+                                    {
+                                        intensity = scc.currentCharge;
+                                        if (intensity < 0.2f)
+                                            intensity = 0.2f;
+                                    }
+                                }
+
+                                if ((bool)(UnityEngine.Object)Player.local.creature.mana.casterRight.ragdollHand.grabbedHandle)
+                                {
+                                    intensity *= 0.5f;
+                                }
+
+                                tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                                Thread.Sleep(SleepDurationSpellCast);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            [HarmonyPostfix]
+            private static void Postfix(SpellCaster __instance, bool active)
+            {
+                if (__instance != null && Player.local?.creature != null && __instance.mana?.creature != null && __instance.mana.creature == Player.local.creature)
+                {
+                    if (active && __instance.spellInstance != null && __instance.isFiring)
+                    {
+                        if (__instance.ragdollHand.side == Side.Left)
+                        {
+                            if (!CastingLeft)
+                            {
+                                CastingLeft = true;
+                                CastingLeftSpellId = __instance.spellInstance.id;
+                                Thread thread = new Thread(() => SpellCastFunc(__instance.spellInstance.id, true));
+                                thread.Start();
+                            }
+                        }
+                        else
+                        {
+                            if (!CastingRight)
+                            {
+                                CastingRight = true;
+                                CastingRightSpellId = __instance.spellInstance.id;
+                                Thread thread = new Thread(() => SpellCastFunc(__instance.spellInstance.id, false));
+                                thread.Start();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (__instance != null && __instance.ragdollHand.side == Side.Left && CastingLeft)
+                        {
+                            CastingLeft = false;
+                            CastingLeftSpellId = "";
+                        }
+                        else if (__instance != null && __instance.ragdollHand.side == Side.Right && CastingRight)
+                        {
+                            CastingRight = false;
+                            CastingRightSpellId = "";
+                        }
+                    }
+                }
+            }
+        }
+
         private void CheckStates(Creature creature)
         {
             if (creature != null)
-            {
-               
+            {               
                 #region Slow Motion
 
                 if (slowMotionActive)
@@ -2356,7 +2460,7 @@ namespace TactsuitBS
 
                 #region Pushed
 
-                if (Player.local.locomotion.isGrounded && !Player.local.locomotion.isEnabled && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f && (hoverJetVFX == null))
+                if (Player.local.locomotion.isGrounded && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f && (hoverJetVFX == null))
                 {
                     if (!beingPushed)
                     {
@@ -2370,8 +2474,8 @@ namespace TactsuitBS
 
                 if (!beingPushed && (hoverJetVFX == null))
                 {
-                    Item leftItem = creature.equipment.GetHeldobject(Side.Left);
-                    Item rightItem = creature.equipment.GetHeldobject(Side.Right);
+                    Item leftItem = creature.equipment.GetHeldItem(Side.Left);
+                    Item rightItem = creature.equipment.GetHeldItem(Side.Right);
 
                     if (!noExplosionFeedback && Player.local.locomotion.isGrounded && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude > 5f && Player.local.locomotion.rb.velocity.y>=-TOLERANCE
                         && (leftItem == null || (leftItem != null && !leftItemUseStarted) || (leftItem != null && leftItemUseStarted && !leftItem.name.Contains("Grapple")))
@@ -2421,13 +2525,13 @@ namespace TactsuitBS
                 
                 #region SuddenStop
 
-                if (Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude < 0.1f && lastFrameVelocity.magnitude > 5.0f)
-                {
-                    float hitAngle = Utility.GetAngleForPosition(Player.local.transform.position + lastFrameVelocity);
+                //if (Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude < 0.1f && lastFrameVelocity.magnitude > 5.0f)
+                //{
+                //    float hitAngle = Utility.GetAngleForPosition(Player.local.transform.position + lastFrameVelocity);
 
-                    LOG("Hit a wall. Velocity before hit: " + lastFrameVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture));
-                    tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestBluntStoneLarge, false, lastFrameVelocity.magnitude/10f, TactsuitVR.FeedbackType.NoFeedback, false);
-                }
+                //    LOG("Hit a wall. Velocity before hit: " + lastFrameVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture));
+                //    tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestBluntStoneLarge, false, lastFrameVelocity.magnitude/10f, TactsuitVR.FeedbackType.NoFeedback, false);
+                //}
 
                 lastFrameVelocity = Player.local.locomotion.rb.velocity;
 
@@ -2587,86 +2691,6 @@ namespace TactsuitBS
 
                 #endregion
 
-                #region Throw
-
-                hapticCheckTimeLeft -= deltaTime;
-
-                if (!GameManager.timeStopped && hapticCheckTimeLeft <= 0f)
-                {
-                    hapticCheckTimeLeft = 50;
-
-                    if (PlayerControl.handLeft.hapticPlayClipEnabled && PlayerControl.handLeft.hapticPlayClip == Catalog.gameData.haptics.telekinesisThrow)
-                    {
-                        hapticCheckTimeLeft = 1000;
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerThrowRight, true, PlayerControl.handLeft.hapticPlayClipAmplitude, TactsuitVR.FeedbackType.NoFeedback, true);
-                    }
-                }
-
-                hapticCheckTimeRight -= deltaTime;
-
-                if (!GameManager.timeStopped && hapticCheckTimeRight <= 0f)
-                {
-                    hapticCheckTimeRight = 50;
-
-                    if (PlayerControl.handRight.hapticPlayClipEnabled && PlayerControl.handRight.hapticPlayClip == Catalog.gameData.haptics.telekinesisThrow)
-                    {
-                        hapticCheckTimeRight = 1000;
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerThrowRight, true, PlayerControl.handRight.hapticPlayClipAmplitude, TactsuitVR.FeedbackType.NoFeedback, false);
-                    }
-                }
-
-                #endregion
-
-                #region Spell Cast Left Hand
-
-                if (creature.mana != null && creature.mana.casterLeft != null && creature.mana.casterLeft.spellInstance != null && creature.mana.casterLeft.isFiring)
-                {
-                    if (!CastingLeft)
-                    {
-                        CastingLeft = true;
-                        CastingLeftSpellId = creature.mana.casterLeft.spellInstance.id;
-                        Thread thread = new Thread(() => SpellCastFunc(creature.mana.casterLeft.spellInstance.id, true));
-                        thread.Start();
-                        LOG("Player is firing left spell: " + creature.mana.casterLeft.spellInstance.id); //Fire-Gravity-Lightning
-                    }
-                }
-                else
-                {
-                    if (CastingLeft)
-                    {
-                        CastingLeft = false;
-                        CastingLeftSpellId = "";
-                        LOG("Player stops firing left spell.");
-                    }
-                }
-
-                #endregion
-
-                #region Spell Cast Right Hand
-
-                if (creature.mana != null && creature.mana.casterRight != null && creature.mana.casterRight.spellInstance != null && creature.mana.casterRight.isFiring)
-                {
-                    if (!CastingRight)
-                    {
-                        CastingRight = true;
-                        CastingRightSpellId = creature.mana.casterRight.spellInstance.id;
-                        Thread thread = new Thread(() => SpellCastFunc(creature.mana.casterRight.spellInstance.id, false));
-                        thread.Start();
-                        LOG("Player is firing right spell: " + creature.mana.casterRight.spellInstance.id); //Fire-Gravity-Lightning
-                    }
-                }
-                else
-                {
-                    if (CastingRight)
-                    {
-                        CastingRight = false;
-                        CastingRightSpellId = "";
-                        LOG("Player stops firing right spell.");
-                    }
-                }
-
-                #endregion
-
                 #region Climbing
 
                 climbingCheckTimeLeft -= deltaTime;
@@ -2675,11 +2699,11 @@ namespace TactsuitBS
                 {
                     climbingCheckTimeLeft = 300;
 
-                    Item leftObject = creature.equipment.GetHeldobject(Side.Left);
-                    Item rightObject = creature.equipment.GetHeldobject(Side.Right);
+                    Item leftObject = creature.equipment.GetHeldItem(Side.Left);
+                    Item rightObject = creature.equipment.GetHeldItem(Side.Right);
 
                     if ((leftObject == null && Player.local?.handLeft?.link != null && Player.local?.handLeft?.link.isActive == true && Player.local?.handLeft?.link.playerJointActive == true && Player.local?.handLeft?.ragdollHand?.climb != null && Player.local.handLeft.ragdollHand.climb.isGripping)
-                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handLeftEnabled && creature.ragdoll.ik.handLeftTarget != null && leftObject == null && creature.equipment.GetHeldHandle(Side.Left) != null && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Left) - 1f) < TOLERANCE))
+                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handLeftEnabled && creature.ragdoll.ik.handLeftTarget != null && leftObject == null && creature.equipment.GetHeldHandle(Side.Left) != null && !creature.equipment.GetHeldHandle(Side.Left).rb.isKinematic && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Left) - 1f) < TOLERANCE))
                     {
                         if (!leftHandClimbing)
                         {
@@ -2695,7 +2719,7 @@ namespace TactsuitBS
                     }
 
                     if ((rightObject == null && Player.local?.handRight?.link != null && Player.local?.handRight?.link.isActive == true && Player.local?.handRight?.link.playerJointActive == true && Player.local?.handRight?.ragdollHand?.climb != null && Player.local.handRight.ragdollHand.climb.isGripping)
-                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handRightEnabled && creature.ragdoll.ik.handRightTarget != null && rightObject == null && creature.equipment.GetHeldHandle(Side.Right) != null && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Right) - 1f) < TOLERANCE))
+                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handRightEnabled && creature.ragdoll.ik.handRightTarget != null && rightObject == null && creature.equipment.GetHeldHandle(Side.Right) != null && !creature.equipment.GetHeldHandle(Side.Right).rb.isKinematic && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Right) - 1f) < TOLERANCE))
                     {
                         if (!rightHandClimbing)
                         {
@@ -2721,37 +2745,43 @@ namespace TactsuitBS
                 {
                     shootGunCheckTimeLeft = 30;
 
-                    Item leftItem = creature.equipment.GetHeldobject(Side.Left);
-                    Item rightItem = creature.equipment.GetHeldobject(Side.Right);
+                    Item leftItem = creature.equipment.GetHeldItem(Side.Left);
+                    Item rightItem = creature.equipment.GetHeldItem(Side.Right);
 
                     if (leftItem != null)
                     {
                         ParticleSystem temp_leftItemShootVFX = null;
 
-                        if (leftItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
+                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "FireEffect")) != null && leftItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
                         {
                             temp_leftItemShootVFX = leftItem.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
                         }
-
-                        foreach (var vfx in VFXList)
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotVFX")) != null && leftItem.GetCustomReference("bulletShotVFX")?.GetComponent<ParticleSystem>() != null)
                         {
-                            if (leftItem.transform?.Find(vfx)?.gameObject?.GetComponentInChildren<ParticleSystem>() != null)
+                            temp_leftItemShootVFX = leftItem.GetCustomReference("bulletShotVFX").GetComponent<ParticleSystem>();
+                        }
+                        else
+                        {
+                            foreach (var vfx in VFXList)
                             {
-                                temp_leftItemShootVFX = leftItem.transform.Find(vfx).gameObject.GetComponentInChildren<ParticleSystem>();
-                                if (temp_leftItemShootVFX != null)
-                                    break;
-                            }
-                            else if (leftItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
-                            {
-                                temp_leftItemShootVFX = (ParticleSystem)((Component)leftItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
-                                if (temp_leftItemShootVFX != null)
-                                    break;
+                                if (leftItem.transform?.Find(vfx)?.gameObject?.GetComponentInChildren<ParticleSystem>() != null)
+                                {
+                                    temp_leftItemShootVFX = leftItem.transform.Find(vfx).gameObject.GetComponentInChildren<ParticleSystem>();
+                                    if (temp_leftItemShootVFX != null)
+                                        break;
+                                }
+                                else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == vfx)) != null && leftItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
+                                {
+                                    temp_leftItemShootVFX = (ParticleSystem)((Component)leftItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
+                                    if (temp_leftItemShootVFX != null)
+                                        break;
+                                }
                             }
                         }
 
                         leftItemShootVFX = temp_leftItemShootVFX;
 
-                        if (leftItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
+                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "AltFireEffect")) != null && leftItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
                         {
                             leftItemShoot2VFX = leftItem.GetCustomReference("AltFireEffect").GetComponent<ParticleSystem>();
                         }
@@ -2760,19 +2790,26 @@ namespace TactsuitBS
                             leftItemShoot2VFX = null;
                         }
 
-                        foreach (var sfx in SFXList)
+                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotSFX")) != null && leftItem.GetCustomReference("bulletShotSFX")?.GetComponent<AudioSource>() != null)
                         {
-                            if (leftItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                            leftItemShootSFX = leftItem.GetCustomReference("bulletShotSFX").GetComponent<AudioSource>();
+                        }
+                        else
+                        {
+                            foreach (var sfx in SFXList)
                             {
-                                leftItemShootSFX = leftItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
-                                if (leftItemShootSFX != null)
-                                    break;
-                            }
-                            else if (leftItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
-                            {
-                                leftItemShootSFX = (AudioSource)((Component)leftItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
-                                if (leftItemShootSFX != null)
-                                    break;
+                                if (leftItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                                {
+                                    leftItemShootSFX = leftItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
+                                    if (leftItemShootSFX != null)
+                                        break;
+                                }
+                                else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == sfx)) != null && leftItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
+                                {
+                                    leftItemShootSFX = (AudioSource)((Component)leftItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
+                                    if (leftItemShootSFX != null)
+                                        break;
+                                }
                             }
                         }
 
@@ -2780,7 +2817,7 @@ namespace TactsuitBS
                         {
                             leftItemChargeReadySFX = leftItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
                         }
-                        else if (leftItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeReadySounds")) != null && leftItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
                         {
                             leftItemChargeReadySFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
                         }
@@ -2789,7 +2826,7 @@ namespace TactsuitBS
                         {
                             leftItemChargeSFX = leftItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
                         }
-                        else if (leftItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeStartSounds")) != null && leftItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
                         {
                             leftItemChargeSFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
                         }
@@ -2797,7 +2834,7 @@ namespace TactsuitBS
                         {
                             leftItemChargeSFX = leftItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
                         }
-                        else if (leftItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeSounds")) != null && leftItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
                         {
                             leftItemChargeSFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
                         }
@@ -2976,9 +3013,13 @@ namespace TactsuitBS
                     {
                         ParticleSystem temp_rightItemShootVFX = null;
 
-                        if (rightItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
+                        if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "FireEffect")) != null && rightItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
                         {
                             temp_rightItemShootVFX = rightItem.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
+                        }
+                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotVFX")) != null && rightItem.GetCustomReference("bulletShotVFX")?.GetComponent<ParticleSystem>() != null)
+                        {
+                            temp_rightItemShootVFX = rightItem.GetCustomReference("bulletShotVFX").GetComponent<ParticleSystem>();
                         }
                         else
                         {
@@ -2990,7 +3031,7 @@ namespace TactsuitBS
                                     if (temp_rightItemShootVFX != null)
                                         break;
                                 }
-                                else if (rightItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
+                                else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == vfx)) != null && rightItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
                                 {
                                     temp_rightItemShootVFX = (ParticleSystem)((Component)rightItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
                                     if (temp_rightItemShootVFX != null)
@@ -3001,7 +3042,7 @@ namespace TactsuitBS
 
                         rightItemShootVFX = temp_rightItemShootVFX;
 
-                        if (rightItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
+                        if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "AltFireEffect")) != null && rightItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
                         {
                             rightItemShoot2VFX = rightItem.GetCustomReference("AltFireEffect").GetComponent<ParticleSystem>();
                         }
@@ -3010,27 +3051,35 @@ namespace TactsuitBS
                             rightItemShoot2VFX = null;
                         }
 
-                        foreach (var sfx in SFXList)
+                        if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotSFX")) != null && rightItem.GetCustomReference("bulletShotSFX")?.GetComponent<AudioSource>() != null)
                         {
-                            if (rightItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                            rightItemShootSFX = rightItem.GetCustomReference("bulletShotSFX").GetComponent<AudioSource>();
+                        }
+                        else
+                        {
+                            foreach (var sfx in SFXList)
                             {
-                                rightItemShootSFX = rightItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
-                                if (rightItemShootSFX != null)
-                                    break;
-                            }
-                            else if (rightItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
-                            {
-                                rightItemShootSFX = (AudioSource)((Component)rightItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
-                                if (rightItemShootSFX != null)
-                                    break;
+                                if (rightItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                                {
+                                    rightItemShootSFX = rightItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
+                                    if (rightItemShootSFX != null)
+                                        break;
+                                }
+                                else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == sfx)) != null && rightItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
+                                {
+                                    rightItemShootSFX = (AudioSource)((Component)rightItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
+                                    if (rightItemShootSFX != null)
+                                        break;
+                                }
                             }
                         }
+                        
 
                         if (rightItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
                         {
                             rightItemChargeReadySFX = rightItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
                         }
-                        else if (rightItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
+                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeReadySounds")) != null && rightItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
                         {
                             rightItemChargeReadySFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
                         }
@@ -3039,7 +3088,7 @@ namespace TactsuitBS
                         {
                             rightItemChargeSFX = rightItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
                         }
-                        else if (rightItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
+                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeStartSounds")) != null && rightItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
                         {
                             rightItemChargeSFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
                         }
@@ -3047,7 +3096,7 @@ namespace TactsuitBS
                         {
                             rightItemChargeSFX = rightItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
                         }
-                        else if (rightItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
+                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeSounds")) != null && rightItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
                         {
                             rightItemChargeSFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
                         }
@@ -3158,7 +3207,7 @@ namespace TactsuitBS
                                     LOG("Right blaster fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
 
                                 bool value = false;
-                                if (GunUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value) || itemBlasterComponent != null)
+                                if (GunUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value) || itemBlasterComponent != null || !GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))
                                 {
                                     if ((itemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && rightItemUseStarted)) //This item allows multi shots
                                     {
@@ -3282,14 +3331,22 @@ namespace TactsuitBS
             {
                 HeartbeatingFast = false;
                 Heartbeating = false;
-                CastingLeft = false;
-                CastingRight = false;
             }
         }
 
         #endregion
 
         #region Events
+
+        private void ContinueArrowEffect(CollisionInstance collisionstruct, float hitAngle, float locationHeight, float intensity, TactsuitVR.FeedbackType feedback, bool reflected)
+        {
+            Thread.Sleep(400);
+            while(collisionstruct!=null && collisionstruct.active && Player.local!=null)
+            {
+                Thread.Sleep(SleepDurationStuckArrow);
+                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * IntensityMultiplierStuckArrow, TactsuitVR.FeedbackType.NoFeedback, reflected);
+            }
+        }
 
         private void PlayerGotHit(CollisionInstance collisionstruct, bool kill, float fixedLocationHeight)
         {
@@ -3420,89 +3477,118 @@ namespace TactsuitBS
             }
 
             if(Logging)
-                LOG("Player got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " DamagerDataId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : "") + " DamagerDataMaterialDamageId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.damageModifierId : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
+                LOG("Player got hit by Spell?: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Damager: " + (collisionstruct.damageStruct.damager != null ? collisionstruct.damageStruct.damager.name : "") + " DamagerDataId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.id : "") + " DamagerDataMaterialDamageId: " + (collisionstruct.damageStruct.damager?.data != null ? collisionstruct.damageStruct.damager.data.damageModifierId : "") + " Imbue: " + imbueSpellId + " - Source: " + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + (collisionstruct.targetCollider != null ? collisionstruct.targetCollider.name : "whole body") + " with Hit Angle: " + hitAngle + " LocationHeight: " + locationHeight.ToString(CultureInfo.InvariantCulture) + " Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ("Materials: " + ((collisionstruct.sourceMaterial != null ? collisionstruct.sourceMaterial.id : "Null") + " > " + (collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "Null"))) + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
 
             bool reflected = (modifiedTargetColliderName.Contains("Arm") || modifiedTargetColliderName.Contains("Hand")) && modifiedTargetColliderName.Contains("Left");
             
-            tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, kill ? intensity * 5f : intensity, TactsuitVR.FeedbackType.NoFeedback, reflected);
+            tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, kill ? intensity * 50f : intensity, TactsuitVR.FeedbackType.NoFeedback, reflected);
             if (kill)
             {
-                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * 10f, TactsuitVR.FeedbackType.NoFeedback, reflected);
-                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * 5f, TactsuitVR.FeedbackType.NoFeedback, reflected);
+                Thread.Sleep(250);
+                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * 50f, TactsuitVR.FeedbackType.NoFeedback, reflected);
+                Thread.Sleep(500);
+                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * 25f, TactsuitVR.FeedbackType.NoFeedback, reflected);
             }
-
+            else
+            {
+                if (IntensityMultiplierStuckArrow > TOLERANCE && collisionstruct.active &&
+                    (feedback == TactsuitVR.FeedbackType.DamageHeadArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageHeadFireArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageHeadIceArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageHeadLightningArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageRightArmArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageRightArmFireArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageRightArmLightningArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageRightArmIceArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageVestArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageVestFireArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageVestIceArrow
+                    || feedback == TactsuitVR.FeedbackType.DamageVestLightningArrow))
+                {
+                    var @struct = collisionstruct;
+                    Thread thread = new Thread(() => ContinueArrowEffect(@struct, hitAngle, locationHeight, intensity, feedback, reflected));
+                    thread.Start();
+                }
+            }
         }
 
         private void OnCreatureHitFunc(Creature creature, CollisionInstance collisionstruct)
         {
-            if (creature && Player.local && Player.local.creature && Player.local.creature == creature)
+            try
             {
-                var @struct = collisionstruct;
-                Thread thread = new Thread(() => PlayerGotHit(@struct, false,0f));
-                thread.Start();
-            }
-            else if (creature && Player.local && Player.local.creature && Player.local.creature != creature)
-            {
-                //For debug purposes
-                LOG("------------------------>An NPC got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Source:" + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + collisionstruct.targetCollider.name + " with Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionstruct.sourceMaterial != null && collisionstruct.targetMaterial != null) ? ("Materials: " + collisionstruct.sourceMaterial.id + " > " + collisionstruct.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
-            }
-
-            if (collisionstruct.intensity > 0.01f)
-            {
-                if (collisionstruct.IsDoneByPlayer())
+                if (creature != null && Player.local?.creature != null && Player.local.creature == creature && collisionstruct != null)
                 {
-                    LOG("Player hit something...");
-                    LOG("->Player hit something with " + collisionstruct.sourceCollider.name);
+                    var @struct = collisionstruct;
+                    Thread thread = new Thread(() => PlayerGotHit(@struct, false, 0f));
+                    thread.Start();
+                }
+                else if (creature != null && Player.local?.creature != null && Player.local.creature != creature && collisionstruct != null)
+                {
+                    //For debug purposes
+                    LOG("------------------------>An NPC got hit by Spell: " + (collisionstruct.casterHand?.spellInstance != null ? collisionstruct.casterHand.spellInstance.id : "null") + " Source:" + (collisionstruct.sourceCollider != null ? collisionstruct.sourceCollider.name : "Unknown") + " on " + collisionstruct.targetCollider.name + " with Intensity:" + collisionstruct.intensity.ToString(CultureInfo.InvariantCulture) + " " + ((collisionstruct.sourceMaterial != null && collisionstruct.targetMaterial != null) ? ("Materials: " + collisionstruct.sourceMaterial.id + " > " + collisionstruct.targetMaterial.id) : "") + " DamageType: " + Utility.GetDamageTypeName(collisionstruct.damageStruct.damageType) + " Penetration: " + ((collisionstruct.damageStruct.damager != null && collisionstruct.damageStruct.damager.data != null) ? (collisionstruct.damageStruct.damager.data.penetrationDamage <= 15.0f ? "Small" : "Large") : ""));
+                }
 
-                    if ((bool) (UnityEngine.Object) collisionstruct.sourceColliderGroup.collisionHandler?.item?.rightPlayerHand)
+                if (collisionstruct != null && collisionstruct.intensity > 0.01f)
+                {
+                    if (collisionstruct.IsDoneByPlayer() && collisionstruct.sourceCollider != null)
                     {
-                        if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemData.Type.Body) //punch
+                        LOG("Player hit something...");
+                        LOG("->Player hit something with " + collisionstruct.sourceCollider.name);
+
+                        if ((bool)(UnityEngine.Object)collisionstruct.sourceColliderGroup?.collisionHandler?.item?.rightPlayerHand)
                         {
-                            TactsuitVR.FeedbackType feedback = GetPlayerPunchFeedback(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "");
-                            tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
-                            LOG("Player punched something with right Hand: Intensity: " + collisionstruct.intensity);
+                            if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemData.Type.Body) //punch
+                            {
+                                TactsuitVR.FeedbackType feedback = GetPlayerPunchFeedback(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "");
+                                tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                                LOG("Player punched something with right Hand: Intensity: " + collisionstruct.intensity);
+                            }
+                            else
+                            {
+                                TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
+                                tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                                LOG("Player hit something with right Hand: Intensity: " + collisionstruct.intensity);
+                            }
                         }
-                        else
+
+                        if ((bool)(UnityEngine.Object)collisionstruct.sourceColliderGroup?.collisionHandler?.item?.leftPlayerHand)
                         {
-                            TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
-                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
-                            LOG("Player hit something with right Hand: Intensity: " + collisionstruct.intensity);
+                            if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemData.Type.Body) //punch
+                            {
+                                TactsuitVR.FeedbackType feedback = GetPlayerPunchFeedback(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "");
+                                tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
+                                LOG("Player punched something with left Hand: Intensity: " + collisionstruct.intensity);
+                            }
+                            else
+                            {
+                                TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
+                                tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
+                                LOG("Player hit something with left Hand weapon: Intensity: " + collisionstruct.intensity);
+                            }
                         }
                     }
 
-                    if ((bool) (UnityEngine.Object) collisionstruct.sourceColliderGroup.collisionHandler?.item?.leftPlayerHand)
+                    if ((bool)(UnityEngine.Object)collisionstruct.targetColliderGroup && collisionstruct.targetColliderGroup?.collisionHandler?.item != null)
                     {
-                        if (collisionstruct.sourceColliderGroup.collisionHandler.item.data?.type == ItemData.Type.Body) //punch
-                        {
-                            TactsuitVR.FeedbackType feedback = GetPlayerPunchFeedback(collisionstruct.targetMaterial != null ? collisionstruct.targetMaterial.id : "");
-                            tactsuitVr.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
-                            LOG("Player punched something with left Hand: Intensity: " + collisionstruct.intensity);
-                        }
-                        else
+                        if ((bool)(UnityEngine.Object)collisionstruct.targetColliderGroup.collisionHandler?.item?.leftPlayerHand)
                         {
                             TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
                             tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
-                            LOG("Player hit something with left Hand weapon: Intensity: " + collisionstruct.intensity);
+                            LOG("Something hit Player's left Hand item: Intensity: " + collisionstruct.intensity);
+                        }
+
+                        if ((bool)(UnityEngine.Object)collisionstruct.targetColliderGroup.collisionHandler?.item?.rightPlayerHand)
+                        {
+                            TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
+                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                            LOG("Something hit Player's right Hand item: Intensity: " + collisionstruct.intensity);
                         }
                     }
                 }
+            }
+            catch (Exception)
+            {
 
-                if ((bool) (UnityEngine.Object) collisionstruct.targetColliderGroup && collisionstruct.targetColliderGroup?.collisionHandler?.item != null)
-                {
-                    if ((bool) (UnityEngine.Object) collisionstruct.targetColliderGroup.collisionHandler?.item?.leftPlayerHand)
-                    {
-                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, true);
-                        LOG("Something hit Player's left Hand item: Intensity: " + collisionstruct.intensity);
-                    }
-
-                    if ((bool) (UnityEngine.Object) collisionstruct.targetColliderGroup.collisionHandler?.item?.rightPlayerHand)
-                    {
-                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerMeleeFeedbackType(collisionstruct.damageStruct.damageType, collisionstruct.sourceMaterial, collisionstruct.targetMaterial);
-                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, collisionstruct.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
-                        LOG("Something hit Player's right Hand item: Intensity: " + collisionstruct.intensity);
-                    }
-                }
             }
         }
 

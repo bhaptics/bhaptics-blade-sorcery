@@ -33,9 +33,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="0Harmony, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>UnityDlls\Assembly-CSharp.dll</HintPath>
+      <HintPath>UnityDlls\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Bhaptics.Tact, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhaptics.Tac.1.4.16\lib\net35\Bhaptics.Tact.dll</HintPath>
@@ -51,6 +51,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="ThunderRoad, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>UnityDlls\ThunderRoad.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>UnityDlls\UnityEngine.dll</HintPath>
@@ -84,8 +88,15 @@
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UnityDlls\Assembly-CSharp.dll" />
-    <Content Include="UnityDlls\PowerBooks.dll" />
+    <Content Include="UnityDlls\0Harmony.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UnityDlls\PowerBooks.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UnityDlls\ThunderRoad.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UnityDlls\UnityEngine.AnimationModule.dll" />
     <Content Include="UnityDlls\UnityEngine.AudioModule.dll" />
     <Content Include="UnityDlls\UnityEngine.CoreModule.dll" />
@@ -1322,7 +1333,7 @@
     <None Include="bHaptics\UnholsterRightShoulder_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Level_TactsuitBS_Settings.json">
+    <None Include="Level_TactsuitBS.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="manifest.json">

@@ -54,11 +54,9 @@ namespace TactsuitBS
         {
             try
             {
-                FieldInfo stringHandleField = bowString.GetType().GetField("stringHandle", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (stringHandleField != null)
+                if (bowString.stringHandle != null)
                 {
-                    Handle stringHandle = (Handle)stringHandleField.GetValue(bowString);
-                    if (stringHandle.handlers.Count > 0 && (bool)(UnityEngine.Object)stringHandle.handlers[0].playerHand)
+                    if (bowString.stringHandle.handlers.Count > 0 && (bool)(UnityEngine.Object)bowString.stringHandle.handlers[0].playerHand)
                     {
                         FieldInfo currentPullField = bowString.GetType().GetField("currentPull", BindingFlags.NonPublic | BindingFlags.Instance);
                         if (currentPullField != null)
@@ -75,6 +73,7 @@ namespace TactsuitBS
 
             return 0f;
         }
+
 
         public static float GetAngleForPosition(Vector3 pos)
         {
@@ -94,6 +93,26 @@ namespace TactsuitBS
 
                 angle += 180.0f;
             }
+
+            return angle;
+        }
+
+        public static float GetAngleForPositionOther(this UnityEngine.Vector3 pos, Vector3 forward, Vector3 position)
+        {
+            float angle = 0.0f;
+
+            angle = UnityEngine.Vector3.SignedAngle(forward.ToXZ(), pos.ToXZ() - position.ToXZ(), Vector3.up);
+            if (angle < 0)
+            {
+                angle = -180 - angle;
+            }
+            else
+            {
+                angle = 180 - angle;
+            }
+
+            angle += 180.0f;
+
 
             return angle;
         }

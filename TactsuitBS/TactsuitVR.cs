@@ -265,7 +265,7 @@ namespace TactsuitBS
 
         public float IntensityPlayerThrow = 1.0f;
 
-        public float IntensityExplosion = 1.0f;
+        public float IntensityExplosion = 0.0f;
 
         public float IntensityShoulderTurret = 1.0f;
         public float IntensityHoverJetFeet = 1.0f;
@@ -987,7 +987,7 @@ namespace TactsuitBS
             {
                 return FeedbackType.PlayerSpellDrainRight;
             }
-            else if (lowerId.Contains("force"))
+            else if (lowerId.Contains("force") || lowerId.Contains("jet") || lowerId.Contains("iron"))
             {
                 return FeedbackType.PlayerSpellForceFieldRight;
             }
@@ -1595,7 +1595,7 @@ namespace TactsuitBS
                 }
                 else if (damageType == DamageType.Energy)
                 {
-                    string lowerId = spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant();
+                    string lowerId = (spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant()) + damagerId.ToLowerInvariant();
                     if (sourceMaterial == "Lightsaber")
                     {
                         return FeedbackType.DamageRightArmSlashLightsaber;
@@ -1930,7 +1930,7 @@ namespace TactsuitBS
                     }
                     else if (damageType == DamageType.Energy)
                     {
-                        string lowerId = spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant();
+                        string lowerId = (spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant()) + damagerId.ToLowerInvariant();
                         if (sourceMaterial == "Lightsaber")
                         {
                             return FeedbackType.DamageHeadSlashLightsaber;
@@ -2371,7 +2371,7 @@ namespace TactsuitBS
                     }
                     else if (damageType == DamageType.Energy)
                     {
-                        string lowerId = spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant();
+                        string lowerId = (spellId != "" ? spellId.ToLowerInvariant() : sourceMaterial.ToLowerInvariant()) + damagerId.ToLowerInvariant();
                         if (sourceMaterial == "Lightsaber")
                         {
                             if (direction == Direction.LeftRightDown)

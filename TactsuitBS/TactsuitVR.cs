@@ -269,6 +269,10 @@ namespace TactsuitBS
 
         public float IntensityShoulderTurret = 1.0f;
         public float IntensityHoverJetFeet = 1.0f;
+		
+		public float IntensityEquipUnequip = 1.0f;
+
+        public float IntensityConsumableFood = 1.0f;
         #endregion
 
         public enum PenetrationSize
@@ -591,7 +595,21 @@ namespace TactsuitBS
 
             feedbackMap.Add(FeedbackType.LeftShoulderTurret, new Feedback(FeedbackType.LeftShoulderTurret, "LeftShoulderTurret_", 0));
             feedbackMap.Add(FeedbackType.HoverJetFeet, new Feedback(FeedbackType.HoverJetFeet, "HoverJetFeet_", 0));
+			
+			feedbackMap.Add(FeedbackType.EquipCuirass, new Feedback(FeedbackType.EquipCuirass, "EquipCuirass_", 0));
+            feedbackMap.Add(FeedbackType.EquipGauntletsLeft, new Feedback(FeedbackType.EquipGauntletsLeft, "EquipGauntletsLeft_", 0));
+            feedbackMap.Add(FeedbackType.EquipGauntletsRight, new Feedback(FeedbackType.EquipGauntletsRight, "EquipGauntletsRight_", 0));
+            feedbackMap.Add(FeedbackType.EquipHelmet, new Feedback(FeedbackType.EquipHelmet, "EquipHelmet_", 0));
+            feedbackMap.Add(FeedbackType.UnequipCuirass, new Feedback(FeedbackType.UnequipCuirass, "UnequipCuirass_", 0));
+            feedbackMap.Add(FeedbackType.UnequipGauntletsLeft, new Feedback(FeedbackType.UnequipGauntletsLeft, "UnequipGauntletsLeft_", 0));
+            feedbackMap.Add(FeedbackType.UnequipGauntletsRight, new Feedback(FeedbackType.UnequipGauntletsRight, "UnequipGauntletsRight_", 0));
+            feedbackMap.Add(FeedbackType.UnequipHelmet, new Feedback(FeedbackType.UnequipHelmet, "UnequipHelmet_", 0));
+            feedbackMap.Add(FeedbackType.EquipFeet, new Feedback(FeedbackType.EquipFeet, "EquipFeet_", 0));
+            feedbackMap.Add(FeedbackType.UnequipFeet, new Feedback(FeedbackType.UnequipFeet, "UnequipFeet_", 0));
 
+            feedbackMap.Add(FeedbackType.ConsumableFood, new Feedback(FeedbackType.ConsumableFood, "ConsumableFood_", 0));
+
+            
         }
 
         public bool systemInitialized = false;
@@ -850,6 +868,7 @@ namespace TactsuitBS
             PotionDrinking,
             PoisonDrinking,
             Healing,
+            ConsumableFood,
 
             FallDamage,
             FallDamageFeet,
@@ -920,6 +939,17 @@ namespace TactsuitBS
 
             LeftShoulderTurret,
             HoverJetFeet,
+			
+			EquipCuirass,
+            EquipGauntletsRight,
+            EquipGauntletsLeft,
+            EquipHelmet,
+            UnequipCuirass,
+            UnequipGauntletsRight,
+            UnequipGauntletsLeft,
+            UnequipHelmet,
+            EquipFeet,
+            UnequipFeet,
 
             NoFeedback
         }
@@ -2895,7 +2925,18 @@ namespace TactsuitBS
                 case TactsuitVR.FeedbackType.LeftShoulderTurret: return IntensityShoulderTurret; break;
                 case TactsuitVR.FeedbackType.HoverJetFeet: return IntensityHoverJetFeet; break;
 
+				case TactsuitVR.FeedbackType.EquipCuirass: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.EquipGauntletsLeft: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.EquipGauntletsRight: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.EquipHelmet: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.UnequipCuirass: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.UnequipGauntletsLeft: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.UnequipGauntletsRight: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.UnequipHelmet: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.EquipFeet: return IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.UnequipFeet: return IntensityEquipUnequip; break;
 
+                case TactsuitVR.FeedbackType.ConsumableFood: return IntensityConsumableFood; break;
             }
 
             return IntensityDefaultDamage;

@@ -40,6 +40,7 @@
     <Reference Include="Bhaptics.Tact, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhaptics.Tac.1.4.16\lib\net35\Bhaptics.Tact.dll</HintPath>
     </Reference>
+    <Reference Include="netstandard" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\STEAM\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed\Newtonsoft.Json.dll</HintPath>
@@ -107,6 +108,9 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="bHaptics\ClimbingRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\ConsumableFood_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\DamageHeadArrow_1.tact">
@@ -856,6 +860,21 @@
     <None Include="bHaptics\DefaultDamage_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\EquipCuirass_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\EquipFeet_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\EquipGauntletsLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\EquipGauntletsRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\EquipHelmet_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="bHaptics\Explosion_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -1319,6 +1338,21 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\SlowMotion_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnequipCuirass_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnequipFeet_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnequipGauntletsLeft_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnequipGauntletsRight_1.tact">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="bHaptics\UnequipHelmet_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="bHaptics\UnholsterArrowLeftShoulder_1.tact">

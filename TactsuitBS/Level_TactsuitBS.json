@@ -269,7 +269,7 @@
 					"IntensityHolsterArrow": 1.0,
 					"IntensityUnholsterArrow": 1.0,
 
-					"IntensityClimbing": 1.1,
+					"IntensityClimbing": 1.2,
 
 					"IntensityPlayerKickOther": 3.0,
 					"IntensityPlayerKickWood": 3.0,
@@ -314,6 +314,10 @@
 
 					"IntensityShoulderTurret": 1.0,
 					"IntensityHoverJetFeet": 1.0,
+
+					"IntensityEquipUnequip": 1.0,
+
+					"IntensityConsumableFood": 1.0,
 
 					"IntensityDefaultDamage": 2.0
 				}

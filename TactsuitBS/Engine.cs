@@ -733,7 +733,28 @@ namespace TactsuitBS
         }
 
         private void OnPlayerSpawned(Player player)
-        {            
+        {
+            foreach (GameObject gameObject in (GameObject[])UnityEngine.Object.FindObjectsOfType<GameObject>())
+            {
+                if (gameObject != null)
+                {
+                    if (gameObject.GetComponent("RainController"))
+                    {
+                        rainController = gameObject;
+                        break;
+                    }
+                }
+            }
+
+            if (rainController != null)
+            {
+                LOG("Rain Controller found in scene.");
+            }
+            else
+            {
+                LOG("Rain Controller not found in scene.");
+            }
+
             Thread thread = new Thread(CheckPlayerSpawn);
             thread.Start();
         }
@@ -941,7 +962,7 @@ namespace TactsuitBS
             }
 
             LOG("Player spawned.");
-            
+
             Player.local.locomotion.OnGroundEvent -= OnGroundFunc;
             Player.local.locomotion.OnGroundEvent += OnGroundFunc;
             LOG("OnGround function added.");
@@ -1075,26 +1096,7 @@ namespace TactsuitBS
                 LOG("Can't find Liquid Receiver on player.");
             }
 
-            foreach (GameObject gameObject in (GameObject[])UnityEngine.Object.FindObjectsOfType<GameObject>())
-            {
-                if (gameObject != null)
-                {
-                    if (gameObject.GetComponent("RainController"))
-                    {
-                        rainController = gameObject;
-                        break;
-                    }
-                }
-            }
-
-            if (rainController != null)
-            {
-                LOG("Rain Controller found in scene.");
-            }
-            else
-            {
-                LOG("Rain Controller not found in scene.");
-            }
+            
         }
 
         //[HarmonyPatch("OnCollisionEnter")]
@@ -1275,6 +1277,167 @@ namespace TactsuitBS
             }
         }
 
+        [HarmonyPatch("Explosion")]
+        [HarmonyPatch(typeof(SpellMergeFire))]
+        private static class SpellMergeFireExplosionPatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(SpellMergeFire __instance, UnityEngine.Vector3 position, float radius)
+            {
+                if (!gamePaused && !GameManager.timeStopped)
+                {
+                    float dist = Vector3.Distance(Player.local.locomotion.transform.position, position);
+                    if (dist < radius * 1.5f)
+                    {
+                        float hitAngle = Utility.GetAngleForPosition(position);
+
+                        float intensity = 1.0f;
+                        if (dist < radius)
+                            intensity = 1.0f;
+                        else if (dist > radius)
+                        {
+                            intensity = 1.0f - (radius * 0.5f) * (dist - radius);
+                        }
+
+                        tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.Explosion, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                    }
+                }
+            }
+        }
+
+        //[HarmonyPatch("FixedUpdate")]
+        //[HarmonyPatch(typeof(RepulsionForce))]
+        //private static class RepulsionForcePatch
+        //{
+        //    [HarmonyPostfix]
+        //    private static void Postfix(RepulsionForce __instance)
+        //    {
+        //        if (!gamePaused && !GameManager.timeStopped)
+        //        {
+        //            float dist = Vector3.Distance(Player.local.locomotion.transform.position, __instance.transform.position);
+        //            if (dist < __instance.radius * 1.5f)
+        //            {
+        //                float hitAngle = Utility.GetAngleForPosition(__instance.transform.position);
+
+        //                float intensity = 1.0f;
+        //                if (dist < __instance.radius)
+        //                    intensity = 1.0f;
+        //                else if (dist > __instance.radius)
+        //                {
+        //                    intensity = 1.0f - (__instance.radius * 0.5f) * (dist - __instance.radius);
+        //                }
+
+        //                tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.Explosion, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //[HarmonyPatch("ShockWaveCoroutine")]
+        //[HarmonyPatch(typeof(SpellCastGravity))]
+        //private static class SpellCastGravityShockWaveCoroutinePatch
+        //{
+        //    [HarmonyPostfix]
+        //    private static void Postfix(SpellCastGravity __instance, UnityEngine.Vector3 contactPoint, UnityEngine.Vector3 impactVelocity)
+        //    {
+        //        if (!gamePaused && !GameManager.timeStopped)
+        //        {
+        //            float radius = 10.0f;
+
+        //            float dist = Vector3.Distance(Player.local.locomotion.transform.position, contactPoint);
+        //            if (dist < radius * 1.5f)
+        //            {
+        //                float hitAngle = Utility.GetAngleForPosition(contactPoint);
+
+        //                float intensity = 1.0f;
+        //                if (dist < radius)
+        //                    intensity = 1.0f;
+        //                else if (dist > radius)
+        //                {
+        //                    intensity = 1.0f - (radius * 0.5f) * (dist - radius);
+        //                }
+        //                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.DefaultDamage, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //[HarmonyPatch("RadialZapCoroutine")]
+        //[HarmonyPatch(typeof(SpellCastLightning))]
+        //private static class SpellCastLightningRadialZapCoroutinePatch
+        //{
+        //    [HarmonyPostfix]
+        //    private static void Postfix(SpellCastLightning __instance, UnityEngine.Vector3 position, float radius, float duration, System.Action<ColliderGroup> callback = null)
+        //    {
+        //        if (!gamePaused && !GameManager.timeStopped)
+        //        {
+        //            float dist = Vector3.Distance(Player.local.locomotion.transform.position, position);
+        //            if (dist < radius * 1.5f)
+        //            {
+        //                float hitAngle = Utility.GetAngleForPosition(position);
+
+        //                float intensity = 1.0f;
+        //                if (dist < radius)
+        //                    intensity = 1.0f;
+        //                else if (dist > radius)
+        //                {
+        //                    intensity = 1.0f - (radius * 0.5f) * (dist - radius);
+        //                }
+        //                tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestLightning, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false, duration);
+        //                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.DefaultDamage, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+        //            }
+        //        }
+        //    }
+        //}
+
+        [HarmonyPatch("OnCrystalSlam")]
+        [HarmonyPatch(typeof(SpellCastCharge))]
+        private static class SpellCastChargeOnCrystalSlamPatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(SpellCastCharge __instance, CollisionInstance collisionInstance)
+            {
+                if (!gamePaused && !GameManager.timeStopped)
+                {
+                    if (__instance is SpellCastProjectile)
+                        return;
+
+                    Vector3 position = collisionInstance.contactPoint;
+                    float radius = 10.0f;
+                    float duration = 1.0f;
+
+                    if (__instance is SpellCastLightning)
+                    {
+                        radius = ((SpellCastLightning)__instance).staffSlamRadius;
+                        duration = ((SpellCastLightning)__instance).staffSlamExpandDuration;
+                    }
+                    else if(__instance is SpellCastGravity)
+                    {
+                        radius = ((SpellCastGravity)__instance).staffSlamMaxRadius;
+                    }
+
+                    float dist = Vector3.Distance(Player.local.locomotion.transform.position, position);
+                    if (dist < radius * 1.5f)
+                    {
+                        float hitAngle = Utility.GetAngleForPosition(position);
+
+                        float intensity = 1.0f;
+                        if (dist < radius)
+                            intensity = 1.0f;
+                        else if (dist > radius)
+                        {
+                            intensity = 1.0f - (radius * 0.5f) * (dist - radius);
+                        }
+                        if (__instance is SpellCastLightning)
+                        {
+                            tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestLightning, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false, duration);
+                        }
+                        tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.DefaultDamage, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false, duration);
+                    }
+                }
+            }
+        }
+
         private TactsuitVR.FeedbackType GetPlayerPunchFeedback(string material)
         {
             if (!material.IsNullOrEmpty())
@@ -1424,73 +1587,73 @@ namespace TactsuitBS
 
         private void TorsoCollisionFunc(CollisionInstance collisionInstance)
         {
-            if (collisionInstance.damageStruct.hitRagdollPart?.ragdoll?.creature != null || collisionInstance.damageStruct.damage > TOLERANCE || collisionInstance.impactVelocity.magnitude < 7.0f)
-                return;
+            //if (collisionInstance.damageStruct.hitRagdollPart?.ragdoll?.creature != null || collisionInstance.damageStruct.damage > TOLERANCE || collisionInstance.impactVelocity.magnitude < 7.0f)
+            //    return;
 
-            bool sourceIsPlayer = false;
-            bool targetIsPlayer = false;
+            //bool sourceIsPlayer = false;
+            //bool targetIsPlayer = false;
 
-            if (collisionInstance.sourceColliderGroup?.collisionHandler != null)
-            {
-                if (collisionInstance.sourceColliderGroup?.collisionHandler?.isRagdollPart == true)
-                {
-                    if (collisionInstance.sourceColliderGroup?.collisionHandler?.ragdollPart?.ragdoll?.creature == Player.local?.creature)
-                    {
-                        sourceIsPlayer = true;
-                    }
-                }
-                if (!sourceIsPlayer && collisionInstance.sourceColliderGroup?.collisionHandler?.isItem == true)
-                {
-                    if (collisionInstance.sourceColliderGroup?.collisionHandler?.item?.rightPlayerHand != null
-                        || collisionInstance.sourceColliderGroup?.collisionHandler?.item?.leftPlayerHand != null
-                        || collisionInstance.sourceColliderGroup?.collisionHandler?.item?.ignoredRagdoll?.creature == Player.local?.creature
-                        || collisionInstance.IsSameSourceColliderGroup(null, Player.local?.footLeft.ragdollFoot.colliderGroup)
-                        || collisionInstance.IsSameSourceColliderGroup(null, Player.local?.footRight.ragdollFoot.colliderGroup))
-                    {
-                        sourceIsPlayer = true;
-                    }
-                }
-            }
-            if (collisionInstance.targetColliderGroup?.collisionHandler != null)
-            {
-                if (collisionInstance.targetColliderGroup?.collisionHandler?.isRagdollPart == true)
-                {
-                    if (collisionInstance.targetColliderGroup?.collisionHandler?.ragdollPart?.ragdoll?.creature == Player.local?.creature)
-                    {
-                        targetIsPlayer = true;
-                    }
-                }
-                if (!targetIsPlayer && collisionInstance.targetColliderGroup?.collisionHandler?.isItem == true)
-                {
-                    if (collisionInstance.targetColliderGroup?.collisionHandler?.item?.rightPlayerHand != null
-                        || collisionInstance.targetColliderGroup?.collisionHandler?.item?.leftPlayerHand != null
-                        || collisionInstance.targetColliderGroup?.collisionHandler?.item?.ignoredRagdoll?.creature == Player.local?.creature
-                        || collisionInstance.IsSameTargetColliderGroup(null, Player.local?.footLeft.ragdollFoot.colliderGroup)
-                        || collisionInstance.IsSameTargetColliderGroup(null, Player.local?.footRight.ragdollFoot.colliderGroup))
-                    {
-                        targetIsPlayer = true;
-                    }
-                }
-            }
+            //if (collisionInstance.sourceColliderGroup?.collisionHandler != null)
+            //{
+            //    if (collisionInstance.sourceColliderGroup?.collisionHandler?.isRagdollPart == true)
+            //    {
+            //        if (collisionInstance.sourceColliderGroup?.collisionHandler?.ragdollPart?.ragdoll?.creature == Player.local?.creature)
+            //        {
+            //            sourceIsPlayer = true;
+            //        }
+            //    }
+            //    if (!sourceIsPlayer && collisionInstance.sourceColliderGroup?.collisionHandler?.isItem == true)
+            //    {
+            //        if (collisionInstance.sourceColliderGroup?.collisionHandler?.item?.rightPlayerHand != null
+            //            || collisionInstance.sourceColliderGroup?.collisionHandler?.item?.leftPlayerHand != null
+            //            || collisionInstance.sourceColliderGroup?.collisionHandler?.item?.ignoredRagdoll?.creature == Player.local?.creature
+            //            || collisionInstance.IsSameSourceColliderGroup(null, Player.local?.footLeft.ragdollFoot.colliderGroup)
+            //            || collisionInstance.IsSameSourceColliderGroup(null, Player.local?.footRight.ragdollFoot.colliderGroup))
+            //        {
+            //            sourceIsPlayer = true;
+            //        }
+            //    }
+            //}
+            //if (collisionInstance.targetColliderGroup?.collisionHandler != null)
+            //{
+            //    if (collisionInstance.targetColliderGroup?.collisionHandler?.isRagdollPart == true)
+            //    {
+            //        if (collisionInstance.targetColliderGroup?.collisionHandler?.ragdollPart?.ragdoll?.creature == Player.local?.creature)
+            //        {
+            //            targetIsPlayer = true;
+            //        }
+            //    }
+            //    if (!targetIsPlayer && collisionInstance.targetColliderGroup?.collisionHandler?.isItem == true)
+            //    {
+            //        if (collisionInstance.targetColliderGroup?.collisionHandler?.item?.rightPlayerHand != null
+            //            || collisionInstance.targetColliderGroup?.collisionHandler?.item?.leftPlayerHand != null
+            //            || collisionInstance.targetColliderGroup?.collisionHandler?.item?.ignoredRagdoll?.creature == Player.local?.creature
+            //            || collisionInstance.IsSameTargetColliderGroup(null, Player.local?.footLeft.ragdollFoot.colliderGroup)
+            //            || collisionInstance.IsSameTargetColliderGroup(null, Player.local?.footRight.ragdollFoot.colliderGroup))
+            //        {
+            //            targetIsPlayer = true;
+            //        }
+            //    }
+            //}
 
             float hitAngle = Utility.GetAngleForPosition(collisionInstance.contactPoint);
 
-            if (collisionInstance.sourceColliderGroup != null && collisionInstance.targetColliderGroup != null)
-            {
-                LOG("Player torso collision " + (sourceIsPlayer ? "Source is player!" : "") + " " + (targetIsPlayer ? "Target is player!" : "") + " ST: SourceName: " + (collisionInstance.sourceColliderGroup.collisionHandler != null ? collisionInstance.sourceColliderGroup.collisionHandler.name : "") + " TargetName: " + (collisionInstance.targetColliderGroup.collisionHandler != null ? collisionInstance.targetColliderGroup.collisionHandler.name : "") + " with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
-            }
-            else if (collisionInstance.sourceColliderGroup != null && collisionInstance.targetColliderGroup == null)
-            {
-                LOG("Player torso collision " + (sourceIsPlayer ? "Source is player!" : "") + " S: SourceName: " + (collisionInstance.sourceColliderGroup.collisionHandler != null ? collisionInstance.sourceColliderGroup.collisionHandler.name : "") + " with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
-            }
-            else if (collisionInstance.sourceColliderGroup == null && collisionInstance.targetColliderGroup != null)
-            {
-                LOG("Player torso collision " + (targetIsPlayer ? "Target is player!" : "") + " T: TargetName: " + (collisionInstance.targetColliderGroup.collisionHandler != null ? collisionInstance.targetColliderGroup.collisionHandler.name : "") + " with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
-            }
-            else if (collisionInstance.sourceColliderGroup == null && collisionInstance.targetColliderGroup == null)
-            {
-                LOG("Player torso collision with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
-            }
+            //if (collisionInstance.sourceColliderGroup != null && collisionInstance.targetColliderGroup != null)
+            //{
+            //    LOG("Player torso collision " + (sourceIsPlayer ? "Source is player!" : "") + " " + (targetIsPlayer ? "Target is player!" : "") + " ST: SourceName: " + (collisionInstance.sourceColliderGroup.collisionHandler != null ? collisionInstance.sourceColliderGroup.collisionHandler.name : "") + " TargetName: " + (collisionInstance.targetColliderGroup.collisionHandler != null ? collisionInstance.targetColliderGroup.collisionHandler.name : "") + " with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
+            //}
+            //else if (collisionInstance.sourceColliderGroup != null && collisionInstance.targetColliderGroup == null)
+            //{
+            //    LOG("Player torso collision " + (sourceIsPlayer ? "Source is player!" : "") + " S: SourceName: " + (collisionInstance.sourceColliderGroup.collisionHandler != null ? collisionInstance.sourceColliderGroup.collisionHandler.name : "") + " with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
+            //}
+            //else if (collisionInstance.sourceColliderGroup == null && collisionInstance.targetColliderGroup != null)
+            //{
+            //    LOG("Player torso collision " + (targetIsPlayer ? "Target is player!" : "") + " T: TargetName: " + (collisionInstance.targetColliderGroup.collisionHandler != null ? collisionInstance.targetColliderGroup.collisionHandler.name : "") + " with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
+            //}
+            //else if (collisionInstance.sourceColliderGroup == null && collisionInstance.targetColliderGroup == null)
+            //{
+            //    LOG("Player torso collision with Hit Angle: " + hitAngle.ToString(CultureInfo.InvariantCulture) + " with intensity=" + collisionInstance.intensity.ToString(CultureInfo.InvariantCulture) + " with ImpactVelocity:" + collisionInstance.impactVelocity.magnitude.ToString(CultureInfo.InvariantCulture) + " DamageType: " + Enum.GetName(typeof(DamageType), collisionInstance.damageStruct.damageType) + " " + ("Materials: " + ((collisionInstance.sourceMaterial != null ? collisionInstance.sourceMaterial.id : "Null") + " > " + (collisionInstance.targetMaterial != null ? collisionInstance.targetMaterial.id : "Null"))));
+            //}
             
             tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestBluntStoneLarge, false, collisionInstance.intensity, TactsuitVR.FeedbackType.NoFeedback, false);
         }
@@ -1685,7 +1848,7 @@ namespace TactsuitBS
             if (handle.gameObject?.transform?.parent?.transform?.parent?.gameObject != null)
                 objectName = handle.gameObject.transform.parent.transform.parent.gameObject.name;
 
-            if (objectName == "LadderBuilder")
+            if (objectName.ToLowerInvariant().Contains("ladder"))
             {
                 if (side == Side.Left) grabbedLadderWithLeftHand = false;
                 else grabbedLadderWithRightHand = false;
@@ -1847,7 +2010,7 @@ namespace TactsuitBS
                 if (handle.item != null)
                     itemName += handle.item.name;
 
-                if(objectName == "LadderBuilder")
+                if (objectName.ToLowerInvariant().Contains("ladder"))
                 {
                     if (side == Side.Left) grabbedLadderWithLeftHand = true;
                     else grabbedLadderWithRightHand = true;
@@ -2238,7 +2401,7 @@ namespace TactsuitBS
             while (raining)
             {
                 minsleepduration = (float)RainVestSleepDuration / rainDensity;
-                minsleepDurationInt = (int) minsleepduration;
+                minsleepDurationInt = (int)minsleepduration;
 
                 sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
 
@@ -2246,7 +2409,7 @@ namespace TactsuitBS
                 int pos = RandomNumber.Between(0, 1);
                 int durationOffset = RandomNumber.Between(0, 30) - 15;
                 tactsuitVr.ProvideDotFeedback(pos == 1 ? PositionType.VestFront : PositionType.VestBack, index, (int)(30.0f * rainIntensity * IntensityRaindropVest), RainEffectDuration + durationOffset);
-            
+
                 Thread.Sleep(sleepDuration);
             }
         }
@@ -2257,18 +2420,21 @@ namespace TactsuitBS
             int minsleepDurationInt = 100;
             int sleepDuration = 100;
 
-            while (raining)
+            if (tactsuitVr.ArmsActive)
             {
-                minsleepduration = (float)RainArmSleepDuration / rainDensity;
-                minsleepDurationInt = (int)(minsleepduration);
+                while (raining)
+                {
+                    minsleepduration = (float)RainArmSleepDuration / rainDensity;
+                    minsleepDurationInt = (int)(minsleepduration);
 
-                sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
+                    sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
 
-                int index = RandomNumber.Between(0, 5);
-                int durationOffset = RandomNumber.Between(0, 30) - 15;
-                tactsuitVr.ProvideDotFeedback(left ? PositionType.ForearmL : PositionType.ForearmR, index, (int)(30.0f * rainIntensity * IntensityRaindropArm), RainEffectDuration + durationOffset);
+                    int index = RandomNumber.Between(0, 5);
+                    int durationOffset = RandomNumber.Between(0, 30) - 15;
+                    tactsuitVr.ProvideDotFeedback(left ? PositionType.ForearmL : PositionType.ForearmR, index, (int)(30.0f * rainIntensity * IntensityRaindropArm), RainEffectDuration + durationOffset);
 
-                Thread.Sleep(sleepDuration);
+                    Thread.Sleep(sleepDuration);
+                }
             }
         }
 
@@ -2278,18 +2444,21 @@ namespace TactsuitBS
             int minsleepDurationInt = 100;
             int sleepDuration = 1;
 
-            while (raining)
+            if (tactsuitVr.HeadActive)
             {
-                minsleepduration = (float)RainHeadSleepDuration / rainDensity;
-                minsleepDurationInt = (int)(minsleepduration);
+                while (raining)
+                {
+                    minsleepduration = (float)RainHeadSleepDuration / rainDensity;
+                    minsleepDurationInt = (int)(minsleepduration);
 
-                sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
+                    sleepDuration = RandomNumber.Between(minsleepDurationInt, minsleepDurationInt * 2);
 
-                int index = RandomNumber.Between(0, 5);
-                int durationOffset = RandomNumber.Between(0, 30) - 15;
-                tactsuitVr.ProvideDotFeedback(PositionType.Head, index, (int)(30.0f * rainIntensity * IntensityRaindropHead), RainEffectDuration + durationOffset);
+                    int index = RandomNumber.Between(0, 5);
+                    int durationOffset = RandomNumber.Between(0, 30) - 15;
+                    tactsuitVr.ProvideDotFeedback(PositionType.Head, index, (int)(30.0f * rainIntensity * IntensityRaindropHead), RainEffectDuration + durationOffset);
 
-                Thread.Sleep(sleepDuration);
+                    Thread.Sleep(sleepDuration);
+                }
             }
         }
 
@@ -2518,6 +2687,60 @@ namespace TactsuitBS
             }
         }
 
+        [HarmonyPatch("Merge")]
+        [HarmonyPatch(typeof(SpellMergeData))]
+        private static class SpellMergeDataMergePatch
+        {
+            private static bool Casting = false;
+
+            private static void SpellMergeFunc(SpellMergeData __instance)
+            {
+                if (tactsuitVr != null)
+                {
+                    TactsuitVR.FeedbackType leftFeedback = TactsuitVR.GetSpellFeedbackFromId(__instance.leftSpellId);
+                    TactsuitVR.FeedbackType rightFeedback = TactsuitVR.GetSpellFeedbackFromId(__instance.rightSpellId);
+                    
+                    while (!GameManager.timeStopped && Casting)
+                    {
+                        if (Player.local != null && Player.local.creature != null
+                            && Player.local.creature.mana != null)
+                        {
+                            float intensity = __instance.currentCharge / __instance.minCharge;                            
+
+                            tactsuitVr.ProvideHapticFeedback(0, 0, leftFeedback, false, intensity, TactsuitVR.FeedbackType.NoFeedback, true);
+                            tactsuitVr.ProvideHapticFeedback(0, 0, rightFeedback, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
+                            Thread.Sleep(SleepDurationSpellCast);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }                    
+                }
+            }
+
+            [HarmonyPostfix]
+            private static void Postfix(SpellMergeData __instance, bool active)
+            {
+                if (__instance != null && Player.local?.creature != null && __instance.mana?.creature != null && __instance.mana.creature == Player.local.creature)
+                {
+                    if (active && __instance != null)
+                    {
+                        if (!Casting)
+                        {
+                            Casting = true;
+                            Thread thread = new Thread(() => SpellMergeFunc(__instance));
+                            thread.Start();
+                        }
+                    }
+                    else
+                    {                        
+                        Casting = false;
+                    }
+                }
+            }
+        }
+
         private void CheckStates(Creature creature)
         {
             if (creature != null)
@@ -2566,14 +2789,14 @@ namespace TactsuitBS
                         && (leftItem == null || (leftItem != null && !leftItemUseStarted) || (leftItem != null && leftItemUseStarted && !leftItem.name.Contains("Grapple")))
                         && (rightItem == null || (rightItem != null && !rightItemUseStarted) || (rightItem != null && rightItemUseStarted && !rightItem.name.Contains("Grapple"))))
                     {
-                        if (!beingPushedOther)
-                        {
-                            beingPushedOther = true;
+                        //if (!beingPushedOther)
+                        //{
+                        //    beingPushedOther = true;
 
-                            Thread thread = new Thread(BeingPushedOtherFunc);
-                            thread.Start();
-                            LOG("Player is being pushed by a strong force like explosion.");
-                        }
+                        //    Thread thread = new Thread(BeingPushedOtherFunc);
+                        //    thread.Start();
+                        //    LOG("Player is being pushed by a strong force like explosion.");
+                        //}
                     }
                     else
                     {
@@ -3453,7 +3676,7 @@ namespace TactsuitBS
             bool heightCalculated = false;
             if (PlayFallbackEffectsForArmHead && !targetColliderName.IsNullOrEmpty())
             {
-                if (targetColliderName.Contains("Head") && !Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.Head))
+                if (targetColliderName.Contains("Head") && !tactsuitVr.HeadActive)
                 {
                     modifiedTargetColliderName = "Neck";
                     if (hitAngle > 90f && hitAngle < 270f) hitAngle = 180f;
@@ -3461,14 +3684,14 @@ namespace TactsuitBS
                 }
                 else if(targetColliderName.Contains("Arm"))
                 {
-                    if (targetColliderName.Contains("Left") && !Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.ForearmL))
+                    if (targetColliderName.Contains("Left") && !tactsuitVr.ArmsActive)
                     {
                         modifiedTargetColliderName = "Part_LeftShoulder";
                         locationHeight = 0.45f;
                         hitAngle = 90f;
                         heightCalculated = true;
                     }
-                    else if (targetColliderName.Contains("Right") && !Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.ForearmR))
+                    else if (targetColliderName.Contains("Right") && !tactsuitVr.ArmsActive)
                     {
                         modifiedTargetColliderName = "Part_RightShoulder";
                         locationHeight = 0.45f;

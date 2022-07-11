@@ -275,6 +275,10 @@ namespace TactsuitBS
         public float IntensityConsumableFood = 1.0f;
         #endregion
 
+        public bool ArmsActive = false;
+        public bool HeadActive = false;
+        public bool FeetActive = false;
+
         public enum PenetrationSize
         {
             Small,
@@ -299,315 +303,315 @@ namespace TactsuitBS
         private void FillFeedbackList()
         {
             feedbackMap.Clear();
-            feedbackMap.Add(FeedbackType.HeartBeat, new Feedback(FeedbackType.HeartBeat, "HeartBeat_", 0));
-            feedbackMap.Add(FeedbackType.HeartBeatFast, new Feedback(FeedbackType.HeartBeatFast, "HeartBeatFast_", 0));
+            feedbackMap.Add(FeedbackType.HeartBeat, new Feedback(FeedbackType.HeartBeat, "HeartBeat_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.HeartBeatFast, new Feedback(FeedbackType.HeartBeatFast, "HeartBeatFast_", 0, PositionType.Vest));
 
-            feedbackMap.Add(FeedbackType.DefaultDamage, new Feedback(FeedbackType.DefaultDamage, "DefaultDamage_", 0));
+            feedbackMap.Add(FeedbackType.DefaultDamage, new Feedback(FeedbackType.DefaultDamage, "DefaultDamage_", 0, PositionType.Vest));
 
-            feedbackMap.Add(FeedbackType.PlayerBowPullRight, new Feedback(FeedbackType.PlayerBowPullRight, "PlayerBowPullRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerBowPullRight, new Feedback(FeedbackType.PlayerBowPullRight, "PlayerBowPullRight_", 0, PositionType.ForearmR));
             
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeWoodPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeWoodPierceRight, "PlayerMeleeBladeWoodPierceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeMetalPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeMetalPierceRight, "PlayerMeleeBladeMetalPierceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeStonePierceRight, new Feedback(FeedbackType.PlayerMeleeBladeStonePierceRight, "PlayerMeleeBladeStonePierceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFabricPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeFabricPierceRight, "PlayerMeleeBladeFabricPierceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFleshPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeFleshPierceRight, "PlayerMeleeBladeFleshPierceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeWoodSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeWoodSlashRight, "PlayerMeleeBladeWoodSlashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeMetalSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeMetalSlashRight, "PlayerMeleeBladeMetalSlashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeStoneSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeStoneSlashRight, "PlayerMeleeBladeStoneSlashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFabricSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeFabricSlashRight, "PlayerMeleeBladeFabricSlashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFleshSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeFleshSlashRight, "PlayerMeleeBladeFleshSlashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeWoodBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeWoodBluntRight, "PlayerMeleeBladeWoodBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeMetalBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeMetalBluntRight, "PlayerMeleeBladeMetalBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeStoneBluntRight, "PlayerMeleeBladeStoneBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeFabricBluntRight, "PlayerMeleeBladeFabricBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeFleshBluntRight, "PlayerMeleeBladeFleshBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeWoodWoodBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodWoodBluntRight, "PlayerMeleeWoodWoodBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeWoodMetalBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodMetalBluntRight, "PlayerMeleeWoodMetalBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeWoodStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodStoneBluntRight, "PlayerMeleeWoodStoneBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeWoodFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodFabricBluntRight, "PlayerMeleeWoodFabricBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeWoodFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodFleshBluntRight, "PlayerMeleeWoodFleshBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeStoneStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneStoneBluntRight, "PlayerMeleeStoneStoneBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeStoneFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneFabricBluntRight, "PlayerMeleeStoneFabricBluntRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeStoneFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneFleshBluntRight, "PlayerMeleeStoneFleshBluntRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeWoodPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeWoodPierceRight, "PlayerMeleeBladeWoodPierceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeMetalPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeMetalPierceRight, "PlayerMeleeBladeMetalPierceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeStonePierceRight, new Feedback(FeedbackType.PlayerMeleeBladeStonePierceRight, "PlayerMeleeBladeStonePierceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFabricPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeFabricPierceRight, "PlayerMeleeBladeFabricPierceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFleshPierceRight, new Feedback(FeedbackType.PlayerMeleeBladeFleshPierceRight, "PlayerMeleeBladeFleshPierceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeWoodSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeWoodSlashRight, "PlayerMeleeBladeWoodSlashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeMetalSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeMetalSlashRight, "PlayerMeleeBladeMetalSlashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeStoneSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeStoneSlashRight, "PlayerMeleeBladeStoneSlashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFabricSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeFabricSlashRight, "PlayerMeleeBladeFabricSlashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFleshSlashRight, new Feedback(FeedbackType.PlayerMeleeBladeFleshSlashRight, "PlayerMeleeBladeFleshSlashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeWoodBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeWoodBluntRight, "PlayerMeleeBladeWoodBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeMetalBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeMetalBluntRight, "PlayerMeleeBladeMetalBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeStoneBluntRight, "PlayerMeleeBladeStoneBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeFabricBluntRight, "PlayerMeleeBladeFabricBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeBladeFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeBladeFleshBluntRight, "PlayerMeleeBladeFleshBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeWoodWoodBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodWoodBluntRight, "PlayerMeleeWoodWoodBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeWoodMetalBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodMetalBluntRight, "PlayerMeleeWoodMetalBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeWoodStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodStoneBluntRight, "PlayerMeleeWoodStoneBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeWoodFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodFabricBluntRight, "PlayerMeleeWoodFabricBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeWoodFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeWoodFleshBluntRight, "PlayerMeleeWoodFleshBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeStoneStoneBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneStoneBluntRight, "PlayerMeleeStoneStoneBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeStoneFabricBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneFabricBluntRight, "PlayerMeleeStoneFabricBluntRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeStoneFleshBluntRight, new Feedback(FeedbackType.PlayerMeleeStoneFleshBluntRight, "PlayerMeleeStoneFleshBluntRight_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberClashRight, new Feedback(FeedbackType.PlayerMeleeLightsaberClashRight, "PlayerMeleeLightsaberClashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberSlashRight, new Feedback(FeedbackType.PlayerMeleeLightsaberSlashRight, "PlayerMeleeLightsaberSlashRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberPierceRight, new Feedback(FeedbackType.PlayerMeleeLightsaberPierceRight, "PlayerMeleeLightsaberPierceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberBluntRight, new Feedback(FeedbackType.PlayerMeleeLightsaberBluntRight, "PlayerMeleeLightsaberBluntRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberClashRight, new Feedback(FeedbackType.PlayerMeleeLightsaberClashRight, "PlayerMeleeLightsaberClashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberSlashRight, new Feedback(FeedbackType.PlayerMeleeLightsaberSlashRight, "PlayerMeleeLightsaberSlashRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberPierceRight, new Feedback(FeedbackType.PlayerMeleeLightsaberPierceRight, "PlayerMeleeLightsaberPierceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerMeleeLightsaberBluntRight, new Feedback(FeedbackType.PlayerMeleeLightsaberBluntRight, "PlayerMeleeLightsaberBluntRight_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.PlayerSpellFireRight, new Feedback(FeedbackType.PlayerSpellFireRight, "PlayerSpellFireRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellLightningRight, new Feedback(FeedbackType.PlayerSpellLightningRight, "PlayerSpellLightningRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellGravityRight, new Feedback(FeedbackType.PlayerSpellGravityRight, "PlayerSpellGravityRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellIceRight, new Feedback(FeedbackType.PlayerSpellIceRight, "PlayerSpellIceRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellCrushRight, new Feedback(FeedbackType.PlayerSpellCrushRight, "PlayerSpellCrushRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellHealRight, new Feedback(FeedbackType.PlayerSpellHealRight, "PlayerSpellHealRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellImplosionRight, new Feedback(FeedbackType.PlayerSpellImplosionRight, "PlayerSpellImplosionRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellInvisibilityRight, new Feedback(FeedbackType.PlayerSpellInvisibilityRight, "PlayerSpellInvisibilityRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellTeslaRight, new Feedback(FeedbackType.PlayerSpellTeslaRight, "PlayerSpellTeslaRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellUtilityRight, new Feedback(FeedbackType.PlayerSpellUtilityRight, "PlayerSpellUtilityRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellCorruptionRight, new Feedback(FeedbackType.PlayerSpellCorruptionRight, "PlayerSpellCorruptionRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellTeleportRight, new Feedback(FeedbackType.PlayerSpellTeleportRight, "PlayerSpellTeleportRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellRasenganRight, new Feedback(FeedbackType.PlayerSpellRasenganRight, "PlayerSpellRasenganRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellNeedleRight, new Feedback(FeedbackType.PlayerSpellNeedleRight, "PlayerSpellNeedleRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellDrainRight, new Feedback(FeedbackType.PlayerSpellDrainRight, "PlayerSpellDrainRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellForceFieldRight, new Feedback(FeedbackType.PlayerSpellForceFieldRight, "PlayerSpellForceFieldRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerSpellOtherRight, new Feedback(FeedbackType.PlayerSpellOtherRight, "PlayerSpellOtherRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerSpellFireRight, new Feedback(FeedbackType.PlayerSpellFireRight, "PlayerSpellFireRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellLightningRight, new Feedback(FeedbackType.PlayerSpellLightningRight, "PlayerSpellLightningRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellGravityRight, new Feedback(FeedbackType.PlayerSpellGravityRight, "PlayerSpellGravityRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellIceRight, new Feedback(FeedbackType.PlayerSpellIceRight, "PlayerSpellIceRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellCrushRight, new Feedback(FeedbackType.PlayerSpellCrushRight, "PlayerSpellCrushRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellHealRight, new Feedback(FeedbackType.PlayerSpellHealRight, "PlayerSpellHealRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellImplosionRight, new Feedback(FeedbackType.PlayerSpellImplosionRight, "PlayerSpellImplosionRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellInvisibilityRight, new Feedback(FeedbackType.PlayerSpellInvisibilityRight, "PlayerSpellInvisibilityRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellTeslaRight, new Feedback(FeedbackType.PlayerSpellTeslaRight, "PlayerSpellTeslaRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellUtilityRight, new Feedback(FeedbackType.PlayerSpellUtilityRight, "PlayerSpellUtilityRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellCorruptionRight, new Feedback(FeedbackType.PlayerSpellCorruptionRight, "PlayerSpellCorruptionRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellTeleportRight, new Feedback(FeedbackType.PlayerSpellTeleportRight, "PlayerSpellTeleportRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellRasenganRight, new Feedback(FeedbackType.PlayerSpellRasenganRight, "PlayerSpellRasenganRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellNeedleRight, new Feedback(FeedbackType.PlayerSpellNeedleRight, "PlayerSpellNeedleRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellDrainRight, new Feedback(FeedbackType.PlayerSpellDrainRight, "PlayerSpellDrainRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellForceFieldRight, new Feedback(FeedbackType.PlayerSpellForceFieldRight, "PlayerSpellForceFieldRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerSpellOtherRight, new Feedback(FeedbackType.PlayerSpellOtherRight, "PlayerSpellOtherRight_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.PlayerTelekinesisActiveRight, new Feedback(FeedbackType.PlayerTelekinesisActiveRight, "PlayerTelekinesisActiveRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerTelekinesisPullRight, new Feedback(FeedbackType.PlayerTelekinesisPullRight, "PlayerTelekinesisPullRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerTelekinesisRepelRight, new Feedback(FeedbackType.PlayerTelekinesisRepelRight, "PlayerTelekinesisRepelRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerTelekinesisCatchRight, new Feedback(FeedbackType.PlayerTelekinesisCatchRight, "PlayerTelekinesisCatchRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerTelekinesisActiveRight, new Feedback(FeedbackType.PlayerTelekinesisActiveRight, "PlayerTelekinesisActiveRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerTelekinesisPullRight, new Feedback(FeedbackType.PlayerTelekinesisPullRight, "PlayerTelekinesisPullRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerTelekinesisRepelRight, new Feedback(FeedbackType.PlayerTelekinesisRepelRight, "PlayerTelekinesisRepelRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerTelekinesisCatchRight, new Feedback(FeedbackType.PlayerTelekinesisCatchRight, "PlayerTelekinesisCatchRight_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.DamageVestPierceBladeSmall, new Feedback(FeedbackType.DamageVestPierceBladeSmall, "DamageVestPierceBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallLRD, new Feedback(FeedbackType.DamageVestSlashBladeSmallLRD, "DamageVestSlashBladeSmallLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallLRU, new Feedback(FeedbackType.DamageVestSlashBladeSmallLRU, "DamageVestSlashBladeSmallLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallRLD, new Feedback(FeedbackType.DamageVestSlashBladeSmallRLD, "DamageVestSlashBladeSmallRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallRLU, new Feedback(FeedbackType.DamageVestSlashBladeSmallRLU, "DamageVestSlashBladeSmallRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntBladeSmall, new Feedback(FeedbackType.DamageVestBluntBladeSmall, "DamageVestBluntBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntWoodSmall, new Feedback(FeedbackType.DamageVestBluntWoodSmall, "DamageVestBluntWoodSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntMetalSmall, new Feedback(FeedbackType.DamageVestBluntMetalSmall, "DamageVestBluntMetalSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntStoneSmall, new Feedback(FeedbackType.DamageVestBluntStoneSmall, "DamageVestBluntStoneSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntFleshSmall, new Feedback(FeedbackType.DamageVestBluntFleshSmall, "DamageVestBluntFleshSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceFireSmall, new Feedback(FeedbackType.DamageVestPierceFireSmall, "DamageVestPierceFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallLRD, new Feedback(FeedbackType.DamageVestSlashFireSmallLRD, "DamageVestSlashFireSmallLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallLRU, new Feedback(FeedbackType.DamageVestSlashFireSmallLRU, "DamageVestSlashFireSmallLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallRLD, new Feedback(FeedbackType.DamageVestSlashFireSmallRLD, "DamageVestSlashFireSmallRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallRLU, new Feedback(FeedbackType.DamageVestSlashFireSmallRLU, "DamageVestSlashFireSmallRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntFireSmall, new Feedback(FeedbackType.DamageVestBluntFireSmall, "DamageVestBluntFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceLightningSmall, new Feedback(FeedbackType.DamageVestPierceLightningSmall, "DamageVestPierceLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallLRD, new Feedback(FeedbackType.DamageVestSlashLightningSmallLRD, "DamageVestSlashLightningSmallLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallLRU, new Feedback(FeedbackType.DamageVestSlashLightningSmallLRU, "DamageVestSlashLightningSmallLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallRLD, new Feedback(FeedbackType.DamageVestSlashLightningSmallRLD, "DamageVestSlashLightningSmallRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallRLU, new Feedback(FeedbackType.DamageVestSlashLightningSmallRLU, "DamageVestSlashLightningSmallRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntLightningSmall, new Feedback(FeedbackType.DamageVestBluntLightningSmall, "DamageVestBluntLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceIceSmall, new Feedback(FeedbackType.DamageVestPierceIceSmall, "DamageVestPierceIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallLRD, new Feedback(FeedbackType.DamageVestSlashIceSmallLRD, "DamageVestSlashIceSmallLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallLRU, new Feedback(FeedbackType.DamageVestSlashIceSmallLRU, "DamageVestSlashIceSmallLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallRLD, new Feedback(FeedbackType.DamageVestSlashIceSmallRLD, "DamageVestSlashIceSmallRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallRLU, new Feedback(FeedbackType.DamageVestSlashIceSmallRLU, "DamageVestSlashIceSmallRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntIceSmall, new Feedback(FeedbackType.DamageVestBluntIceSmall, "DamageVestBluntIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceBladeLarge, new Feedback(FeedbackType.DamageVestPierceBladeLarge, "DamageVestPierceBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeLRD, new Feedback(FeedbackType.DamageVestSlashBladeLargeLRD, "DamageVestSlashBladeLargeLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeLRU, new Feedback(FeedbackType.DamageVestSlashBladeLargeLRU, "DamageVestSlashBladeLargeLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeRLD, new Feedback(FeedbackType.DamageVestSlashBladeLargeRLD, "DamageVestSlashBladeLargeRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeRLU, new Feedback(FeedbackType.DamageVestSlashBladeLargeRLU, "DamageVestSlashBladeLargeRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntBladeLarge, new Feedback(FeedbackType.DamageVestBluntBladeLarge, "DamageVestBluntBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntWoodLarge, new Feedback(FeedbackType.DamageVestBluntWoodLarge, "DamageVestBluntWoodLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntMetalLarge, new Feedback(FeedbackType.DamageVestBluntMetalLarge, "DamageVestBluntMetalLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntStoneLarge, new Feedback(FeedbackType.DamageVestBluntStoneLarge, "DamageVestBluntStoneLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntFleshLarge, new Feedback(FeedbackType.DamageVestBluntFleshLarge, "DamageVestBluntFleshLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceFireLarge, new Feedback(FeedbackType.DamageVestPierceFireLarge, "DamageVestPierceFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeLRD, new Feedback(FeedbackType.DamageVestSlashFireLargeLRD, "DamageVestSlashFireLargeLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeLRU, new Feedback(FeedbackType.DamageVestSlashFireLargeLRU, "DamageVestSlashFireLargeLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeRLD, new Feedback(FeedbackType.DamageVestSlashFireLargeRLD, "DamageVestSlashFireLargeRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeRLU, new Feedback(FeedbackType.DamageVestSlashFireLargeRLU, "DamageVestSlashFireLargeRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntFireLarge, new Feedback(FeedbackType.DamageVestBluntFireLarge, "DamageVestBluntFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceLightningLarge, new Feedback(FeedbackType.DamageVestPierceLightningLarge, "DamageVestPierceLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeLRD, new Feedback(FeedbackType.DamageVestSlashLightningLargeLRD, "DamageVestSlashLightningLargeLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeLRU, new Feedback(FeedbackType.DamageVestSlashLightningLargeLRU, "DamageVestSlashLightningLargeLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeRLD, new Feedback(FeedbackType.DamageVestSlashLightningLargeRLD, "DamageVestSlashLightningLargeRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeRLU, new Feedback(FeedbackType.DamageVestSlashLightningLargeRLU, "DamageVestSlashLightningLargeRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntLightningLarge, new Feedback(FeedbackType.DamageVestBluntLightningLarge, "DamageVestBluntLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestPierceIceLarge, new Feedback(FeedbackType.DamageVestPierceIceLarge, "DamageVestPierceIceLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeLRD, new Feedback(FeedbackType.DamageVestSlashIceLargeLRD, "DamageVestSlashIceLargeLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeLRU, new Feedback(FeedbackType.DamageVestSlashIceLargeLRU, "DamageVestSlashIceLargeLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeRLD, new Feedback(FeedbackType.DamageVestSlashIceLargeRLD, "DamageVestSlashIceLargeRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeRLU, new Feedback(FeedbackType.DamageVestSlashIceLargeRLU, "DamageVestSlashIceLargeRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntIceLarge, new Feedback(FeedbackType.DamageVestBluntIceLarge, "DamageVestBluntIceLarge_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestPierceBladeSmall, new Feedback(FeedbackType.DamageVestPierceBladeSmall, "DamageVestPierceBladeSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallLRD, new Feedback(FeedbackType.DamageVestSlashBladeSmallLRD, "DamageVestSlashBladeSmallLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallLRU, new Feedback(FeedbackType.DamageVestSlashBladeSmallLRU, "DamageVestSlashBladeSmallLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallRLD, new Feedback(FeedbackType.DamageVestSlashBladeSmallRLD, "DamageVestSlashBladeSmallRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeSmallRLU, new Feedback(FeedbackType.DamageVestSlashBladeSmallRLU, "DamageVestSlashBladeSmallRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntBladeSmall, new Feedback(FeedbackType.DamageVestBluntBladeSmall, "DamageVestBluntBladeSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntWoodSmall, new Feedback(FeedbackType.DamageVestBluntWoodSmall, "DamageVestBluntWoodSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntMetalSmall, new Feedback(FeedbackType.DamageVestBluntMetalSmall, "DamageVestBluntMetalSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntStoneSmall, new Feedback(FeedbackType.DamageVestBluntStoneSmall, "DamageVestBluntStoneSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntFleshSmall, new Feedback(FeedbackType.DamageVestBluntFleshSmall, "DamageVestBluntFleshSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceFireSmall, new Feedback(FeedbackType.DamageVestPierceFireSmall, "DamageVestPierceFireSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallLRD, new Feedback(FeedbackType.DamageVestSlashFireSmallLRD, "DamageVestSlashFireSmallLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallLRU, new Feedback(FeedbackType.DamageVestSlashFireSmallLRU, "DamageVestSlashFireSmallLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallRLD, new Feedback(FeedbackType.DamageVestSlashFireSmallRLD, "DamageVestSlashFireSmallRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireSmallRLU, new Feedback(FeedbackType.DamageVestSlashFireSmallRLU, "DamageVestSlashFireSmallRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntFireSmall, new Feedback(FeedbackType.DamageVestBluntFireSmall, "DamageVestBluntFireSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceLightningSmall, new Feedback(FeedbackType.DamageVestPierceLightningSmall, "DamageVestPierceLightningSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallLRD, new Feedback(FeedbackType.DamageVestSlashLightningSmallLRD, "DamageVestSlashLightningSmallLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallLRU, new Feedback(FeedbackType.DamageVestSlashLightningSmallLRU, "DamageVestSlashLightningSmallLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallRLD, new Feedback(FeedbackType.DamageVestSlashLightningSmallRLD, "DamageVestSlashLightningSmallRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningSmallRLU, new Feedback(FeedbackType.DamageVestSlashLightningSmallRLU, "DamageVestSlashLightningSmallRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntLightningSmall, new Feedback(FeedbackType.DamageVestBluntLightningSmall, "DamageVestBluntLightningSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceIceSmall, new Feedback(FeedbackType.DamageVestPierceIceSmall, "DamageVestPierceIceSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallLRD, new Feedback(FeedbackType.DamageVestSlashIceSmallLRD, "DamageVestSlashIceSmallLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallLRU, new Feedback(FeedbackType.DamageVestSlashIceSmallLRU, "DamageVestSlashIceSmallLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallRLD, new Feedback(FeedbackType.DamageVestSlashIceSmallRLD, "DamageVestSlashIceSmallRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceSmallRLU, new Feedback(FeedbackType.DamageVestSlashIceSmallRLU, "DamageVestSlashIceSmallRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntIceSmall, new Feedback(FeedbackType.DamageVestBluntIceSmall, "DamageVestBluntIceSmall_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceBladeLarge, new Feedback(FeedbackType.DamageVestPierceBladeLarge, "DamageVestPierceBladeLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeLRD, new Feedback(FeedbackType.DamageVestSlashBladeLargeLRD, "DamageVestSlashBladeLargeLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeLRU, new Feedback(FeedbackType.DamageVestSlashBladeLargeLRU, "DamageVestSlashBladeLargeLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeRLD, new Feedback(FeedbackType.DamageVestSlashBladeLargeRLD, "DamageVestSlashBladeLargeRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashBladeLargeRLU, new Feedback(FeedbackType.DamageVestSlashBladeLargeRLU, "DamageVestSlashBladeLargeRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntBladeLarge, new Feedback(FeedbackType.DamageVestBluntBladeLarge, "DamageVestBluntBladeLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntWoodLarge, new Feedback(FeedbackType.DamageVestBluntWoodLarge, "DamageVestBluntWoodLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntMetalLarge, new Feedback(FeedbackType.DamageVestBluntMetalLarge, "DamageVestBluntMetalLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntStoneLarge, new Feedback(FeedbackType.DamageVestBluntStoneLarge, "DamageVestBluntStoneLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntFleshLarge, new Feedback(FeedbackType.DamageVestBluntFleshLarge, "DamageVestBluntFleshLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceFireLarge, new Feedback(FeedbackType.DamageVestPierceFireLarge, "DamageVestPierceFireLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeLRD, new Feedback(FeedbackType.DamageVestSlashFireLargeLRD, "DamageVestSlashFireLargeLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeLRU, new Feedback(FeedbackType.DamageVestSlashFireLargeLRU, "DamageVestSlashFireLargeLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeRLD, new Feedback(FeedbackType.DamageVestSlashFireLargeRLD, "DamageVestSlashFireLargeRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashFireLargeRLU, new Feedback(FeedbackType.DamageVestSlashFireLargeRLU, "DamageVestSlashFireLargeRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntFireLarge, new Feedback(FeedbackType.DamageVestBluntFireLarge, "DamageVestBluntFireLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceLightningLarge, new Feedback(FeedbackType.DamageVestPierceLightningLarge, "DamageVestPierceLightningLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeLRD, new Feedback(FeedbackType.DamageVestSlashLightningLargeLRD, "DamageVestSlashLightningLargeLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeLRU, new Feedback(FeedbackType.DamageVestSlashLightningLargeLRU, "DamageVestSlashLightningLargeLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeRLD, new Feedback(FeedbackType.DamageVestSlashLightningLargeRLD, "DamageVestSlashLightningLargeRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightningLargeRLU, new Feedback(FeedbackType.DamageVestSlashLightningLargeRLU, "DamageVestSlashLightningLargeRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntLightningLarge, new Feedback(FeedbackType.DamageVestBluntLightningLarge, "DamageVestBluntLightningLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestPierceIceLarge, new Feedback(FeedbackType.DamageVestPierceIceLarge, "DamageVestPierceIceLarge_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeLRD, new Feedback(FeedbackType.DamageVestSlashIceLargeLRD, "DamageVestSlashIceLargeLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeLRU, new Feedback(FeedbackType.DamageVestSlashIceLargeLRU, "DamageVestSlashIceLargeLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeRLD, new Feedback(FeedbackType.DamageVestSlashIceLargeRLD, "DamageVestSlashIceLargeRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashIceLargeRLU, new Feedback(FeedbackType.DamageVestSlashIceLargeRLU, "DamageVestSlashIceLargeRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntIceLarge, new Feedback(FeedbackType.DamageVestBluntIceLarge, "DamageVestBluntIceLarge_", 0, PositionType.Vest));
 
-            feedbackMap.Add(FeedbackType.DamageVestBlaster, new Feedback(FeedbackType.DamageVestBlaster, "DamageVestBlaster_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBlasterStun, new Feedback(FeedbackType.DamageVestBlasterStun, "DamageVestBlasterStun_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBlaster, new Feedback(FeedbackType.DamageRightArmBlaster, "DamageRightArmBlaster_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBlasterStun, new Feedback(FeedbackType.DamageRightArmBlasterStun, "DamageRightArmBlasterStun_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBlaster, new Feedback(FeedbackType.DamageHeadBlaster, "DamageHeadBlaster_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBlasterStun, new Feedback(FeedbackType.DamageHeadBlasterStun, "DamageHeadBlasterStun_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestBlaster, new Feedback(FeedbackType.DamageVestBlaster, "DamageVestBlaster_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBlasterStun, new Feedback(FeedbackType.DamageVestBlasterStun, "DamageVestBlasterStun_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageRightArmBlaster, new Feedback(FeedbackType.DamageRightArmBlaster, "DamageRightArmBlaster_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBlasterStun, new Feedback(FeedbackType.DamageRightArmBlasterStun, "DamageRightArmBlasterStun_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadBlaster, new Feedback(FeedbackType.DamageHeadBlaster, "DamageHeadBlaster_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBlasterStun, new Feedback(FeedbackType.DamageHeadBlasterStun, "DamageHeadBlasterStun_", 0, PositionType.Head));
             
-            feedbackMap.Add(FeedbackType.DamageVestPierceLightsaber, new Feedback(FeedbackType.DamageVestPierceLightsaber, "DamageVestPierceLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberLRD, new Feedback(FeedbackType.DamageVestSlashLightsaberLRD, "DamageVestSlashLightsaberLRD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberLRU, new Feedback(FeedbackType.DamageVestSlashLightsaberLRU, "DamageVestSlashLightsaberLRU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberRLD, new Feedback(FeedbackType.DamageVestSlashLightsaberRLD, "DamageVestSlashLightsaberRLD_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberRLU, new Feedback(FeedbackType.DamageVestSlashLightsaberRLU, "DamageVestSlashLightsaberRLU_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestBluntLightsaber, new Feedback(FeedbackType.DamageVestBluntLightsaber, "DamageVestBluntLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightsaber, new Feedback(FeedbackType.DamageRightArmBluntLightsaber, "DamageRightArmBluntLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightsaber, new Feedback(FeedbackType.DamageRightArmPierceLightsaber, "DamageRightArmPierceLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightsaber, new Feedback(FeedbackType.DamageRightArmSlashLightsaber, "DamageRightArmSlashLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceLightsaber, new Feedback(FeedbackType.DamageHeadPierceLightsaber, "DamageHeadPierceLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashLightsaber, new Feedback(FeedbackType.DamageHeadSlashLightsaber, "DamageHeadSlashLightsaber_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntLightsaber, new Feedback(FeedbackType.DamageHeadBluntLightsaber, "DamageHeadBluntLightsaber_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestPierceLightsaber, new Feedback(FeedbackType.DamageVestPierceLightsaber, "DamageVestPierceLightsaber_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberLRD, new Feedback(FeedbackType.DamageVestSlashLightsaberLRD, "DamageVestSlashLightsaberLRD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberLRU, new Feedback(FeedbackType.DamageVestSlashLightsaberLRU, "DamageVestSlashLightsaberLRU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberRLD, new Feedback(FeedbackType.DamageVestSlashLightsaberRLD, "DamageVestSlashLightsaberRLD_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestSlashLightsaberRLU, new Feedback(FeedbackType.DamageVestSlashLightsaberRLU, "DamageVestSlashLightsaberRLU_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestBluntLightsaber, new Feedback(FeedbackType.DamageVestBluntLightsaber, "DamageVestBluntLightsaber_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightsaber, new Feedback(FeedbackType.DamageRightArmBluntLightsaber, "DamageRightArmBluntLightsaber_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightsaber, new Feedback(FeedbackType.DamageRightArmPierceLightsaber, "DamageRightArmPierceLightsaber_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightsaber, new Feedback(FeedbackType.DamageRightArmSlashLightsaber, "DamageRightArmSlashLightsaber_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceLightsaber, new Feedback(FeedbackType.DamageHeadPierceLightsaber, "DamageHeadPierceLightsaber_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashLightsaber, new Feedback(FeedbackType.DamageHeadSlashLightsaber, "DamageHeadSlashLightsaber_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntLightsaber, new Feedback(FeedbackType.DamageHeadBluntLightsaber, "DamageHeadBluntLightsaber_", 0, PositionType.Head));
 
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceBladeSmall, new Feedback(FeedbackType.DamageRightArmPierceBladeSmall, "DamageRightArmPierceBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashBladeSmall, new Feedback(FeedbackType.DamageRightArmSlashBladeSmall, "DamageRightArmSlashBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntBladeSmall, new Feedback(FeedbackType.DamageRightArmBluntBladeSmall, "DamageRightArmBluntBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntWoodSmall, new Feedback(FeedbackType.DamageRightArmBluntWoodSmall, "DamageRightArmBluntWoodSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntMetalSmall, new Feedback(FeedbackType.DamageRightArmBluntMetalSmall, "DamageRightArmBluntMetalSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntStoneSmall, new Feedback(FeedbackType.DamageRightArmBluntStoneSmall, "DamageRightArmBluntStoneSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntFleshSmall, new Feedback(FeedbackType.DamageRightArmBluntFleshSmall, "DamageRightArmBluntFleshSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceFireSmall, new Feedback(FeedbackType.DamageRightArmPierceFireSmall, "DamageRightArmPierceFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashFireSmall, new Feedback(FeedbackType.DamageRightArmSlashFireSmall, "DamageRightArmSlashFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntFireSmall, new Feedback(FeedbackType.DamageRightArmBluntFireSmall, "DamageRightArmBluntFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightningSmall, new Feedback(FeedbackType.DamageRightArmPierceLightningSmall, "DamageRightArmPierceLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightningSmall, new Feedback(FeedbackType.DamageRightArmSlashLightningSmall, "DamageRightArmSlashLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightningSmall, new Feedback(FeedbackType.DamageRightArmBluntLightningSmall, "DamageRightArmBluntLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceIceSmall, new Feedback(FeedbackType.DamageRightArmPierceIceSmall, "DamageRightArmPierceIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashIceSmall, new Feedback(FeedbackType.DamageRightArmSlashIceSmall, "DamageRightArmSlashIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntIceSmall, new Feedback(FeedbackType.DamageRightArmBluntIceSmall, "DamageRightArmBluntIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceBladeLarge, new Feedback(FeedbackType.DamageRightArmPierceBladeLarge, "DamageRightArmPierceBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashBladeLarge, new Feedback(FeedbackType.DamageRightArmSlashBladeLarge, "DamageRightArmSlashBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntBladeLarge, new Feedback(FeedbackType.DamageRightArmBluntBladeLarge, "DamageRightArmBluntBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntWoodLarge, new Feedback(FeedbackType.DamageRightArmBluntWoodLarge, "DamageRightArmBluntWoodLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntMetalLarge, new Feedback(FeedbackType.DamageRightArmBluntMetalLarge, "DamageRightArmBluntMetalLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntStoneLarge, new Feedback(FeedbackType.DamageRightArmBluntStoneLarge, "DamageRightArmBluntStoneLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntFleshLarge, new Feedback(FeedbackType.DamageRightArmBluntFleshLarge, "DamageRightArmBluntFleshLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceFireLarge, new Feedback(FeedbackType.DamageRightArmPierceFireLarge, "DamageRightArmPierceFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashFireLarge, new Feedback(FeedbackType.DamageRightArmSlashFireLarge, "DamageRightArmSlashFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntFireLarge, new Feedback(FeedbackType.DamageRightArmBluntFireLarge, "DamageRightArmBluntFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightningLarge, new Feedback(FeedbackType.DamageRightArmPierceLightningLarge, "DamageRightArmPierceLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightningLarge, new Feedback(FeedbackType.DamageRightArmSlashLightningLarge, "DamageRightArmSlashLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightningLarge, new Feedback(FeedbackType.DamageRightArmBluntLightningLarge, "DamageRightArmBluntLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmPierceIceLarge, new Feedback(FeedbackType.DamageRightArmPierceIceLarge, "DamageRightArmPierceIceLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmSlashIceLarge, new Feedback(FeedbackType.DamageRightArmSlashIceLarge, "DamageRightArmSlashIceLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmBluntIceLarge, new Feedback(FeedbackType.DamageRightArmBluntIceLarge, "DamageRightArmBluntIceLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceBladeSmall, new Feedback(FeedbackType.DamageHeadPierceBladeSmall, "DamageHeadPierceBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashBladeSmall, new Feedback(FeedbackType.DamageHeadSlashBladeSmall, "DamageHeadSlashBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntBladeSmall, new Feedback(FeedbackType.DamageHeadBluntBladeSmall, "DamageHeadBluntBladeSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntWoodSmall, new Feedback(FeedbackType.DamageHeadBluntWoodSmall, "DamageHeadBluntWoodSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntMetalSmall, new Feedback(FeedbackType.DamageHeadBluntMetalSmall, "DamageHeadBluntMetalSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntStoneSmall, new Feedback(FeedbackType.DamageHeadBluntStoneSmall, "DamageHeadBluntStoneSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntFleshSmall, new Feedback(FeedbackType.DamageHeadBluntFleshSmall, "DamageHeadBluntFleshSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceFireSmall, new Feedback(FeedbackType.DamageHeadPierceFireSmall, "DamageHeadPierceFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashFireSmall, new Feedback(FeedbackType.DamageHeadSlashFireSmall, "DamageHeadSlashFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntFireSmall, new Feedback(FeedbackType.DamageHeadBluntFireSmall, "DamageHeadBluntFireSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceLightningSmall, new Feedback(FeedbackType.DamageHeadPierceLightningSmall, "DamageHeadPierceLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashLightningSmall, new Feedback(FeedbackType.DamageHeadSlashLightningSmall, "DamageHeadSlashLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntLightningSmall, new Feedback(FeedbackType.DamageHeadBluntLightningSmall, "DamageHeadBluntLightningSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceIceSmall, new Feedback(FeedbackType.DamageHeadPierceIceSmall, "DamageHeadPierceIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashIceSmall, new Feedback(FeedbackType.DamageHeadSlashIceSmall, "DamageHeadSlashIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntIceSmall, new Feedback(FeedbackType.DamageHeadBluntIceSmall, "DamageHeadBluntIceSmall_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceBladeLarge, new Feedback(FeedbackType.DamageHeadPierceBladeLarge, "DamageHeadPierceBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashBladeLarge, new Feedback(FeedbackType.DamageHeadSlashBladeLarge, "DamageHeadSlashBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntBladeLarge, new Feedback(FeedbackType.DamageHeadBluntBladeLarge, "DamageHeadBluntBladeLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntWoodLarge, new Feedback(FeedbackType.DamageHeadBluntWoodLarge, "DamageHeadBluntWoodLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntMetalLarge, new Feedback(FeedbackType.DamageHeadBluntMetalLarge, "DamageHeadBluntMetalLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntStoneLarge, new Feedback(FeedbackType.DamageHeadBluntStoneLarge, "DamageHeadBluntStoneLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntFleshLarge, new Feedback(FeedbackType.DamageHeadBluntFleshLarge, "DamageHeadBluntFleshLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceFireLarge, new Feedback(FeedbackType.DamageHeadPierceFireLarge, "DamageHeadPierceFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashFireLarge, new Feedback(FeedbackType.DamageHeadSlashFireLarge, "DamageHeadSlashFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntFireLarge, new Feedback(FeedbackType.DamageHeadBluntFireLarge, "DamageHeadBluntFireLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceLightningLarge, new Feedback(FeedbackType.DamageHeadPierceLightningLarge, "DamageHeadPierceLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashLightningLarge, new Feedback(FeedbackType.DamageHeadSlashLightningLarge, "DamageHeadSlashLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntLightningLarge, new Feedback(FeedbackType.DamageHeadBluntLightningLarge, "DamageHeadBluntLightningLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadPierceIceLarge, new Feedback(FeedbackType.DamageHeadPierceIceLarge, "DamageHeadPierceIceLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadSlashIceLarge, new Feedback(FeedbackType.DamageHeadSlashIceLarge, "DamageHeadSlashIceLarge_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadBluntIceLarge, new Feedback(FeedbackType.DamageHeadBluntIceLarge, "DamageHeadBluntIceLarge_", 0));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceBladeSmall, new Feedback(FeedbackType.DamageRightArmPierceBladeSmall, "DamageRightArmPierceBladeSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashBladeSmall, new Feedback(FeedbackType.DamageRightArmSlashBladeSmall, "DamageRightArmSlashBladeSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntBladeSmall, new Feedback(FeedbackType.DamageRightArmBluntBladeSmall, "DamageRightArmBluntBladeSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntWoodSmall, new Feedback(FeedbackType.DamageRightArmBluntWoodSmall, "DamageRightArmBluntWoodSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntMetalSmall, new Feedback(FeedbackType.DamageRightArmBluntMetalSmall, "DamageRightArmBluntMetalSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntStoneSmall, new Feedback(FeedbackType.DamageRightArmBluntStoneSmall, "DamageRightArmBluntStoneSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntFleshSmall, new Feedback(FeedbackType.DamageRightArmBluntFleshSmall, "DamageRightArmBluntFleshSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceFireSmall, new Feedback(FeedbackType.DamageRightArmPierceFireSmall, "DamageRightArmPierceFireSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashFireSmall, new Feedback(FeedbackType.DamageRightArmSlashFireSmall, "DamageRightArmSlashFireSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntFireSmall, new Feedback(FeedbackType.DamageRightArmBluntFireSmall, "DamageRightArmBluntFireSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightningSmall, new Feedback(FeedbackType.DamageRightArmPierceLightningSmall, "DamageRightArmPierceLightningSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightningSmall, new Feedback(FeedbackType.DamageRightArmSlashLightningSmall, "DamageRightArmSlashLightningSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightningSmall, new Feedback(FeedbackType.DamageRightArmBluntLightningSmall, "DamageRightArmBluntLightningSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceIceSmall, new Feedback(FeedbackType.DamageRightArmPierceIceSmall, "DamageRightArmPierceIceSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashIceSmall, new Feedback(FeedbackType.DamageRightArmSlashIceSmall, "DamageRightArmSlashIceSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntIceSmall, new Feedback(FeedbackType.DamageRightArmBluntIceSmall, "DamageRightArmBluntIceSmall_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceBladeLarge, new Feedback(FeedbackType.DamageRightArmPierceBladeLarge, "DamageRightArmPierceBladeLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashBladeLarge, new Feedback(FeedbackType.DamageRightArmSlashBladeLarge, "DamageRightArmSlashBladeLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntBladeLarge, new Feedback(FeedbackType.DamageRightArmBluntBladeLarge, "DamageRightArmBluntBladeLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntWoodLarge, new Feedback(FeedbackType.DamageRightArmBluntWoodLarge, "DamageRightArmBluntWoodLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntMetalLarge, new Feedback(FeedbackType.DamageRightArmBluntMetalLarge, "DamageRightArmBluntMetalLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntStoneLarge, new Feedback(FeedbackType.DamageRightArmBluntStoneLarge, "DamageRightArmBluntStoneLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntFleshLarge, new Feedback(FeedbackType.DamageRightArmBluntFleshLarge, "DamageRightArmBluntFleshLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceFireLarge, new Feedback(FeedbackType.DamageRightArmPierceFireLarge, "DamageRightArmPierceFireLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashFireLarge, new Feedback(FeedbackType.DamageRightArmSlashFireLarge, "DamageRightArmSlashFireLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntFireLarge, new Feedback(FeedbackType.DamageRightArmBluntFireLarge, "DamageRightArmBluntFireLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceLightningLarge, new Feedback(FeedbackType.DamageRightArmPierceLightningLarge, "DamageRightArmPierceLightningLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashLightningLarge, new Feedback(FeedbackType.DamageRightArmSlashLightningLarge, "DamageRightArmSlashLightningLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntLightningLarge, new Feedback(FeedbackType.DamageRightArmBluntLightningLarge, "DamageRightArmBluntLightningLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmPierceIceLarge, new Feedback(FeedbackType.DamageRightArmPierceIceLarge, "DamageRightArmPierceIceLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmSlashIceLarge, new Feedback(FeedbackType.DamageRightArmSlashIceLarge, "DamageRightArmSlashIceLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmBluntIceLarge, new Feedback(FeedbackType.DamageRightArmBluntIceLarge, "DamageRightArmBluntIceLarge_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceBladeSmall, new Feedback(FeedbackType.DamageHeadPierceBladeSmall, "DamageHeadPierceBladeSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashBladeSmall, new Feedback(FeedbackType.DamageHeadSlashBladeSmall, "DamageHeadSlashBladeSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntBladeSmall, new Feedback(FeedbackType.DamageHeadBluntBladeSmall, "DamageHeadBluntBladeSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntWoodSmall, new Feedback(FeedbackType.DamageHeadBluntWoodSmall, "DamageHeadBluntWoodSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntMetalSmall, new Feedback(FeedbackType.DamageHeadBluntMetalSmall, "DamageHeadBluntMetalSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntStoneSmall, new Feedback(FeedbackType.DamageHeadBluntStoneSmall, "DamageHeadBluntStoneSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntFleshSmall, new Feedback(FeedbackType.DamageHeadBluntFleshSmall, "DamageHeadBluntFleshSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceFireSmall, new Feedback(FeedbackType.DamageHeadPierceFireSmall, "DamageHeadPierceFireSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashFireSmall, new Feedback(FeedbackType.DamageHeadSlashFireSmall, "DamageHeadSlashFireSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntFireSmall, new Feedback(FeedbackType.DamageHeadBluntFireSmall, "DamageHeadBluntFireSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceLightningSmall, new Feedback(FeedbackType.DamageHeadPierceLightningSmall, "DamageHeadPierceLightningSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashLightningSmall, new Feedback(FeedbackType.DamageHeadSlashLightningSmall, "DamageHeadSlashLightningSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntLightningSmall, new Feedback(FeedbackType.DamageHeadBluntLightningSmall, "DamageHeadBluntLightningSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceIceSmall, new Feedback(FeedbackType.DamageHeadPierceIceSmall, "DamageHeadPierceIceSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashIceSmall, new Feedback(FeedbackType.DamageHeadSlashIceSmall, "DamageHeadSlashIceSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntIceSmall, new Feedback(FeedbackType.DamageHeadBluntIceSmall, "DamageHeadBluntIceSmall_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceBladeLarge, new Feedback(FeedbackType.DamageHeadPierceBladeLarge, "DamageHeadPierceBladeLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashBladeLarge, new Feedback(FeedbackType.DamageHeadSlashBladeLarge, "DamageHeadSlashBladeLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntBladeLarge, new Feedback(FeedbackType.DamageHeadBluntBladeLarge, "DamageHeadBluntBladeLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntWoodLarge, new Feedback(FeedbackType.DamageHeadBluntWoodLarge, "DamageHeadBluntWoodLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntMetalLarge, new Feedback(FeedbackType.DamageHeadBluntMetalLarge, "DamageHeadBluntMetalLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntStoneLarge, new Feedback(FeedbackType.DamageHeadBluntStoneLarge, "DamageHeadBluntStoneLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntFleshLarge, new Feedback(FeedbackType.DamageHeadBluntFleshLarge, "DamageHeadBluntFleshLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceFireLarge, new Feedback(FeedbackType.DamageHeadPierceFireLarge, "DamageHeadPierceFireLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashFireLarge, new Feedback(FeedbackType.DamageHeadSlashFireLarge, "DamageHeadSlashFireLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntFireLarge, new Feedback(FeedbackType.DamageHeadBluntFireLarge, "DamageHeadBluntFireLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceLightningLarge, new Feedback(FeedbackType.DamageHeadPierceLightningLarge, "DamageHeadPierceLightningLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashLightningLarge, new Feedback(FeedbackType.DamageHeadSlashLightningLarge, "DamageHeadSlashLightningLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntLightningLarge, new Feedback(FeedbackType.DamageHeadBluntLightningLarge, "DamageHeadBluntLightningLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadPierceIceLarge, new Feedback(FeedbackType.DamageHeadPierceIceLarge, "DamageHeadPierceIceLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadSlashIceLarge, new Feedback(FeedbackType.DamageHeadSlashIceLarge, "DamageHeadSlashIceLarge_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadBluntIceLarge, new Feedback(FeedbackType.DamageHeadBluntIceLarge, "DamageHeadBluntIceLarge_", 0, PositionType.Head));
 
-            feedbackMap.Add(FeedbackType.DamageVestArrow, new Feedback(FeedbackType.DamageVestArrow, "DamageVestArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmArrow, new Feedback(FeedbackType.DamageRightArmArrow, "DamageRightArmArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadArrow, new Feedback(FeedbackType.DamageHeadArrow, "DamageHeadArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestFireArrow, new Feedback(FeedbackType.DamageVestFireArrow, "DamageVestFireArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmFireArrow, new Feedback(FeedbackType.DamageRightArmFireArrow, "DamageRightArmFireArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadFireArrow, new Feedback(FeedbackType.DamageHeadFireArrow, "DamageHeadFireArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestLightningArrow, new Feedback(FeedbackType.DamageVestLightningArrow, "DamageVestLightningArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmLightningArrow, new Feedback(FeedbackType.DamageRightArmLightningArrow, "DamageRightArmLightningArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadLightningArrow, new Feedback(FeedbackType.DamageHeadLightningArrow, "DamageHeadLightningArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestIceArrow, new Feedback(FeedbackType.DamageVestIceArrow, "DamageVestIceArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmIceArrow, new Feedback(FeedbackType.DamageRightArmIceArrow, "DamageRightArmIceArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadIceArrow, new Feedback(FeedbackType.DamageHeadIceArrow, "DamageHeadIceArrow_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmFire, new Feedback(FeedbackType.DamageRightArmFire, "DamageRightArmFire_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmLightning, new Feedback(FeedbackType.DamageRightArmLightning, "DamageRightArmLightning_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmGravity, new Feedback(FeedbackType.DamageRightArmGravity, "DamageRightArmGravity_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmIce, new Feedback(FeedbackType.DamageRightArmIce, "DamageRightArmIce_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmDrain, new Feedback(FeedbackType.DamageRightArmDrain, "DamageRightArmDrain_", 0));
-            feedbackMap.Add(FeedbackType.DamageRightArmEnergy, new Feedback(FeedbackType.DamageRightArmEnergy, "DamageRightArmEnergy_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestArrow, new Feedback(FeedbackType.DamageVestArrow, "DamageVestArrow_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageRightArmArrow, new Feedback(FeedbackType.DamageRightArmArrow, "DamageRightArmArrow_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadArrow, new Feedback(FeedbackType.DamageHeadArrow, "DamageHeadArrow_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageVestFireArrow, new Feedback(FeedbackType.DamageVestFireArrow, "DamageVestFireArrow_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageRightArmFireArrow, new Feedback(FeedbackType.DamageRightArmFireArrow, "DamageRightArmFireArrow_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadFireArrow, new Feedback(FeedbackType.DamageHeadFireArrow, "DamageHeadFireArrow_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageVestLightningArrow, new Feedback(FeedbackType.DamageVestLightningArrow, "DamageVestLightningArrow_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageRightArmLightningArrow, new Feedback(FeedbackType.DamageRightArmLightningArrow, "DamageRightArmLightningArrow_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadLightningArrow, new Feedback(FeedbackType.DamageHeadLightningArrow, "DamageHeadLightningArrow_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageVestIceArrow, new Feedback(FeedbackType.DamageVestIceArrow, "DamageVestIceArrow_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageRightArmIceArrow, new Feedback(FeedbackType.DamageRightArmIceArrow, "DamageRightArmIceArrow_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageHeadIceArrow, new Feedback(FeedbackType.DamageHeadIceArrow, "DamageHeadIceArrow_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageRightArmFire, new Feedback(FeedbackType.DamageRightArmFire, "DamageRightArmFire_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmLightning, new Feedback(FeedbackType.DamageRightArmLightning, "DamageRightArmLightning_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmGravity, new Feedback(FeedbackType.DamageRightArmGravity, "DamageRightArmGravity_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmIce, new Feedback(FeedbackType.DamageRightArmIce, "DamageRightArmIce_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmDrain, new Feedback(FeedbackType.DamageRightArmDrain, "DamageRightArmDrain_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.DamageRightArmEnergy, new Feedback(FeedbackType.DamageRightArmEnergy, "DamageRightArmEnergy_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.DamageHeadFire, new Feedback(FeedbackType.DamageHeadFire, "DamageHeadFire_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadLightning, new Feedback(FeedbackType.DamageHeadLightning, "DamageHeadLightning_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadGravity, new Feedback(FeedbackType.DamageHeadGravity, "DamageHeadGravity_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadIce, new Feedback(FeedbackType.DamageHeadIce, "DamageHeadIce_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadDrain, new Feedback(FeedbackType.DamageHeadDrain, "DamageHeadDrain_", 0));
-            feedbackMap.Add(FeedbackType.DamageHeadEnergy, new Feedback(FeedbackType.DamageHeadEnergy, "DamageHeadEnergy_", 0));
+            feedbackMap.Add(FeedbackType.DamageHeadFire, new Feedback(FeedbackType.DamageHeadFire, "DamageHeadFire_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadLightning, new Feedback(FeedbackType.DamageHeadLightning, "DamageHeadLightning_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadGravity, new Feedback(FeedbackType.DamageHeadGravity, "DamageHeadGravity_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadIce, new Feedback(FeedbackType.DamageHeadIce, "DamageHeadIce_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadDrain, new Feedback(FeedbackType.DamageHeadDrain, "DamageHeadDrain_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.DamageHeadEnergy, new Feedback(FeedbackType.DamageHeadEnergy, "DamageHeadEnergy_", 0, PositionType.Head));
 
-            feedbackMap.Add(FeedbackType.DamageVestEnergy, new Feedback(FeedbackType.DamageVestEnergy, "DamageVestEnergy_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestFire, new Feedback(FeedbackType.DamageVestFire, "DamageVestFire_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestIce, new Feedback(FeedbackType.DamageVestIce, "DamageVestIce_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestDrain, new Feedback(FeedbackType.DamageVestDrain, "DamageVestDrain_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestLightning, new Feedback(FeedbackType.DamageVestLightning, "DamageVestLightning_", 0));
-            feedbackMap.Add(FeedbackType.DamageVestGravity, new Feedback(FeedbackType.DamageVestGravity, "DamageVestGravity_", 0));
-            feedbackMap.Add(FeedbackType.PotionDrinking, new Feedback(FeedbackType.PotionDrinking, "PotionDrinking_", 0));
-            feedbackMap.Add(FeedbackType.PoisonDrinking, new Feedback(FeedbackType.PoisonDrinking, "PoisonDrinking_", 0));
-            feedbackMap.Add(FeedbackType.Healing, new Feedback(FeedbackType.Healing, "Healing_", 0));
-            feedbackMap.Add(FeedbackType.FallDamage, new Feedback(FeedbackType.FallDamage, "FallDamage_", 0));
-            feedbackMap.Add(FeedbackType.FallDamageFeet, new Feedback(FeedbackType.FallDamageFeet, "FallDamageFeet_", 0));
-            feedbackMap.Add(FeedbackType.SlowMotion, new Feedback(FeedbackType.SlowMotion, "SlowMotion_", 0));
-            feedbackMap.Add(FeedbackType.HolsterLeftShoulder, new Feedback(FeedbackType.HolsterLeftShoulder, "HolsterLeftShoulder_", 0));
-            feedbackMap.Add(FeedbackType.HolsterRightShoulder, new Feedback(FeedbackType.HolsterRightShoulder, "HolsterRightShoulder_", 0));
-            feedbackMap.Add(FeedbackType.UnholsterLeftShoulder, new Feedback(FeedbackType.UnholsterLeftShoulder, "UnholsterLeftShoulder_", 0));
-            feedbackMap.Add(FeedbackType.UnholsterRightShoulder, new Feedback(FeedbackType.UnholsterRightShoulder, "UnholsterRightShoulder_", 0));
-            feedbackMap.Add(FeedbackType.HolsterArrowLeftShoulder, new Feedback(FeedbackType.HolsterArrowLeftShoulder, "HolsterArrowLeftShoulder_", 0));
-            feedbackMap.Add(FeedbackType.HolsterArrowRightShoulder, new Feedback(FeedbackType.HolsterArrowRightShoulder, "HolsterArrowRightShoulder_", 0));
-            feedbackMap.Add(FeedbackType.UnholsterArrowLeftShoulder, new Feedback(FeedbackType.UnholsterArrowLeftShoulder, "UnholsterArrowLeftShoulder_", 0));
-            feedbackMap.Add(FeedbackType.UnholsterArrowRightShoulder, new Feedback(FeedbackType.UnholsterArrowRightShoulder, "UnholsterArrowRightShoulder_", 0));
-            feedbackMap.Add(FeedbackType.ClimbingRight, new Feedback(FeedbackType.ClimbingRight, "ClimbingRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerKickOtherRight, new Feedback(FeedbackType.PlayerKickOtherRight, "PlayerKickOtherRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerKickWoodRight, new Feedback(FeedbackType.PlayerKickWoodRight, "PlayerKickWoodRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerKickFleshRight, new Feedback(FeedbackType.PlayerKickFleshRight, "PlayerKickFleshRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerKickStoneRight, new Feedback(FeedbackType.PlayerKickStoneRight, "PlayerKickStoneRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerKickMetalRight, new Feedback(FeedbackType.PlayerKickMetalRight, "PlayerKickMetalRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerKickFabricRight, new Feedback(FeedbackType.PlayerKickFabricRight, "PlayerKickFabricRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerPunchOtherRight, new Feedback(FeedbackType.PlayerPunchOtherRight, "PlayerPunchOtherRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerPunchWoodRight, new Feedback(FeedbackType.PlayerPunchWoodRight, "PlayerPunchWoodRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerPunchFleshRight, new Feedback(FeedbackType.PlayerPunchFleshRight, "PlayerPunchFleshRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerPunchStoneRight, new Feedback(FeedbackType.PlayerPunchStoneRight, "PlayerPunchStoneRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerPunchMetalRight, new Feedback(FeedbackType.PlayerPunchMetalRight, "PlayerPunchMetalRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerPunchFabricRight, new Feedback(FeedbackType.PlayerPunchFabricRight, "PlayerPunchFabricRight_", 0));
+            feedbackMap.Add(FeedbackType.DamageVestEnergy, new Feedback(FeedbackType.DamageVestEnergy, "DamageVestEnergy_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestFire, new Feedback(FeedbackType.DamageVestFire, "DamageVestFire_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestIce, new Feedback(FeedbackType.DamageVestIce, "DamageVestIce_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestDrain, new Feedback(FeedbackType.DamageVestDrain, "DamageVestDrain_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestLightning, new Feedback(FeedbackType.DamageVestLightning, "DamageVestLightning_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.DamageVestGravity, new Feedback(FeedbackType.DamageVestGravity, "DamageVestGravity_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.PotionDrinking, new Feedback(FeedbackType.PotionDrinking, "PotionDrinking_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.PoisonDrinking, new Feedback(FeedbackType.PoisonDrinking, "PoisonDrinking_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.Healing, new Feedback(FeedbackType.Healing, "Healing_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.FallDamage, new Feedback(FeedbackType.FallDamage, "FallDamage_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.FallDamageFeet, new Feedback(FeedbackType.FallDamageFeet, "FallDamageFeet_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.SlowMotion, new Feedback(FeedbackType.SlowMotion, "SlowMotion_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.HolsterLeftShoulder, new Feedback(FeedbackType.HolsterLeftShoulder, "HolsterLeftShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.HolsterRightShoulder, new Feedback(FeedbackType.HolsterRightShoulder, "HolsterRightShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.UnholsterLeftShoulder, new Feedback(FeedbackType.UnholsterLeftShoulder, "UnholsterLeftShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.UnholsterRightShoulder, new Feedback(FeedbackType.UnholsterRightShoulder, "UnholsterRightShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.HolsterArrowLeftShoulder, new Feedback(FeedbackType.HolsterArrowLeftShoulder, "HolsterArrowLeftShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.HolsterArrowRightShoulder, new Feedback(FeedbackType.HolsterArrowRightShoulder, "HolsterArrowRightShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.UnholsterArrowLeftShoulder, new Feedback(FeedbackType.UnholsterArrowLeftShoulder, "UnholsterArrowLeftShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.UnholsterArrowRightShoulder, new Feedback(FeedbackType.UnholsterArrowRightShoulder, "UnholsterArrowRightShoulder_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.ClimbingRight, new Feedback(FeedbackType.ClimbingRight, "ClimbingRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerKickOtherRight, new Feedback(FeedbackType.PlayerKickOtherRight, "PlayerKickOtherRight_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.PlayerKickWoodRight, new Feedback(FeedbackType.PlayerKickWoodRight, "PlayerKickWoodRight_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.PlayerKickFleshRight, new Feedback(FeedbackType.PlayerKickFleshRight, "PlayerKickFleshRight_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.PlayerKickStoneRight, new Feedback(FeedbackType.PlayerKickStoneRight, "PlayerKickStoneRight_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.PlayerKickMetalRight, new Feedback(FeedbackType.PlayerKickMetalRight, "PlayerKickMetalRight_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.PlayerKickFabricRight, new Feedback(FeedbackType.PlayerKickFabricRight, "PlayerKickFabricRight_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.PlayerPunchOtherRight, new Feedback(FeedbackType.PlayerPunchOtherRight, "PlayerPunchOtherRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerPunchWoodRight, new Feedback(FeedbackType.PlayerPunchWoodRight, "PlayerPunchWoodRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerPunchFleshRight, new Feedback(FeedbackType.PlayerPunchFleshRight, "PlayerPunchFleshRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerPunchStoneRight, new Feedback(FeedbackType.PlayerPunchStoneRight, "PlayerPunchStoneRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerPunchMetalRight, new Feedback(FeedbackType.PlayerPunchMetalRight, "PlayerPunchMetalRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerPunchFabricRight, new Feedback(FeedbackType.PlayerPunchFabricRight, "PlayerPunchFabricRight_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.PlayerGunRight, new Feedback(FeedbackType.PlayerGunRight, "PlayerGunRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunBlasterRight, new Feedback(FeedbackType.PlayerGunBlasterRight, "PlayerGunBlasterRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunAutomaticRight, new Feedback(FeedbackType.PlayerGunAutomaticRight, "PlayerGunAutomaticRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunBallisticRight, new Feedback(FeedbackType.PlayerGunBallisticRight, "PlayerGunBallisticRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunSprayRight, new Feedback(FeedbackType.PlayerGunSprayRight, "PlayerGunSprayRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunMiniGunRight, new Feedback(FeedbackType.PlayerGunMiniGunRight, "PlayerGunMiniGunRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunBazookaRight, new Feedback(FeedbackType.PlayerGunBazookaRight, "PlayerGunBazookaRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunHeavyRight, new Feedback(FeedbackType.PlayerGunHeavyRight, "PlayerGunHeavyRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunLaserRight, new Feedback(FeedbackType.PlayerGunLaserRight, "PlayerGunLaserRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunRifleRight, new Feedback(FeedbackType.PlayerGunRifleRight, "PlayerGunRifleRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunPistolRight, new Feedback(FeedbackType.PlayerGunPistolRight, "PlayerGunPistolRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunPlasmaRight, new Feedback(FeedbackType.PlayerGunPlasmaRight, "PlayerGunPlasmaRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunShotgunRight, new Feedback(FeedbackType.PlayerGunShotgunRight, "PlayerGunShotgunRight_", 0));
-            feedbackMap.Add(FeedbackType.PlayerGunEnergyRight, new Feedback(FeedbackType.PlayerGunEnergyRight, "PlayerGunEnergyRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunRight, new Feedback(FeedbackType.KickbackPlayerGunRight, "KickbackPlayerGunRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunPistolRight, new Feedback(FeedbackType.KickbackPlayerGunPistolRight, "KickbackPlayerGunPistolRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunBallisticRight, new Feedback(FeedbackType.KickbackPlayerGunBallisticRight, "KickbackPlayerGunBallisticRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunLaserRight, new Feedback(FeedbackType.KickbackPlayerGunLaserRight, "KickbackPlayerGunLaserRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunPlasmaRight, new Feedback(FeedbackType.KickbackPlayerGunPlasmaRight, "KickbackPlayerGunPlasmaRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunSprayRight, new Feedback(FeedbackType.KickbackPlayerGunSprayRight, "KickbackPlayerGunSprayRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunHeavyRight, new Feedback(FeedbackType.KickbackPlayerGunHeavyRight, "KickbackPlayerGunHeavyRight_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunLeft, new Feedback(FeedbackType.KickbackPlayerGunLeft, "KickbackPlayerGunLeft_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunPistolLeft, new Feedback(FeedbackType.KickbackPlayerGunPistolLeft, "KickbackPlayerGunPistolLeft_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunBallisticLeft, new Feedback(FeedbackType.KickbackPlayerGunBallisticLeft, "KickbackPlayerGunBallisticLeft_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunLaserLeft, new Feedback(FeedbackType.KickbackPlayerGunLaserLeft, "KickbackPlayerGunLaserLeft_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunPlasmaLeft, new Feedback(FeedbackType.KickbackPlayerGunPlasmaLeft, "KickbackPlayerGunPlasmaLeft_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunSprayLeft, new Feedback(FeedbackType.KickbackPlayerGunSprayLeft, "KickbackPlayerGunSprayLeft_", 0));
-            feedbackMap.Add(FeedbackType.KickbackPlayerGunHeavyLeft, new Feedback(FeedbackType.KickbackPlayerGunHeavyLeft, "KickbackPlayerGunHeavyLeft_", 0));
+            feedbackMap.Add(FeedbackType.PlayerGunRight, new Feedback(FeedbackType.PlayerGunRight, "PlayerGunRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunBlasterRight, new Feedback(FeedbackType.PlayerGunBlasterRight, "PlayerGunBlasterRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunAutomaticRight, new Feedback(FeedbackType.PlayerGunAutomaticRight, "PlayerGunAutomaticRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunBallisticRight, new Feedback(FeedbackType.PlayerGunBallisticRight, "PlayerGunBallisticRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunSprayRight, new Feedback(FeedbackType.PlayerGunSprayRight, "PlayerGunSprayRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunMiniGunRight, new Feedback(FeedbackType.PlayerGunMiniGunRight, "PlayerGunMiniGunRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunBazookaRight, new Feedback(FeedbackType.PlayerGunBazookaRight, "PlayerGunBazookaRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunHeavyRight, new Feedback(FeedbackType.PlayerGunHeavyRight, "PlayerGunHeavyRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunLaserRight, new Feedback(FeedbackType.PlayerGunLaserRight, "PlayerGunLaserRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunRifleRight, new Feedback(FeedbackType.PlayerGunRifleRight, "PlayerGunRifleRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunPistolRight, new Feedback(FeedbackType.PlayerGunPistolRight, "PlayerGunPistolRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunPlasmaRight, new Feedback(FeedbackType.PlayerGunPlasmaRight, "PlayerGunPlasmaRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunShotgunRight, new Feedback(FeedbackType.PlayerGunShotgunRight, "PlayerGunShotgunRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.PlayerGunEnergyRight, new Feedback(FeedbackType.PlayerGunEnergyRight, "PlayerGunEnergyRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunRight, new Feedback(FeedbackType.KickbackPlayerGunRight, "KickbackPlayerGunRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunPistolRight, new Feedback(FeedbackType.KickbackPlayerGunPistolRight, "KickbackPlayerGunPistolRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunBallisticRight, new Feedback(FeedbackType.KickbackPlayerGunBallisticRight, "KickbackPlayerGunBallisticRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunLaserRight, new Feedback(FeedbackType.KickbackPlayerGunLaserRight, "KickbackPlayerGunLaserRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunPlasmaRight, new Feedback(FeedbackType.KickbackPlayerGunPlasmaRight, "KickbackPlayerGunPlasmaRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunSprayRight, new Feedback(FeedbackType.KickbackPlayerGunSprayRight, "KickbackPlayerGunSprayRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunHeavyRight, new Feedback(FeedbackType.KickbackPlayerGunHeavyRight, "KickbackPlayerGunHeavyRight_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunLeft, new Feedback(FeedbackType.KickbackPlayerGunLeft, "KickbackPlayerGunLeft_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunPistolLeft, new Feedback(FeedbackType.KickbackPlayerGunPistolLeft, "KickbackPlayerGunPistolLeft_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunBallisticLeft, new Feedback(FeedbackType.KickbackPlayerGunBallisticLeft, "KickbackPlayerGunBallisticLeft_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunLaserLeft, new Feedback(FeedbackType.KickbackPlayerGunLaserLeft, "KickbackPlayerGunLaserLeft_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunPlasmaLeft, new Feedback(FeedbackType.KickbackPlayerGunPlasmaLeft, "KickbackPlayerGunPlasmaLeft_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunSprayLeft, new Feedback(FeedbackType.KickbackPlayerGunSprayLeft, "KickbackPlayerGunSprayLeft_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.KickbackPlayerGunHeavyLeft, new Feedback(FeedbackType.KickbackPlayerGunHeavyLeft, "KickbackPlayerGunHeavyLeft_", 0, PositionType.Vest));
 
-            feedbackMap.Add(FeedbackType.PlayerThrowRight, new Feedback(FeedbackType.PlayerThrowRight, "PlayerThrowRight_", 0));
+            feedbackMap.Add(FeedbackType.PlayerThrowRight, new Feedback(FeedbackType.PlayerThrowRight, "PlayerThrowRight_", 0, PositionType.ForearmR));
 
-            feedbackMap.Add(FeedbackType.Explosion, new Feedback(FeedbackType.Explosion, "Explosion_", 0));
+            feedbackMap.Add(FeedbackType.Explosion, new Feedback(FeedbackType.Explosion, "Explosion_", 0, PositionType.Vest));
 
-            feedbackMap.Add(FeedbackType.LeftShoulderTurret, new Feedback(FeedbackType.LeftShoulderTurret, "LeftShoulderTurret_", 0));
-            feedbackMap.Add(FeedbackType.HoverJetFeet, new Feedback(FeedbackType.HoverJetFeet, "HoverJetFeet_", 0));
+            feedbackMap.Add(FeedbackType.LeftShoulderTurret, new Feedback(FeedbackType.LeftShoulderTurret, "LeftShoulderTurret_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.HoverJetFeet, new Feedback(FeedbackType.HoverJetFeet, "HoverJetFeet_", 0, PositionType.FootR));
 			
-			feedbackMap.Add(FeedbackType.EquipCuirass, new Feedback(FeedbackType.EquipCuirass, "EquipCuirass_", 0));
-            feedbackMap.Add(FeedbackType.EquipGauntletsLeft, new Feedback(FeedbackType.EquipGauntletsLeft, "EquipGauntletsLeft_", 0));
-            feedbackMap.Add(FeedbackType.EquipGauntletsRight, new Feedback(FeedbackType.EquipGauntletsRight, "EquipGauntletsRight_", 0));
-            feedbackMap.Add(FeedbackType.EquipHelmet, new Feedback(FeedbackType.EquipHelmet, "EquipHelmet_", 0));
-            feedbackMap.Add(FeedbackType.UnequipCuirass, new Feedback(FeedbackType.UnequipCuirass, "UnequipCuirass_", 0));
-            feedbackMap.Add(FeedbackType.UnequipGauntletsLeft, new Feedback(FeedbackType.UnequipGauntletsLeft, "UnequipGauntletsLeft_", 0));
-            feedbackMap.Add(FeedbackType.UnequipGauntletsRight, new Feedback(FeedbackType.UnequipGauntletsRight, "UnequipGauntletsRight_", 0));
-            feedbackMap.Add(FeedbackType.UnequipHelmet, new Feedback(FeedbackType.UnequipHelmet, "UnequipHelmet_", 0));
-            feedbackMap.Add(FeedbackType.EquipFeet, new Feedback(FeedbackType.EquipFeet, "EquipFeet_", 0));
-            feedbackMap.Add(FeedbackType.UnequipFeet, new Feedback(FeedbackType.UnequipFeet, "UnequipFeet_", 0));
+			feedbackMap.Add(FeedbackType.EquipCuirass, new Feedback(FeedbackType.EquipCuirass, "EquipCuirass_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.EquipGauntletsLeft, new Feedback(FeedbackType.EquipGauntletsLeft, "EquipGauntletsLeft_", 0, PositionType.ForearmL));
+            feedbackMap.Add(FeedbackType.EquipGauntletsRight, new Feedback(FeedbackType.EquipGauntletsRight, "EquipGauntletsRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.EquipHelmet, new Feedback(FeedbackType.EquipHelmet, "EquipHelmet_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.UnequipCuirass, new Feedback(FeedbackType.UnequipCuirass, "UnequipCuirass_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.UnequipGauntletsLeft, new Feedback(FeedbackType.UnequipGauntletsLeft, "UnequipGauntletsLeft_", 0, PositionType.ForearmL));
+            feedbackMap.Add(FeedbackType.UnequipGauntletsRight, new Feedback(FeedbackType.UnequipGauntletsRight, "UnequipGauntletsRight_", 0, PositionType.ForearmR));
+            feedbackMap.Add(FeedbackType.UnequipHelmet, new Feedback(FeedbackType.UnequipHelmet, "UnequipHelmet_", 0, PositionType.Head));
+            feedbackMap.Add(FeedbackType.EquipFeet, new Feedback(FeedbackType.EquipFeet, "EquipFeet_", 0, PositionType.FootR));
+            feedbackMap.Add(FeedbackType.UnequipFeet, new Feedback(FeedbackType.UnequipFeet, "UnequipFeet_", 0, PositionType.FootR));
 
-            feedbackMap.Add(FeedbackType.ConsumableFood, new Feedback(FeedbackType.ConsumableFood, "ConsumableFood_", 0));
+            feedbackMap.Add(FeedbackType.ConsumableFood, new Feedback(FeedbackType.ConsumableFood, "ConsumableFood_", 0, PositionType.Vest));
 
             
         }
@@ -2537,15 +2541,17 @@ namespace TactsuitBS
 
         public struct Feedback
         {
-            public Feedback(FeedbackType _feedbackType, string _prefix, int _feedbackFileCount)
+            public Feedback(FeedbackType _feedbackType, string _prefix, int _feedbackFileCount, PositionType _posType)
             {
                 feedbackType = _feedbackType;
                 prefix = _prefix;
                 feedbackFileCount = _feedbackFileCount;
+                posType = _posType;
             }
             public FeedbackType feedbackType;
             public string prefix;
             public int feedbackFileCount;
+            public PositionType posType;
         };
 
         void TactFileRegister(string fullname, Feedback feedback)
@@ -2617,6 +2623,19 @@ namespace TactsuitBS
                     {
                         RegisterFeedbackFiles();
                         systemInitialized = true;
+
+                        if (Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.Head))
+                        {
+                            HeadActive = true;
+                        }
+                        if (Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.FootR) || Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.FootL))
+                        {
+                            FeetActive = true;
+                        }
+                        if (Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.ForearmL) || Bhaptics.Tact.HapticPlayerManager.Instance().GetHapticPlayer().IsActive(PositionType.ForearmR))
+                        {
+                            ArmsActive = true;
+                        }
                     }
                 }
             }
@@ -2975,6 +2994,19 @@ namespace TactsuitBS
                             {
                                 return;
                             }
+                        }
+                        
+                        if (feedbackMap[effect].posType == PositionType.Head && !HeadActive)
+                        {
+                            return;
+                        }
+                        else if ((feedbackMap[effect].posType == PositionType.FootR || feedbackMap[effect].posType == PositionType.FootL) && !FeetActive)
+                        {
+                            return;
+                        }
+                        else if ((feedbackMap[effect].posType == PositionType.ForearmR || feedbackMap[effect].posType == PositionType.ForearmL) && !ArmsActive)
+                        {
+                            return;
                         }
 
                         string key = (reflected ? "Reflected_" : "") + feedbackMap[effect].prefix + (RandomNumber.Between(1, feedbackMap[effect].feedbackFileCount)).ToString();

@@ -310,7 +310,7 @@
 
 					"IntensityPlayerThrow": 1.5,
 
-					"IntensityExplosion": 0.0,
+					"IntensityExplosion": 1.0,
 
 					"IntensityShoulderTurret": 1.0,
 					"IntensityHoverJetFeet": 1.0,

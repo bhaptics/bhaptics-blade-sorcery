@@ -1783,8 +1783,7 @@ namespace TactsuitBS
 
                 if (leftItem == rightItem && bowString.isPulling)
                 {
-                    float currentPull = Utility.GetCurrentPull(bowString);
-                    float intensity = Utility.GetCurrentPull(bowString) + 0.1f / bowString.animationClipLength;
+                    float intensity = bowString.currentPullRatio* 2.5f;
                     //LOG("Pulling bow CurrentPull:" + currentPull.ToString() + " AnimationClipLength:" + bowString.animationClipLength.ToString() + " MaxDistance:" + bowString.maxDrawDistance);
                     if (intensity >= 0.1f && intensity < 0.2f)
                         intensity = 0.2f;

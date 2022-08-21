@@ -50,29 +50,29 @@ namespace TactsuitBS
             }
         }
 
-        public static float GetCurrentPull(BowString bowString)
-        {
-            try
-            {
-                if (bowString.stringHandle != null)
-                {
-                    if (bowString.stringHandle.handlers.Count > 0 && (bool)(UnityEngine.Object)bowString.stringHandle.handlers[0].playerHand)
-                    {
-                        FieldInfo currentPullField = bowString.GetType().GetField("currentPull", BindingFlags.NonPublic | BindingFlags.Instance);
-                        if (currentPullField != null)
-                        {
-                            return (float)currentPullField.GetValue(bowString);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
+        //public static float GetCurrentPull(BowString bowString)
+        //{
+        //    try
+        //    {
+        //        if (bowString.stringHandle != null)
+        //        {
+        //            if (bowString.stringHandle.handlers.Count > 0 && (bool)(UnityEngine.Object)bowString.stringHandle.handlers[0].playerHand)
+        //            {
+        //                FieldInfo currentPullField = bowString.GetType().GetField("currentPull", BindingFlags.NonPublic | BindingFlags.Instance);
+        //                if (currentPullField != null)
+        //                {
+        //                    return (float)currentPullField.GetValue(bowString);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
 
-            }
+        //    }
 
-            return 0f;
-        }
+        //    return 0f;
+        //}
 
 
         public static float GetAngleForPosition(Vector3 pos)

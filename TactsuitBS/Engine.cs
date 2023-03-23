@@ -12,307 +12,629 @@ using System.Threading;
 using Bhaptics.Tact;
 using CustomWebSocketSharp;
 using Newtonsoft.Json.Linq;
-using TLGFPowerBooks;
 using UnityEngine.SceneManagement;
-using System.Collections;
 using HarmonyLib;
+using UnityEngine.Audio;
 
 namespace TactsuitBS
 {
-    public class Engine : LevelModule
+    public class Engine : ThunderScript
     {
         //Public parameters
 
         #region Public Parameters
 
-        public bool Logging = true;
+        [ModOption("Enable Logging", "Enables Logging", defaultValueIndex = 0, order = 0)]
+        public static bool Logging = false;
 
         public static bool GravityEffectOnArms = false;
         public static bool GravityEffectOnHead = false;
+
+        [ModOption("Play Fallback Effects", "Enables Fallback Effects", defaultValueIndex = 1, order = 2)]
         public static bool PlayFallbackEffectsForArmHead = true;
+
         public static bool NoFallEffectWhenFallDamageIsDisabled = false;
 
 
         //Rain
-        public int RainVestSleepDuration = 700;
-        public int RainHeadSleepDuration = 1000;
-        public int RainArmSleepDuration = 1000;
-        public int RainEffectDuration = 50;
+        public static int RainVestSleepDuration = 500;
+        public static int RainHeadSleepDuration = 1000;
+        public static int RainArmSleepDuration = 1000;
+        public static int RainEffectDuration = 60;
 
-        public float IntensityRaindropVest = 1.15f;
-        public float IntensityRaindropArm = 0.8f;
-        public float IntensityRaindropHead = 0.7f;
+
+        public static float IntensityRaindropVest = 1.25f;
+        public static float IntensityRaindropArm = 0.85f;
+        public static float IntensityRaindropHead = 0.75f;
 
 
         //Sleep Durations
         public static int SleepDurationHeartBeat = 900;
+        
         public static int SleepDurationHeartBeatFast = 500;
+        
         public static int SleepDurationSpellCast = 500;
-        public static int SleepDurationBowString = 500;
-        public static int SleepDurationShootGun = 200;
-        public static int SleepDurationClimb = 500;
+        
+        public static int SleepDurationBowString = 150;
+        
+        public static int SleepDurationShootGun = 300;
+        
+        public static int SleepDurationClimb = 300;
+        
         public static int SleepDurationSlowMotion = 1500;
+        
         public static int SleepDurationSpellHit = 300;
-        public static int SleepDurationStuckArrow = 50;
+        
+        public static int SleepDurationStuckArrow = 210;
 
 
         //public float StuckArrowIntensityMultiplier = 0.4f;
         //public float StuckArrowDurationMultiplier = 4.0f;
         //public int StuckArrowSleepDuration = 3000;
 
-        public float FallEffectMinVelocityMagnitude = 10.0f;
+        
+        [ModOption("Melee Intensity Multiplier", "Melee Intensity Multiplier", defaultValueIndex = 10, order = 3)]
+        public static float IntensityMultiplierMelee = 1.0f;
 
-        public float IntensityDefaultDamage = 1.0f;
-        public float IntensityPlayerBowPull = 1.0f;
-        public float IntensityPlayerMeleeBladeWoodPierce = 1.0f;
-        public float IntensityPlayerMeleeBladeMetalPierce = 1.0f;
-        public float IntensityPlayerMeleeBladeStonePierce = 1.0f;
-        public float IntensityPlayerMeleeBladeFabricPierce = 1.0f;
-        public float IntensityPlayerMeleeBladeFleshPierce = 1.0f;
-        public float IntensityPlayerMeleeBladeWoodSlash = 1.0f;
-        public float IntensityPlayerMeleeBladeMetalSlash = 1.0f;
-        public float IntensityPlayerMeleeBladeStoneSlash = 1.0f;
-        public float IntensityPlayerMeleeBladeFabricSlash = 1.0f;
-        public float IntensityPlayerMeleeBladeFleshSlash = 1.0f;
-        public float IntensityPlayerMeleeBladeWoodBlunt = 1.0f;
-        public float IntensityPlayerMeleeBladeMetalBlunt = 1.0f;
-        public float IntensityPlayerMeleeBladeStoneBlunt = 1.0f;
-        public float IntensityPlayerMeleeBladeFabricBlunt = 1.0f;
-        public float IntensityPlayerMeleeBladeFleshBlunt = 1.0f;
-        public float IntensityPlayerMeleeWoodWoodBlunt = 1.0f;
-        public float IntensityPlayerMeleeWoodMetalBlunt = 1.0f;
-        public float IntensityPlayerMeleeWoodStoneBlunt = 1.0f;
-        public float IntensityPlayerMeleeWoodFabricBlunt = 1.0f;
-        public float IntensityPlayerMeleeWoodFleshBlunt = 1.0f;
-        public float IntensityPlayerMeleeStoneStoneBlunt = 1.0f;
-        public float IntensityPlayerMeleeStoneFabricBlunt = 1.0f;
-        public float IntensityPlayerMeleeStoneFleshBlunt = 1.0f;
+        [ModOption("Bow Intensity Multiplier", "Bow Intensity Multiplier", defaultValueIndex = 10, order = 4)]
+        public static float IntensityMultiplierBow = 1.0f;
 
-        public float IntensityPlayerMeleeLightsaberClashRight = 1.0f;
-        public float IntensityPlayerMeleeLightsaberSlashRight = 1.0f;
-        public float IntensityPlayerMeleeLightsaberPierceRight = 1.0f;
-        public float IntensityPlayerMeleeLightsaberBluntRight = 1.0f;
+        [ModOption("Spell Intensity Multiplier", "Spell Intensity Multiplier", defaultValueIndex = 10, order = 5)]
+        public static float IntensityMultiplierSpell = 1.0f;
 
-        public float IntensityPlayerSpellFire = 1.0f;
-        public float IntensityPlayerSpellLightning = 1.0f;
-        public float IntensityPlayerSpellGravity = 1.0f;
-        public float IntensityPlayerSpellIce = 1.0f;
-        public float IntensityPlayerSpellCrush = 1.0f;
-        public float IntensityPlayerSpellHeal = 1.0f;
-        public float IntensityPlayerSpellImplosion = 1.0f;
-        public float IntensityPlayerSpellInvisibility = 1.0f;
-        public float IntensityPlayerSpellTesla = 1.0f;
-        public float IntensityPlayerSpellUtility = 1.0f;
-        public float IntensityPlayerSpellCorruption = 1.0f;
-        public float IntensityPlayerSpellTeleport = 1.0f;
-        public float IntensityPlayerSpellRasengan = 1.0f;
-        public float IntensityPlayerSpellNeedle = 1.0f;
-        public float IntensityPlayerSpellDrain = 1.0f;
-        public float IntensityPlayerSpellForceField = 1.0f;
-        public float IntensityPlayerSpellOther = 1.0f;
+        [ModOption("Telekinesis Intensity Multiplier", "Telekinesis Intensity Multiplier", defaultValueIndex = 10, order = 6)]
+        public static float IntensityMultiplierTelekinesis = 1.0f;
 
-        public float IntensityPlayerTelekinesisActive = 1.0f;
-        public float IntensityPlayerTelekinesisPull = 0.3f;
-        public float IntensityPlayerTelekinesisRepel = 0.3f;
-        public float IntensityPlayerTelekinesisCatch = 2.0f;
+        [ModOption("Arrow Damage Intensity Multiplier", "Arrow Damage Intensity Multiplier", defaultValueIndex = 10, order = 7)]
+        public static float IntensityMultiplierArrowDamage = 1.0f;
 
-        public float IntensityDamageVestArrow = 1.0f;
-        public float IntensityDamageArmArrow = 1.0f;
-        public float IntensityDamageHeadArrow = 1.0f;
-        public float IntensityDamageVestFireArrow = 1.0f;
-        public float IntensityDamageArmFireArrow = 1.0f;
-        public float IntensityDamageHeadFireArrow = 1.0f;
-        public float IntensityDamageVestLightningArrow = 1.0f;
-        public float IntensityDamageArmLightningArrow = 1.0f;
-        public float IntensityDamageHeadLightningArrow = 1.0f;
-        public float IntensityDamageVestIceArrow = 1.0f;
-        public float IntensityDamageArmIceArrow = 1.0f;
-        public float IntensityDamageHeadIceArrow = 1.0f;
-        public float IntensityDamageHeadFire = 1.0f;
-        public float IntensityDamageHeadLightning = 1.0f;
-        public float IntensityDamageHeadGravity = 1.0f;
-        public float IntensityDamageHeadIce = 1.0f;
-        public float IntensityDamageHeadDrain = 1.0f;
-        public float IntensityDamageHeadEnergy = 1.0f;
-        public float IntensityDamageArmFire = 1.0f;
-        public float IntensityDamageArmLightning = 1.0f;
-        public float IntensityDamageArmGravity = 1.0f;
-        public float IntensityDamageArmIce = 1.0f;
-        public float IntensityDamageArmDrain = 1.0f;
-        public float IntensityDamageArmEnergy = 1.0f;
+        [ModOption("Melee Damage Intensity Multiplier", "Melee Damage Intensity Multiplier", defaultValueIndex = 10, order = 8)]
+        public static float IntensityMultiplierMeleeDamage = 1.0f;
 
-        public float IntensityDamageVestEnergy = 1.0f;
-        public float IntensityDamageVestFire = 1.0f;
-        public float IntensityDamageVestLightning = 1.0f;
-        public float IntensityDamageVestGravity = 1.0f;
-        public float IntensityDamageVestIce = 1.0f;
-        public float IntensityDamageVestDrain = 1.0f;
+        [ModOption("Spell Damage Intensity Multiplier", "Spell Damage Intensity Multiplier", defaultValueIndex = 10, order = 9)]
+        public static float IntensityMultiplierSpellDamage = 1.0f;
 
-        public float IntensityDamageVestPierceBladeSmall = 1.0f;
-        public float IntensityDamageVestSlashBladeSmall = 1.0f;
-        public float IntensityDamageVestBluntBladeSmall = 1.0f;
-        public float IntensityDamageVestBluntWoodSmall = 1.0f;
-        public float IntensityDamageVestBluntMetalSmall = 1.0f;
-        public float IntensityDamageVestBluntStoneSmall = 1.0f;
-        public float IntensityDamageVestBluntFleshSmall = 1.0f;
-        public float IntensityDamageVestPierceFireSmall = 1.0f;
-        public float IntensityDamageVestSlashFireSmall = 1.0f;
-        public float IntensityDamageVestBluntFireSmall = 1.0f;
-        public float IntensityDamageVestPierceLightningSmall = 1.0f;
-        public float IntensityDamageVestSlashLightningSmall = 1.0f;
-        public float IntensityDamageVestBluntLightningSmall = 1.0f;
-        public float IntensityDamageVestPierceIceSmall = 1.0f;
-        public float IntensityDamageVestSlashIceSmall = 1.0f;
-        public float IntensityDamageVestBluntIceSmall = 1.0f;
-        public float IntensityDamageVestPierceBladeLarge = 1.0f;
-        public float IntensityDamageVestSlashBladeLarge = 1.0f;
-        public float IntensityDamageVestBluntBladeLarge = 1.0f;
-        public float IntensityDamageVestBluntWoodLarge = 1.0f;
-        public float IntensityDamageVestBluntMetalLarge = 1.0f;
-        public float IntensityDamageVestBluntStoneLarge = 1.0f;
-        public float IntensityDamageVestBluntFleshLarge = 1.0f;
-        public float IntensityDamageVestPierceFireLarge = 1.0f;
-        public float IntensityDamageVestSlashFireLarge = 1.0f;
-        public float IntensityDamageVestBluntFireLarge = 1.0f;
-        public float IntensityDamageVestPierceLightningLarge = 1.0f;
-        public float IntensityDamageVestSlashLightningLarge = 1.0f;
-        public float IntensityDamageVestBluntLightningLarge = 1.0f;
-        public float IntensityDamageVestPierceIceLarge = 1.0f;
-        public float IntensityDamageVestSlashIceLarge = 1.0f;
-        public float IntensityDamageVestBluntIceLarge = 1.0f;
+        [ModOption("Fall Intensity Multiplier", "Fall Intensity Multiplier", defaultValueIndex = 10, order = 10)]
+        public static float IntensityMultiplierFall = 1.0f;
 
-        public float IntensityDamageVestBlaster = 1.0f;
-        public float IntensityDamageVestBlasterStun = 1.0f;
-        public float IntensityDamageArmBlaster = 1.0f;
-        public float IntensityDamageArmBlasterStun = 1.0f;
-        public float IntensityDamageHeadBlaster = 1.0f;
-        public float IntensityDamageHeadBlasterStun = 1.0f;
+        [ModOption("Fall Effect Min Velocity", "Fall Effect Min Velocity", defaultValueIndex = 70, order = 11)]
+        public static float FallEffectMinVelocityMagnitude = 7.0f;
 
-        public float IntensityDamageArmPierceBladeSmall = 1.0f;
-        public float IntensityDamageArmSlashBladeSmall = 1.0f;
-        public float IntensityDamageArmBluntBladeSmall = 1.0f;
-        public float IntensityDamageArmBluntWoodSmall = 1.0f;
-        public float IntensityDamageArmBluntMetalSmall = 1.0f;
-        public float IntensityDamageArmBluntStoneSmall = 1.0f;
-        public float IntensityDamageArmBluntFleshSmall = 1.0f;
-        public float IntensityDamageArmPierceFireSmall = 1.0f;
-        public float IntensityDamageArmSlashFireSmall = 1.0f;
-        public float IntensityDamageArmBluntFireSmall = 1.0f;
-        public float IntensityDamageArmPierceLightningSmall = 1.0f;
-        public float IntensityDamageArmSlashLightningSmall = 1.0f;
-        public float IntensityDamageArmBluntLightningSmall = 1.0f;
-        public float IntensityDamageArmPierceIceSmall = 1.0f;
-        public float IntensityDamageArmSlashIceSmall = 1.0f;
-        public float IntensityDamageArmBluntIceSmall = 1.0f;
-        public float IntensityDamageArmPierceBladeLarge = 1.0f;
-        public float IntensityDamageArmSlashBladeLarge = 1.0f;
-        public float IntensityDamageArmBluntBladeLarge = 1.0f;
-        public float IntensityDamageArmBluntWoodLarge = 1.0f;
-        public float IntensityDamageArmBluntMetalLarge = 1.0f;
-        public float IntensityDamageArmBluntStoneLarge = 1.0f;
-        public float IntensityDamageArmBluntFleshLarge = 1.0f;
-        public float IntensityDamageArmPierceFireLarge = 1.0f;
-        public float IntensityDamageArmSlashFireLarge = 1.0f;
-        public float IntensityDamageArmBluntFireLarge = 1.0f;
-        public float IntensityDamageArmPierceLightningLarge = 1.0f;
-        public float IntensityDamageArmSlashLightningLarge = 1.0f;
-        public float IntensityDamageArmBluntLightningLarge = 1.0f;
-        public float IntensityDamageArmPierceIceLarge = 1.0f;
-        public float IntensityDamageArmSlashIceLarge = 1.0f;
-        public float IntensityDamageArmBluntIceLarge = 1.0f;
-        public float IntensityDamageHeadPierceBladeSmall = 1.0f;
-        public float IntensityDamageHeadSlashBladeSmall = 1.0f;
-        public float IntensityDamageHeadBluntBladeSmall = 1.0f;
-        public float IntensityDamageHeadBluntWoodSmall = 1.0f;
-        public float IntensityDamageHeadBluntMetalSmall = 1.0f;
-        public float IntensityDamageHeadBluntStoneSmall = 1.0f;
-        public float IntensityDamageHeadBluntFleshSmall = 1.0f;
-        public float IntensityDamageHeadPierceFireSmall = 1.0f;
-        public float IntensityDamageHeadSlashFireSmall = 1.0f;
-        public float IntensityDamageHeadBluntFireSmall = 1.0f;
-        public float IntensityDamageHeadPierceLightningSmall = 1.0f;
-        public float IntensityDamageHeadSlashLightningSmall = 1.0f;
-        public float IntensityDamageHeadBluntLightningSmall = 1.0f;
-        public float IntensityDamageHeadPierceIceSmall = 1.0f;
-        public float IntensityDamageHeadSlashIceSmall = 1.0f;
-        public float IntensityDamageHeadBluntIceSmall = 1.0f;
-        public float IntensityDamageHeadPierceBladeLarge = 1.0f;
-        public float IntensityDamageHeadSlashBladeLarge = 1.0f;
-        public float IntensityDamageHeadBluntBladeLarge = 1.0f;
-        public float IntensityDamageHeadBluntWoodLarge = 1.0f;
-        public float IntensityDamageHeadBluntMetalLarge = 1.0f;
-        public float IntensityDamageHeadBluntStoneLarge = 1.0f;
-        public float IntensityDamageHeadBluntFleshLarge = 1.0f;
-        public float IntensityDamageHeadPierceFireLarge = 1.0f;
-        public float IntensityDamageHeadSlashFireLarge = 1.0f;
-        public float IntensityDamageHeadBluntFireLarge = 1.0f;
-        public float IntensityDamageHeadPierceLightningLarge = 1.0f;
-        public float IntensityDamageHeadSlashLightningLarge = 1.0f;
-        public float IntensityDamageHeadBluntLightningLarge = 1.0f;
-        public float IntensityDamageHeadPierceIceLarge = 1.0f;
-        public float IntensityDamageHeadSlashIceLarge = 1.0f;
-        public float IntensityDamageHeadBluntIceLarge = 1.0f;
+        [ModOption("Climbing Intensity Multiplier", "Climb Intensity Multiplier", defaultValueIndex = 10, order = 12)]
+        public static float IntensityMultiplierClimbing = 1.0f;
 
-        public float IntensityHeartBeat = 0.5f;
-        public float IntensityHeartBeatFast = 0.5f;
-        public float IntensityHealing = 1.5f;
-        public float IntensityPotionDrinking = 1.5f;
-        public float IntensityPoisonDrinking = 1.5f;
-        public float IntensityFallDamage = 1.5f;
-        public float IntensityFallDamageFeet = 1.0f;
-        public float IntensitySlowMotion = 1.0f;
-        public float IntensityHolster = 1.0f;
-        public float IntensityUnholster = 1.0f;
-        public float IntensityHolsterArrow = 1.0f;
-        public float IntensityUnholsterArrow = 1.0f;
-        public float IntensityClimbing = 1.0f;
-        public float IntensityPlayerKickOther = 1.0f;
-        public float IntensityPlayerKickWood = 1.0f;
-        public float IntensityPlayerKickFlesh = 1.0f;
-        public float IntensityPlayerKickStone = 1.0f;
-        public float IntensityPlayerKickMetal = 1.0f;
-        public float IntensityPlayerKickFabric = 1.0f;
-        public float IntensityPlayerPunchOther = 1.0f;
-        public float IntensityPlayerPunchWood = 1.0f;
-        public float IntensityPlayerPunchFlesh = 1.0f;
-        public float IntensityPlayerPunchStone = 1.0f;
-        public float IntensityPlayerPunchMetal = 1.0f;
-        public float IntensityPlayerPunchFabric = 1.0f;
+        [ModOption("Consuming Intensity Multiplier", "Consuming Intensity Multiplier", defaultValueIndex = 10, order = 13)]
+        public static float IntensityMultiplierConsuming = 1.0f;
 
-        public float IntensityPlayerGun = 1.0f;
-        public float IntensityPlayerGunBlaster = 1.0f;
-        public float IntensityPlayerGunAutomatic = 1.0f;
-        public float IntensityPlayerGunBallistic = 1.0f;
-        public float IntensityPlayerGunSpray = 1.0f;
-        public float IntensityPlayerGunMiniGun = 1.0f;
-        public float IntensityPlayerGunBazooka = 1.0f;
-        public float IntensityPlayerGunHeavy = 1.0f;
-        public float IntensityPlayerGunLaser = 1.0f;
-        public float IntensityPlayerGunRifle = 1.0f;
-        public float IntensityPlayerGunPistol = 1.0f;
-        public float IntensityPlayerGunPlasma = 1.0f;
-        public float IntensityPlayerGunShotgun = 1.0f;
-        public float IntensityPlayerGunEnergy = 1.0f;
-        public float IntensityKickbackPlayerGun = 1.0f;
-        public float IntensityKickbackPlayerGunPistol = 1.0f;
-        public float IntensityKickbackPlayerGunBallistic = 1.0f;
-        public float IntensityKickbackPlayerGunLaser = 1.0f;
-        public float IntensityKickbackPlayerGunPlasma = 1.0f;
-        public float IntensityKickbackPlayerGunSpray = 1.0f;
-        public float IntensityKickbackPlayerGunHeavy = 1.0f;
+        [ModOption("Heartbeat Intensity Multiplier", "Heartbeat Intensity Multiplier", defaultValueIndex = 10, order = 14)]
+        public static float IntensityMultiplierHeartbeat = 1.0f;
 
-        public float IntensityPlayerThrow = 1.0f;
+        [ModOption("Stuck Arrow Intensity Multiplier", "Stuck Arrow Intensity Multiplier", defaultValueIndex = 10, order = 15)]
+        public static float IntensityMultiplierStuckArrow = 1.0f;
 
-        public float IntensityExplosion = 1.0f;
+        [ModOption("Healing Intensity Multiplier", "Healing Intensity Multiplier", defaultValueIndex = 10, order = 16)]
+        public static float IntensityHealing = 1.0f;
 
-        public float IntensityShoulderTurret = 1.0f;
-        public float IntensityHoverJetFeet = 1.0f;
+        [ModOption("Holster Intensity Multiplier", "Holster Intensity Multiplier", defaultValueIndex = 10, order = 17)]
+        public static float IntensityMultiplierHolster = 1.0f;
 
-        public float IntensityEquipUnequip = 1.0f;
+        [ModOption("Explosion Intensity Multiplier", "Explosion Intensity Multiplier", defaultValueIndex = 10, order = 18)]
+        public static float IntensityExplosion = 1.0f;
 
-        public float IntensityConsumableFood = 1.0f;
+        [ModOption("Raindrop Intensity Multiplier", "Raindrop Intensity Multiplier", defaultValueIndex = 10, order = 19)]
+        public static float IntensityMultiplierRaindrop = 1.0f;
 
-        public float IntensityMultiplierStuckArrow = 0.05f;
+        [ModOption("Equip/Unequip Intensity Multiplier", "Equip/Unequip Intensity Multiplier", defaultValueIndex = 10, order = 20)]
+        public static float IntensityEquipUnequip = 1.0f;
+
+        [ModOption("Other Damage Intensity Multiplier", "Other Damage Intensity Multiplier", defaultValueIndex = 20, order = 21)]
+        public static float IntensityDefaultDamage = 2.0f;
+
+        [ModOption("Slow Motion Intensity Multiplier", "Slow Motion Intensity Multiplier", defaultValueIndex = 10, order = 22)]
+        public static float IntensityMultiplierSlowMotion = 1.0f;
+
+        [ModOption("Gun Firing Intensity Multiplier", "Gun Firing Intensity Multiplier", defaultValueIndex = 0, order = 23)]
+        public static float IntensityMultiplierGun = 0.0f;
+
+
+        public static float IntensityPlayerBowPull = 0.6f;
+        
+        public static float IntensityPlayerMeleeBladeWoodPierce = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeMetalPierce = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeStonePierce = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeFabricPierce = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeFleshPierce = 1.3f;
+        
+        public static float IntensityPlayerMeleeBladeWoodSlash = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeMetalSlash = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeStoneSlash = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeFabricSlash = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeFleshSlash = 1.3f;
+        
+        public static float IntensityPlayerMeleeBladeWoodBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeMetalBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeStoneBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeFabricBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeBladeFleshBlunt = 1.3f;
+        
+        public static float IntensityPlayerMeleeWoodWoodBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeWoodMetalBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeWoodStoneBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeWoodFabricBlunt = 1.0f;
+        
+        public static float IntensityPlayerMeleeWoodFleshBlunt = 1.3f;
+        
+        public static float IntensityPlayerMeleeStoneStoneBlunt = 2.0f;
+        
+        public static float IntensityPlayerMeleeStoneFabricBlunt = 1.5f;
+        
+        public static float IntensityPlayerMeleeStoneFleshBlunt = 1.5f;
+
+        
+        public static float IntensityPlayerMeleeLightsaberClashRight = 1.0f;
+        
+        public static float IntensityPlayerMeleeLightsaberSlashRight = 1.5f;
+        
+        public static float IntensityPlayerMeleeLightsaberPierceRight = 1.5f;
+        
+        public static float IntensityPlayerMeleeLightsaberBluntRight = 1.5f;
+
+        
+        public static float IntensityPlayerSpellFire = 0.5f;
+        
+        public static float IntensityPlayerSpellLightning = 0.5f;
+        
+        public static float IntensityPlayerSpellGravity = 0.5f;
+        
+        public static float IntensityPlayerSpellIce = 0.5f;
+        
+        public static float IntensityPlayerSpellCrush = 0.5f;
+        
+        public static float IntensityPlayerSpellHeal = 0.5f;
+        
+        public static float IntensityPlayerSpellImplosion = 0.5f;
+        
+        public static float IntensityPlayerSpellInvisibility = 0.5f;
+        
+        public static float IntensityPlayerSpellTesla = 0.5f;
+        
+        public static float IntensityPlayerSpellUtility = 0.5f;
+        
+        public static float IntensityPlayerSpellCorruption = 0.5f;
+        
+        public static float IntensityPlayerSpellTeleport = 0.5f;
+        
+        public static float IntensityPlayerSpellRasengan = 0.5f;
+        
+        public static float IntensityPlayerSpellNeedle = 0.5f;
+        
+        public static float IntensityPlayerSpellDrain = 0.5f;
+        
+        public static float IntensityPlayerSpellForceField = 0.5f;
+        
+        public static float IntensityPlayerSpellOther = 0.5f;
+
+        
+        public static float IntensityPlayerTelekinesisActive = 0.3f;
+        
+        public static float IntensityPlayerTelekinesisPull = 0.3f;
+        
+        public static float IntensityPlayerTelekinesisRepel = 0.3f;
+        
+        public static float IntensityPlayerTelekinesisCatch = 0.3f;
+
+        
+        public static float IntensityDamageVestArrow = 1.0f;
+        
+        public static float IntensityDamageArmArrow = 1.0f;
+        
+        public static float IntensityDamageHeadArrow = 1.0f;
+        
+        public static float IntensityDamageVestFireArrow = 1.0f;
+        
+        public static float IntensityDamageArmFireArrow = 1.0f;
+        
+        public static float IntensityDamageHeadFireArrow = 1.0f;
+        
+        public static float IntensityDamageVestLightningArrow = 1.0f;
+        
+        public static float IntensityDamageArmLightningArrow = 1.0f;
+        
+        public static float IntensityDamageHeadLightningArrow = 1.0f;
+        
+        public static float IntensityDamageVestIceArrow = 1.0f;
+        
+        public static float IntensityDamageArmIceArrow = 1.0f;
+        
+        public static float IntensityDamageHeadIceArrow = 1.0f;
+        
+        public static float IntensityDamageHeadFire = 1.0f;
+        
+        public static float IntensityDamageHeadLightning = 1.0f;
+        
+        public static float IntensityDamageHeadGravity = 1.0f;
+        
+        public static float IntensityDamageHeadIce = 1.0f;
+        
+        public static float IntensityDamageHeadDrain = 1.0f;
+        
+        public static float IntensityDamageHeadEnergy = 1.0f;
+        
+        public static float IntensityDamageArmFire = 1.0f;
+        
+        public static float IntensityDamageArmLightning = 1.0f;
+        
+        public static float IntensityDamageArmGravity = 1.0f;
+        
+        public static float IntensityDamageArmIce = 1.0f;
+        
+        public static float IntensityDamageArmDrain = 1.0f;
+        
+        public static float IntensityDamageArmEnergy = 1.0f;
+
+        
+        public static float IntensityDamageVestEnergy = 1.2f;
+        
+        public static float IntensityDamageVestFire = 3.0f;
+        
+        public static float IntensityDamageVestLightning = 1.2f;
+        
+        public static float IntensityDamageVestGravity = 1.0f;
+        
+        public static float IntensityDamageVestIce = 1.2f;
+        
+        public static float IntensityDamageVestDrain = 1.2f;
+
+        
+        public static float IntensityDamageVestPierceBladeSmall = 1.2f;
+        
+        public static float IntensityDamageVestSlashBladeSmall = 1.6f;
+        
+        public static float IntensityDamageVestBluntBladeSmall = 1.6f;
+        
+        public static float IntensityDamageVestBluntWoodSmall = 1.2f;
+        
+        public static float IntensityDamageVestBluntMetalSmall = 1.6f;
+        
+        public static float IntensityDamageVestBluntStoneSmall = 1.2f;
+        
+        public static float IntensityDamageVestBluntFleshSmall = 1.2f;
+        
+        public static float IntensityDamageVestPierceFireSmall = 1.2f;
+        
+        public static float IntensityDamageVestSlashFireSmall = 1.2f;
+        
+        public static float IntensityDamageVestBluntFireSmall = 1.2f;
+        
+        public static float IntensityDamageVestPierceLightningSmall = 1.2f;
+        
+        public static float IntensityDamageVestSlashLightningSmall = 1.6f;
+        
+        public static float IntensityDamageVestBluntLightningSmall = 1.2f;
+        
+        public static float IntensityDamageVestPierceIceSmall = 1.2f;
+        
+        public static float IntensityDamageVestSlashIceSmall = 1.6f;
+        
+        public static float IntensityDamageVestBluntIceSmall = 1.2f;
+        
+        public static float IntensityDamageVestPierceBladeLarge = 1.2f;
+        
+        public static float IntensityDamageVestSlashBladeLarge = 1.6f;
+        
+        public static float IntensityDamageVestBluntBladeLarge = 1.6f;
+        
+        public static float IntensityDamageVestBluntWoodLarge = 1.2f;
+        
+        public static float IntensityDamageVestBluntMetalLarge = 1.6f;
+        
+        public static float IntensityDamageVestBluntStoneLarge = 1.2f;
+        
+        public static float IntensityDamageVestBluntFleshLarge = 1.2f;
+        
+        public static float IntensityDamageVestPierceFireLarge = 1.2f;
+        
+        public static float IntensityDamageVestSlashFireLarge = 1.2f;
+        
+        public static float IntensityDamageVestBluntFireLarge = 1.2f;
+        
+        public static float IntensityDamageVestPierceLightningLarge = 1.2f;
+        
+        public static float IntensityDamageVestSlashLightningLarge = 1.6f;
+        
+        public static float IntensityDamageVestBluntLightningLarge = 1.2f;
+        
+        public static float IntensityDamageVestPierceIceLarge = 1.2f;
+        
+        public static float IntensityDamageVestSlashIceLarge = 1.6f;
+        
+        public static float IntensityDamageVestBluntIceLarge = 1.2f;
+
+        
+        public static float IntensityDamageVestBlaster = 2.0f;
+        
+        public static float IntensityDamageVestBlasterStun = 2.0f;
+        
+        public static float IntensityDamageArmBlaster = 2.0f;
+        
+        public static float IntensityDamageArmBlasterStun = 2.0f;
+        
+        public static float IntensityDamageHeadBlaster = 2.0f;
+        
+        public static float IntensityDamageHeadBlasterStun = 2.0f;
+
+
+        
+        public static float IntensityDamageVestPierceLightsaber = 2.0f;
+        
+        public static float IntensityDamageVestSlashLightsaber = 2.0f;
+        
+        public static float IntensityDamageVestBluntLightsaber = 2.0f;
+        
+        public static float IntensityDamageRightArmBluntLightsaber = 2.0f;
+        
+        public static float IntensityDamageRightArmPierceLightsaber = 2.0f;
+        
+        public static float IntensityDamageRightArmSlashLightsaber = 2.0f;
+        
+        public static float IntensityDamageHeadPierceLightsaber = 2.0f;
+        
+        public static float IntensityDamageHeadSlashLightsaber = 2.0f;
+        
+        public static float IntensityDamageHeadBluntLightsaber = 2.0f;
+
+        
+        public static float IntensityDamageArmPierceBladeSmall = 1.3f;
+        
+        public static float IntensityDamageArmSlashBladeSmall = 1.3f;
+        
+        public static float IntensityDamageArmBluntBladeSmall = 1.3f;
+        
+        public static float IntensityDamageArmBluntWoodSmall = 1.3f;
+        
+        public static float IntensityDamageArmBluntMetalSmall = 1.3f;
+        
+        public static float IntensityDamageArmBluntStoneSmall = 1.3f;
+        
+        public static float IntensityDamageArmBluntFleshSmall = 1.3f;
+        
+        public static float IntensityDamageArmPierceFireSmall = 1.3f;
+        
+        public static float IntensityDamageArmSlashFireSmall = 1.5f;
+        
+        public static float IntensityDamageArmBluntFireSmall = 1.5f;
+        
+        public static float IntensityDamageArmPierceLightningSmall = 1.5f;
+        
+        public static float IntensityDamageArmSlashLightningSmall = 1.5f;
+        
+        public static float IntensityDamageArmBluntLightningSmall = 1.5f;
+        
+        public static float IntensityDamageArmPierceIceSmall = 1.5f;
+        
+        public static float IntensityDamageArmSlashIceSmall = 1.5f;
+        
+        public static float IntensityDamageArmBluntIceSmall = 1.5f;
+        
+        public static float IntensityDamageArmPierceBladeLarge = 1.3f;
+        
+        public static float IntensityDamageArmSlashBladeLarge = 1.30f;
+        
+        public static float IntensityDamageArmBluntBladeLarge = 1.3f;
+        
+        public static float IntensityDamageArmBluntWoodLarge = 1.3f;
+        
+        public static float IntensityDamageArmBluntMetalLarge = 1.3f;
+        
+        public static float IntensityDamageArmBluntStoneLarge = 1.3f;
+        
+        public static float IntensityDamageArmBluntFleshLarge = 1.3f;
+        
+        public static float IntensityDamageArmPierceFireLarge = 1.3f;
+        
+        public static float IntensityDamageArmSlashFireLarge = 1.5f;
+        
+        public static float IntensityDamageArmBluntFireLarge = 1.5f;
+        
+        public static float IntensityDamageArmPierceLightningLarge = 1.5f;
+        
+        public static float IntensityDamageArmSlashLightningLarge = 1.5f;
+        
+        public static float IntensityDamageArmBluntLightningLarge = 1.5f;
+        
+        public static float IntensityDamageArmPierceIceLarge = 1.5f;
+        
+        public static float IntensityDamageArmSlashIceLarge = 1.5f;
+        
+        public static float IntensityDamageArmBluntIceLarge = 1.5f;
+        
+        public static float IntensityDamageHeadPierceBladeSmall = 1.0f;
+        
+        public static float IntensityDamageHeadSlashBladeSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntBladeSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntWoodSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntMetalSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntStoneSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntFleshSmall = 1.0f;
+        
+        public static float IntensityDamageHeadPierceFireSmall = 1.0f;
+        
+        public static float IntensityDamageHeadSlashFireSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntFireSmall = 1.0f;
+        
+        public static float IntensityDamageHeadPierceLightningSmall = 1.0f;
+        
+        public static float IntensityDamageHeadSlashLightningSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntLightningSmall = 1.0f;
+        
+        public static float IntensityDamageHeadPierceIceSmall = 1.0f;
+        
+        public static float IntensityDamageHeadSlashIceSmall = 1.0f;
+        
+        public static float IntensityDamageHeadBluntIceSmall = 1.0f;
+        
+        public static float IntensityDamageHeadPierceBladeLarge = 1.0f;
+        
+        public static float IntensityDamageHeadSlashBladeLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntBladeLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntWoodLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntMetalLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntStoneLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntFleshLarge = 1.0f;
+        
+        public static float IntensityDamageHeadPierceFireLarge = 1.0f;
+        
+        public static float IntensityDamageHeadSlashFireLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntFireLarge = 1.0f;
+        
+        public static float IntensityDamageHeadPierceLightningLarge = 1.0f;
+        
+        public static float IntensityDamageHeadSlashLightningLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntLightningLarge = 1.0f;
+        
+        public static float IntensityDamageHeadPierceIceLarge = 1.0f;
+        
+        public static float IntensityDamageHeadSlashIceLarge = 1.0f;
+        
+        public static float IntensityDamageHeadBluntIceLarge = 1.0f;
+
+        
+        public static float IntensityHeartBeat = 0.5f;
+        
+        public static float IntensityHeartBeatFast = 0.5f;
+        
+        public static float IntensityPotionDrinking = 0.8f;
+        
+        public static float IntensityPoisonDrinking = 1.0f;
+        
+        public static float IntensityFallDamage = 4.0f;
+        
+        public static float IntensityFallDamageFeet = 1.7f;
+        
+        public static float IntensitySlowMotion = 0.8f;
+        
+        public static float IntensityHolster = 1.0f;
+        
+        public static float IntensityUnholster = 1.0f;
+        
+        public static float IntensityHolsterArrow = 1.0f;
+        
+        public static float IntensityUnholsterArrow = 1.0f;
+        
+        public static float IntensityClimbing = 1.2f;
+        
+        public static float IntensityPlayerKickOther = 3.0f;
+        
+        public static float IntensityPlayerKickWood = 3.0f;
+        
+        public static float IntensityPlayerKickFlesh = 3.0f;
+        
+        public static float IntensityPlayerKickStone = 3.0f;
+        
+        public static float IntensityPlayerKickMetal = 3.0f;
+        
+        public static float IntensityPlayerKickFabric = 3.0f;
+        
+        public static float IntensityPlayerPunchOther = 4.0f;
+        
+        public static float IntensityPlayerPunchWood = 4.0f;
+        
+        public static float IntensityPlayerPunchFlesh = 4.0f;
+        
+        public static float IntensityPlayerPunchStone = 4.0f;
+        
+        public static float IntensityPlayerPunchMetal = 4.0f;
+        
+        public static float IntensityPlayerPunchFabric = 4.0f;
+
+        
+        public static float IntensityPlayerGun = 1.0f;
+        
+        public static float IntensityPlayerGunBlaster = 1.2f;
+        
+        public static float IntensityPlayerGunAutomatic = 1.5f;
+        
+        public static float IntensityPlayerGunBallistic = 1.3f;
+        
+        public static float IntensityPlayerGunSpray = 1.0f;
+        
+        public static float IntensityPlayerGunMiniGun = 1.0f;
+        
+        public static float IntensityPlayerGunBazooka = 1.5f;
+        
+        public static float IntensityPlayerGunHeavy = 1.0f;
+        
+        public static float IntensityPlayerGunLaser = 1.0f;
+        
+        public static float IntensityPlayerGunRifle = 1.0f;
+        
+        public static float IntensityPlayerGunPistol = 1.0f;
+        
+        public static float IntensityPlayerGunPlasma = 1.2f;
+        
+        public static float IntensityPlayerGunShotgun = 1.0f;
+        
+        public static float IntensityPlayerGunEnergy = 1.0f;
+        
+        public static float IntensityKickbackPlayerGun = 1.0f;
+        
+        public static float IntensityKickbackPlayerGunPistol = 1.0f;
+        
+        public static float IntensityKickbackPlayerGunBallistic = 1.5f;
+        
+        public static float IntensityKickbackPlayerGunLaser = 1.0f;
+        
+        public static float IntensityKickbackPlayerGunPlasma = 1.5f;
+        
+        public static float IntensityKickbackPlayerGunSpray = 1.0f;
+        
+        public static float IntensityKickbackPlayerGunHeavy = 2.0f;
+
+        
+        public static float IntensityPlayerThrow = 1.5f;
+
+        
+
+        
+        public static float IntensityShoulderTurret = 1.0f;
+        
+        public static float IntensityHoverJetFeet = 1.0f;
+
+
+        
+        public static float IntensityConsumableFood = 1.0f;
+
+        
+        public static float IntensityStuckArrow = 0.35f;
 
 
         #endregion
@@ -325,8 +647,8 @@ namespace TactsuitBS
 
         //private bool playerEventsCreated = false;
         private static TactsuitVR tactsuitVr;
-        private bool Heartbeating = false;
-        private bool HeartbeatingFast = false;
+        private static bool Heartbeating = false;
+        private static bool HeartbeatingFast = false;
         private static bool gamePaused = false;
         
 
@@ -336,11 +658,9 @@ namespace TactsuitBS
         private bool TelekinesisRepelRight = false;
         private bool TelekinesisActiveLeft = false;
         private bool TelekinesisActiveRight = false;
+        private bool TelekinesisSpinLeft = false;
+        private bool TelekinesisSpinRight = false;
 
-        private bool TelekinesisCatchLeftLast = false;
-        private bool TelekinesisCatchRightLast = false;
-
-        private bool slowMotionActive = false;
 
         private ParticleSystem leftItemShootVFX = null;
         private ParticleSystem leftItemShoot2VFX = null;
@@ -419,6 +739,17 @@ namespace TactsuitBS
         Dictionary<string, bool> GunUseMultipleShotMap = new Dictionary<string, bool>();
         Dictionary<string, bool> GunAltUseMultipleShotMap = new Dictionary<string, bool>();
 
+        private Item leftItem;
+        private Item rightItem;
+        private Component leftItemBlasterComponent;
+        private Component rightItemBlasterComponent;
+
+        Component leftItemModularFireArmBaseComponent1;
+        Component leftItemModularFireArmBaseComponent2;
+
+        Component rightItemModularFireArmBaseComponent1;
+        Component rightItemModularFireArmBaseComponent2;
+
         private Harmony harmony;
 
         #endregion
@@ -433,266 +764,17 @@ namespace TactsuitBS
 
         #region Overrides
 
-        public override IEnumerator OnLoadCoroutine()
+        public override void ScriptLoaded(ModManager.ModData modData)
+        {
+            EventManager.OnPlayerPrefabSpawned += new EventManager.PlayerPrefabSpawnedEvent(EngineStart);
+            base.ScriptLoaded(modData);
+        }
+
+        public void EngineStart()
         {
             tactsuitVr = new TactsuitVR();
             Bhaptics.Tact.HapticPlayerManager.SetAppInfo("mod_blade_sorcery", "mod_blade_sorcery");
             tactsuitVr.CreateSystem();
-
-            #region Intensities
-
-            tactsuitVr.IntensityDefaultDamage = IntensityDefaultDamage;
-            tactsuitVr.IntensityPlayerBowPull = IntensityPlayerBowPull;
-            tactsuitVr.IntensityPlayerMeleeBladeWoodPierce = IntensityPlayerMeleeBladeWoodPierce;
-            tactsuitVr.IntensityPlayerMeleeBladeMetalPierce = IntensityPlayerMeleeBladeMetalPierce;
-            tactsuitVr.IntensityPlayerMeleeBladeStonePierce = IntensityPlayerMeleeBladeStonePierce;
-            tactsuitVr.IntensityPlayerMeleeBladeFabricPierce = IntensityPlayerMeleeBladeFabricPierce;
-            tactsuitVr.IntensityPlayerMeleeBladeFleshPierce = IntensityPlayerMeleeBladeFleshPierce;
-            tactsuitVr.IntensityPlayerMeleeBladeWoodSlash = IntensityPlayerMeleeBladeWoodSlash;
-            tactsuitVr.IntensityPlayerMeleeBladeMetalSlash = IntensityPlayerMeleeBladeMetalSlash;
-            tactsuitVr.IntensityPlayerMeleeBladeStoneSlash = IntensityPlayerMeleeBladeStoneSlash;
-            tactsuitVr.IntensityPlayerMeleeBladeFabricSlash = IntensityPlayerMeleeBladeFabricSlash;
-            tactsuitVr.IntensityPlayerMeleeBladeFleshSlash = IntensityPlayerMeleeBladeFleshSlash;
-            tactsuitVr.IntensityPlayerMeleeBladeWoodBlunt = IntensityPlayerMeleeBladeWoodBlunt;
-            tactsuitVr.IntensityPlayerMeleeBladeMetalBlunt = IntensityPlayerMeleeBladeMetalBlunt;
-            tactsuitVr.IntensityPlayerMeleeBladeStoneBlunt = IntensityPlayerMeleeBladeStoneBlunt;
-            tactsuitVr.IntensityPlayerMeleeBladeFabricBlunt = IntensityPlayerMeleeBladeFabricBlunt;
-            tactsuitVr.IntensityPlayerMeleeBladeFleshBlunt = IntensityPlayerMeleeBladeFleshBlunt;
-            tactsuitVr.IntensityPlayerMeleeWoodWoodBlunt = IntensityPlayerMeleeWoodWoodBlunt;
-            tactsuitVr.IntensityPlayerMeleeWoodMetalBlunt = IntensityPlayerMeleeWoodMetalBlunt;
-            tactsuitVr.IntensityPlayerMeleeWoodStoneBlunt = IntensityPlayerMeleeWoodStoneBlunt;
-            tactsuitVr.IntensityPlayerMeleeWoodFabricBlunt = IntensityPlayerMeleeWoodFabricBlunt;
-            tactsuitVr.IntensityPlayerMeleeWoodFleshBlunt = IntensityPlayerMeleeWoodFleshBlunt;
-            tactsuitVr.IntensityPlayerMeleeStoneStoneBlunt = IntensityPlayerMeleeStoneStoneBlunt;
-            tactsuitVr.IntensityPlayerMeleeStoneFabricBlunt = IntensityPlayerMeleeStoneFabricBlunt;
-            tactsuitVr.IntensityPlayerMeleeStoneFleshBlunt = IntensityPlayerMeleeStoneFleshBlunt;
-
-            tactsuitVr.IntensityPlayerMeleeLightsaberClashRight = IntensityPlayerMeleeLightsaberClashRight;
-            tactsuitVr.IntensityPlayerMeleeLightsaberSlashRight = IntensityPlayerMeleeLightsaberSlashRight;
-            tactsuitVr.IntensityPlayerMeleeLightsaberPierceRight = IntensityPlayerMeleeLightsaberPierceRight;
-            tactsuitVr.IntensityPlayerMeleeLightsaberBluntRight = IntensityPlayerMeleeLightsaberBluntRight;
-
-            tactsuitVr.IntensityPlayerSpellFire = IntensityPlayerSpellFire;
-            tactsuitVr.IntensityPlayerSpellLightning = IntensityPlayerSpellLightning;
-            tactsuitVr.IntensityPlayerSpellGravity = IntensityPlayerSpellGravity;
-            tactsuitVr.IntensityPlayerSpellIce = IntensityPlayerSpellIce;
-            tactsuitVr.IntensityPlayerSpellCrush = IntensityPlayerSpellCrush;
-            tactsuitVr.IntensityPlayerSpellHeal = IntensityPlayerSpellHeal;
-            tactsuitVr.IntensityPlayerSpellImplosion = IntensityPlayerSpellImplosion;
-            tactsuitVr.IntensityPlayerSpellInvisibility = IntensityPlayerSpellInvisibility;
-            tactsuitVr.IntensityPlayerSpellTesla = IntensityPlayerSpellTesla;
-            tactsuitVr.IntensityPlayerSpellUtility = IntensityPlayerSpellUtility;
-            tactsuitVr.IntensityPlayerSpellCorruption = IntensityPlayerSpellCorruption;
-            tactsuitVr.IntensityPlayerSpellTeleport = IntensityPlayerSpellTeleport;
-            tactsuitVr.IntensityPlayerSpellRasengan = IntensityPlayerSpellRasengan;
-            tactsuitVr.IntensityPlayerSpellNeedle = IntensityPlayerSpellNeedle;
-            tactsuitVr.IntensityPlayerSpellDrain = IntensityPlayerSpellDrain;
-            tactsuitVr.IntensityPlayerSpellForceField = IntensityPlayerSpellForceField;
-            tactsuitVr.IntensityPlayerSpellOther = IntensityPlayerSpellOther;
-
-            tactsuitVr.IntensityPlayerTelekinesisActive = IntensityPlayerTelekinesisActive;
-            tactsuitVr.IntensityPlayerTelekinesisPull = IntensityPlayerTelekinesisPull;
-            tactsuitVr.IntensityPlayerTelekinesisRepel = IntensityPlayerTelekinesisRepel;
-            tactsuitVr.IntensityPlayerTelekinesisCatch = IntensityPlayerTelekinesisCatch;
-
-            tactsuitVr.IntensityDamageVestArrow = IntensityDamageVestArrow;
-            tactsuitVr.IntensityDamageArmArrow = IntensityDamageArmArrow;
-            tactsuitVr.IntensityDamageHeadArrow = IntensityDamageHeadArrow;
-            tactsuitVr.IntensityDamageVestFireArrow = IntensityDamageVestFireArrow;
-            tactsuitVr.IntensityDamageArmFireArrow = IntensityDamageArmFireArrow;
-            tactsuitVr.IntensityDamageHeadFireArrow = IntensityDamageHeadFireArrow;
-            tactsuitVr.IntensityDamageVestLightningArrow = IntensityDamageVestLightningArrow;
-            tactsuitVr.IntensityDamageArmLightningArrow = IntensityDamageArmLightningArrow;
-            tactsuitVr.IntensityDamageHeadLightningArrow = IntensityDamageHeadLightningArrow;
-            tactsuitVr.IntensityDamageVestIceArrow = IntensityDamageVestIceArrow;
-            tactsuitVr.IntensityDamageArmIceArrow = IntensityDamageArmIceArrow;
-            tactsuitVr.IntensityDamageHeadIceArrow = IntensityDamageHeadIceArrow;
-            tactsuitVr.IntensityDamageHeadFire = IntensityDamageHeadFire;
-            tactsuitVr.IntensityDamageHeadLightning = IntensityDamageHeadLightning;
-            tactsuitVr.IntensityDamageHeadGravity = IntensityDamageHeadGravity;
-            tactsuitVr.IntensityDamageHeadIce = IntensityDamageHeadIce;
-            tactsuitVr.IntensityDamageHeadDrain = IntensityDamageHeadDrain;
-            tactsuitVr.IntensityDamageHeadEnergy = IntensityDamageHeadEnergy;
-            tactsuitVr.IntensityDamageArmFire = IntensityDamageArmFire;
-            tactsuitVr.IntensityDamageArmLightning = IntensityDamageArmLightning;
-            tactsuitVr.IntensityDamageArmGravity = IntensityDamageArmGravity;
-            tactsuitVr.IntensityDamageArmIce = IntensityDamageArmIce;
-            tactsuitVr.IntensityDamageArmDrain = IntensityDamageArmDrain;
-            tactsuitVr.IntensityDamageArmEnergy = IntensityDamageArmEnergy;
-
-            tactsuitVr.IntensityDamageVestEnergy = IntensityDamageVestEnergy;
-            tactsuitVr.IntensityDamageVestFire = IntensityDamageVestFire;
-            tactsuitVr.IntensityDamageVestIce = IntensityDamageVestIce;
-            tactsuitVr.IntensityDamageVestDrain = IntensityDamageVestDrain;
-            tactsuitVr.IntensityDamageVestLightning = IntensityDamageVestLightning;
-            tactsuitVr.IntensityDamageVestGravity = IntensityDamageVestGravity;
-
-            tactsuitVr.IntensityDamageVestPierceBladeSmall = IntensityDamageVestPierceBladeSmall;
-            tactsuitVr.IntensityDamageVestSlashBladeSmall = IntensityDamageVestSlashBladeSmall;
-            tactsuitVr.IntensityDamageVestBluntBladeSmall = IntensityDamageVestBluntBladeSmall;
-            tactsuitVr.IntensityDamageVestBluntWoodSmall = IntensityDamageVestBluntWoodSmall;
-            tactsuitVr.IntensityDamageVestBluntMetalSmall = IntensityDamageVestBluntMetalSmall;
-            tactsuitVr.IntensityDamageVestBluntStoneSmall = IntensityDamageVestBluntStoneSmall;
-            tactsuitVr.IntensityDamageVestBluntFleshSmall = IntensityDamageVestBluntFleshSmall;
-            tactsuitVr.IntensityDamageVestPierceFireSmall = IntensityDamageVestPierceFireSmall;
-            tactsuitVr.IntensityDamageVestSlashFireSmall = IntensityDamageVestSlashFireSmall;
-            tactsuitVr.IntensityDamageVestBluntFireSmall = IntensityDamageVestBluntFireSmall;
-            tactsuitVr.IntensityDamageVestPierceLightningSmall = IntensityDamageVestPierceLightningSmall;
-            tactsuitVr.IntensityDamageVestSlashLightningSmall = IntensityDamageVestSlashLightningSmall;
-            tactsuitVr.IntensityDamageVestBluntLightningSmall = IntensityDamageVestBluntLightningSmall;
-            tactsuitVr.IntensityDamageVestPierceIceSmall = IntensityDamageVestPierceIceSmall;
-            tactsuitVr.IntensityDamageVestSlashIceSmall = IntensityDamageVestSlashIceSmall;
-            tactsuitVr.IntensityDamageVestBluntIceSmall = IntensityDamageVestBluntIceSmall;
-            tactsuitVr.IntensityDamageVestPierceBladeLarge = IntensityDamageVestPierceBladeLarge;
-            tactsuitVr.IntensityDamageVestSlashBladeLarge = IntensityDamageVestSlashBladeLarge;
-            tactsuitVr.IntensityDamageVestBluntBladeLarge = IntensityDamageVestBluntBladeLarge;
-            tactsuitVr.IntensityDamageVestBluntWoodLarge = IntensityDamageVestBluntWoodLarge;
-            tactsuitVr.IntensityDamageVestBluntMetalLarge = IntensityDamageVestBluntMetalLarge;
-            tactsuitVr.IntensityDamageVestBluntStoneLarge = IntensityDamageVestBluntStoneLarge;
-            tactsuitVr.IntensityDamageVestBluntFleshLarge = IntensityDamageVestBluntFleshLarge;
-            tactsuitVr.IntensityDamageVestPierceFireLarge = IntensityDamageVestPierceFireLarge;
-            tactsuitVr.IntensityDamageVestSlashFireLarge = IntensityDamageVestSlashFireLarge;
-            tactsuitVr.IntensityDamageVestBluntFireLarge = IntensityDamageVestBluntFireLarge;
-            tactsuitVr.IntensityDamageVestPierceLightningLarge = IntensityDamageVestPierceLightningLarge;
-            tactsuitVr.IntensityDamageVestSlashLightningLarge = IntensityDamageVestSlashLightningLarge;
-            tactsuitVr.IntensityDamageVestBluntLightningLarge = IntensityDamageVestBluntLightningLarge;
-            tactsuitVr.IntensityDamageVestPierceIceLarge = IntensityDamageVestPierceIceLarge;
-            tactsuitVr.IntensityDamageVestSlashIceLarge = IntensityDamageVestSlashIceLarge;
-            tactsuitVr.IntensityDamageVestBluntIceLarge = IntensityDamageVestBluntIceLarge;
-
-            tactsuitVr.IntensityDamageVestBlaster = IntensityDamageVestBlaster;
-            tactsuitVr.IntensityDamageVestBlasterStun = IntensityDamageVestBlasterStun;
-            tactsuitVr.IntensityDamageArmBlaster = IntensityDamageArmBlaster;
-            tactsuitVr.IntensityDamageArmBlasterStun = IntensityDamageArmBlasterStun;
-            tactsuitVr.IntensityDamageHeadBlaster = IntensityDamageHeadBlaster;
-            tactsuitVr.IntensityDamageHeadBlasterStun = IntensityDamageHeadBlasterStun;
-
-            tactsuitVr.IntensityDamageArmPierceBladeSmall = IntensityDamageArmPierceBladeSmall;
-            tactsuitVr.IntensityDamageArmSlashBladeSmall = IntensityDamageArmSlashBladeSmall;
-            tactsuitVr.IntensityDamageArmBluntBladeSmall = IntensityDamageArmBluntBladeSmall;
-            tactsuitVr.IntensityDamageArmBluntWoodSmall = IntensityDamageArmBluntWoodSmall;
-            tactsuitVr.IntensityDamageArmBluntMetalSmall = IntensityDamageArmBluntMetalSmall;
-            tactsuitVr.IntensityDamageArmBluntStoneSmall = IntensityDamageArmBluntStoneSmall;
-            tactsuitVr.IntensityDamageArmBluntFleshSmall = IntensityDamageArmBluntFleshSmall;
-            tactsuitVr.IntensityDamageArmPierceFireSmall = IntensityDamageArmPierceFireSmall;
-            tactsuitVr.IntensityDamageArmSlashFireSmall = IntensityDamageArmSlashFireSmall;
-            tactsuitVr.IntensityDamageArmBluntFireSmall = IntensityDamageArmBluntFireSmall;
-            tactsuitVr.IntensityDamageArmPierceLightningSmall = IntensityDamageArmPierceLightningSmall;
-            tactsuitVr.IntensityDamageArmSlashLightningSmall = IntensityDamageArmSlashLightningSmall;
-            tactsuitVr.IntensityDamageArmBluntLightningSmall = IntensityDamageArmBluntLightningSmall;
-            tactsuitVr.IntensityDamageArmPierceIceSmall = IntensityDamageArmPierceIceSmall;
-            tactsuitVr.IntensityDamageArmSlashIceSmall = IntensityDamageArmSlashIceSmall;
-            tactsuitVr.IntensityDamageArmBluntIceSmall = IntensityDamageArmBluntIceSmall;
-            tactsuitVr.IntensityDamageArmPierceBladeLarge = IntensityDamageArmPierceBladeLarge;
-            tactsuitVr.IntensityDamageArmSlashBladeLarge = IntensityDamageArmSlashBladeLarge;
-            tactsuitVr.IntensityDamageArmBluntBladeLarge = IntensityDamageArmBluntBladeLarge;
-            tactsuitVr.IntensityDamageArmBluntWoodLarge = IntensityDamageArmBluntWoodLarge;
-            tactsuitVr.IntensityDamageArmBluntMetalLarge = IntensityDamageArmBluntMetalLarge;
-            tactsuitVr.IntensityDamageArmBluntStoneLarge = IntensityDamageArmBluntStoneLarge;
-            tactsuitVr.IntensityDamageArmBluntFleshLarge = IntensityDamageArmBluntFleshLarge;
-            tactsuitVr.IntensityDamageArmPierceFireLarge = IntensityDamageArmPierceFireLarge;
-            tactsuitVr.IntensityDamageArmSlashFireLarge = IntensityDamageArmSlashFireLarge;
-            tactsuitVr.IntensityDamageArmBluntFireLarge = IntensityDamageArmBluntFireLarge;
-            tactsuitVr.IntensityDamageArmPierceLightningLarge = IntensityDamageArmPierceLightningLarge;
-            tactsuitVr.IntensityDamageArmSlashLightningLarge = IntensityDamageArmSlashLightningLarge;
-            tactsuitVr.IntensityDamageArmBluntLightningLarge = IntensityDamageArmBluntLightningLarge;
-            tactsuitVr.IntensityDamageArmPierceIceLarge = IntensityDamageArmPierceIceLarge;
-            tactsuitVr.IntensityDamageArmSlashIceLarge = IntensityDamageArmSlashIceLarge;
-            tactsuitVr.IntensityDamageArmBluntIceLarge = IntensityDamageArmBluntIceLarge;
-            tactsuitVr.IntensityDamageHeadPierceBladeSmall = IntensityDamageHeadPierceBladeSmall;
-            tactsuitVr.IntensityDamageHeadSlashBladeSmall = IntensityDamageHeadSlashBladeSmall;
-            tactsuitVr.IntensityDamageHeadBluntBladeSmall = IntensityDamageHeadBluntBladeSmall;
-            tactsuitVr.IntensityDamageHeadBluntWoodSmall = IntensityDamageHeadBluntWoodSmall;
-            tactsuitVr.IntensityDamageHeadBluntMetalSmall = IntensityDamageHeadBluntMetalSmall;
-            tactsuitVr.IntensityDamageHeadBluntStoneSmall = IntensityDamageHeadBluntStoneSmall;
-            tactsuitVr.IntensityDamageHeadBluntFleshSmall = IntensityDamageHeadBluntFleshSmall;
-            tactsuitVr.IntensityDamageHeadPierceFireSmall = IntensityDamageHeadPierceFireSmall;
-            tactsuitVr.IntensityDamageHeadSlashFireSmall = IntensityDamageHeadSlashFireSmall;
-            tactsuitVr.IntensityDamageHeadBluntFireSmall = IntensityDamageHeadBluntFireSmall;
-            tactsuitVr.IntensityDamageHeadPierceLightningSmall = IntensityDamageHeadPierceLightningSmall;
-            tactsuitVr.IntensityDamageHeadSlashLightningSmall = IntensityDamageHeadSlashLightningSmall;
-            tactsuitVr.IntensityDamageHeadBluntLightningSmall = IntensityDamageHeadBluntLightningSmall;
-            tactsuitVr.IntensityDamageHeadPierceIceSmall = IntensityDamageHeadPierceIceSmall;
-            tactsuitVr.IntensityDamageHeadSlashIceSmall = IntensityDamageHeadSlashIceSmall;
-            tactsuitVr.IntensityDamageHeadBluntIceSmall = IntensityDamageHeadBluntIceSmall;
-            tactsuitVr.IntensityDamageHeadPierceBladeLarge = IntensityDamageHeadPierceBladeLarge;
-            tactsuitVr.IntensityDamageHeadSlashBladeLarge = IntensityDamageHeadSlashBladeLarge;
-            tactsuitVr.IntensityDamageHeadBluntBladeLarge = IntensityDamageHeadBluntBladeLarge;
-            tactsuitVr.IntensityDamageHeadBluntWoodLarge = IntensityDamageHeadBluntWoodLarge;
-            tactsuitVr.IntensityDamageHeadBluntMetalLarge = IntensityDamageHeadBluntMetalLarge;
-            tactsuitVr.IntensityDamageHeadBluntStoneLarge = IntensityDamageHeadBluntStoneLarge;
-            tactsuitVr.IntensityDamageHeadBluntFleshLarge = IntensityDamageHeadBluntFleshLarge;
-            tactsuitVr.IntensityDamageHeadPierceFireLarge = IntensityDamageHeadPierceFireLarge;
-            tactsuitVr.IntensityDamageHeadSlashFireLarge = IntensityDamageHeadSlashFireLarge;
-            tactsuitVr.IntensityDamageHeadBluntFireLarge = IntensityDamageHeadBluntFireLarge;
-            tactsuitVr.IntensityDamageHeadPierceLightningLarge = IntensityDamageHeadPierceLightningLarge;
-            tactsuitVr.IntensityDamageHeadSlashLightningLarge = IntensityDamageHeadSlashLightningLarge;
-            tactsuitVr.IntensityDamageHeadBluntLightningLarge = IntensityDamageHeadBluntLightningLarge;
-            tactsuitVr.IntensityDamageHeadPierceIceLarge = IntensityDamageHeadPierceIceLarge;
-            tactsuitVr.IntensityDamageHeadSlashIceLarge = IntensityDamageHeadSlashIceLarge;
-            tactsuitVr.IntensityDamageHeadBluntIceLarge = IntensityDamageHeadBluntIceLarge;
-
-            tactsuitVr.IntensityHeartBeat = IntensityHeartBeat;
-            tactsuitVr.IntensityHeartBeatFast = IntensityHeartBeatFast;
-            tactsuitVr.IntensityHealing = IntensityHealing;
-            tactsuitVr.IntensityPotionDrinking = IntensityPotionDrinking;
-            tactsuitVr.IntensityPoisonDrinking = IntensityPoisonDrinking;
-            tactsuitVr.IntensityFallDamage = IntensityFallDamage;
-            tactsuitVr.IntensityFallDamageFeet = IntensityFallDamageFeet;
-            tactsuitVr.IntensitySlowMotion = IntensitySlowMotion;
-            tactsuitVr.IntensityHolster = IntensityHolster;
-            tactsuitVr.IntensityUnholster = IntensityUnholster;
-            tactsuitVr.IntensityHolsterArrow = IntensityHolsterArrow;
-            tactsuitVr.IntensityUnholsterArrow = IntensityUnholsterArrow;
-            tactsuitVr.IntensityClimbing = IntensityClimbing;
-            tactsuitVr.IntensityPlayerKickOther = IntensityPlayerKickOther;
-            tactsuitVr.IntensityPlayerKickWood = IntensityPlayerKickWood;
-            tactsuitVr.IntensityPlayerKickFlesh = IntensityPlayerKickFlesh;
-            tactsuitVr.IntensityPlayerKickStone = IntensityPlayerKickStone;
-            tactsuitVr.IntensityPlayerKickMetal = IntensityPlayerKickMetal;
-            tactsuitVr.IntensityPlayerKickFabric = IntensityPlayerKickFabric;
-            tactsuitVr.IntensityPlayerPunchOther = IntensityPlayerPunchOther;
-            tactsuitVr.IntensityPlayerPunchWood = IntensityPlayerPunchWood;
-            tactsuitVr.IntensityPlayerPunchFlesh = IntensityPlayerPunchFlesh;
-            tactsuitVr.IntensityPlayerPunchStone = IntensityPlayerPunchStone;
-            tactsuitVr.IntensityPlayerPunchMetal = IntensityPlayerPunchMetal;
-            tactsuitVr.IntensityPlayerPunchFabric = IntensityPlayerPunchFabric;
-
-            tactsuitVr.IntensityPlayerGun = IntensityPlayerGun ;
-            tactsuitVr.IntensityPlayerGunBlaster = IntensityPlayerGunBlaster ;
-            tactsuitVr.IntensityPlayerGunAutomatic = IntensityPlayerGunAutomatic ;
-            tactsuitVr.IntensityPlayerGunBallistic = IntensityPlayerGunBallistic ;
-            tactsuitVr.IntensityPlayerGunSpray = IntensityPlayerGunSpray ;
-            tactsuitVr.IntensityPlayerGunMiniGun = IntensityPlayerGunMiniGun ;
-            tactsuitVr.IntensityPlayerGunBazooka = IntensityPlayerGunBazooka ;
-            tactsuitVr.IntensityPlayerGunHeavy = IntensityPlayerGunHeavy ;
-            tactsuitVr.IntensityPlayerGunLaser = IntensityPlayerGunLaser ;
-            tactsuitVr.IntensityPlayerGunRifle = IntensityPlayerGunRifle ;
-            tactsuitVr.IntensityPlayerGunPistol = IntensityPlayerGunPistol ;
-            tactsuitVr.IntensityPlayerGunPlasma = IntensityPlayerGunPlasma ;
-            tactsuitVr.IntensityPlayerGunShotgun = IntensityPlayerGunShotgun ;
-            tactsuitVr.IntensityPlayerGunEnergy = IntensityPlayerGunEnergy ;
-            tactsuitVr.IntensityKickbackPlayerGun = IntensityKickbackPlayerGun ;
-            tactsuitVr.IntensityKickbackPlayerGunPistol = IntensityKickbackPlayerGunPistol ;
-            tactsuitVr.IntensityKickbackPlayerGunBallistic = IntensityKickbackPlayerGunBallistic ;
-            tactsuitVr.IntensityKickbackPlayerGunLaser = IntensityKickbackPlayerGunLaser ;
-            tactsuitVr.IntensityKickbackPlayerGunPlasma = IntensityKickbackPlayerGunPlasma ;
-            tactsuitVr.IntensityKickbackPlayerGunSpray = IntensityKickbackPlayerGunSpray ;
-            tactsuitVr.IntensityKickbackPlayerGunHeavy = IntensityKickbackPlayerGunHeavy;
-
-            tactsuitVr.IntensityPlayerThrow = IntensityPlayerThrow;
-
-            tactsuitVr.IntensityExplosion = IntensityExplosion;
-
-            tactsuitVr.IntensityShoulderTurret = IntensityShoulderTurret;
-            tactsuitVr.IntensityHoverJetFeet = IntensityHoverJetFeet;
-
-            tactsuitVr.IntensityEquipUnequip = IntensityEquipUnequip;
-            tactsuitVr.IntensityConsumableFood = IntensityConsumableFood;
-
-            tactsuitVr.Logging = Logging;
-
-            #endregion
 
             this.harmony = new Harmony("com.shizof.bhaptics");
             this.harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -712,24 +794,10 @@ namespace TactsuitBS
 
             FillFXLists();
 
-            string materials = "";
-            foreach (MaterialData data in Catalog.GetDataList(Catalog.Category.Material))
-            {
-                if (data != null)
-                {
-                    materials = materials + (materials.IsNullOrEmpty() ? "": ", ") + data.id;
-                }
-            }
-
-            LOG("Game materials: " + materials);
-
             SceneManager.sceneLoaded += this.OnSceneLoadedFunc;
             SceneManager.sceneUnloaded += this.OnSceneUnloadedFunc;
 
             Player.onSpawn += new Player.SpawnEvent(this.OnPlayerSpawned);
-
-
-            return base.OnLoadCoroutine();
         }
 
         private void OnPlayerSpawned(Player player)
@@ -912,9 +980,9 @@ namespace TactsuitBS
             LOG("Found Gun SFXs: " + String.Join(", ", SFXList));
         }
 
-        public override void Update()
+        public override void ScriptUpdate()
         {
-            gamePaused = MenuBook.local.book.GetBookState() == PBook.BookState.OPEN;
+            gamePaused = UIPlayerMenu.instance.IsShownToPlayer;
                         
             if (!eventsCreated)
             {
@@ -925,6 +993,20 @@ namespace TactsuitBS
                 EventManager.onDeflect += OnDeflectFunc;
                 EventManager.onEdibleConsumed += OnEdibleConsumedFunc;
 
+                SpellTelekinesis.onTelekinesisPullEvent += OnTelekinesisPullEventFunc;
+                SpellTelekinesis.onTelekinesisRepelEvent += OnTelekinesisRepelEvent;
+                SpellTelekinesis.onTelekinesisUngrabEvent += OnTelekinesisUngrabEvent;
+                SpellTelekinesis.onTelekinesisGrabEvent += OnTelekinesisGrabEvent;
+                SpellTelekinesis.onTelekinesisUnTargetEvent += OnTelekinesisUnTargetEvent;
+
+
+                SpellTelekinesis telekinesis = Catalog.GetData<SpellTelekinesis>("Telekinesis");
+                if(telekinesis!=null)
+                {
+                    telekinesis.onTelekinesisSpinStart += Telekinesis_onTelekinesisSpinStart;
+                    telekinesis.onTelekinesisSpinEnd += Telekinesis_onTelekinesisSpinEnd; ;
+                }
+
                 //Locomotion.OnGroundEvent 
                 eventsCreated = true;
                 LOG("Events are created.");
@@ -932,26 +1014,518 @@ namespace TactsuitBS
 
             deltaTime = Time.deltaTime * 1000f;
 
-            if (!GameManager.timeStopped)
+            if (!TimeManager.timeStopped)
             {
                 if (Player.local != null && Player.local.creature != null && Player.local.creature.initialized)
                 {
                     CheckStates(Player.local.creature);
                     CheckStatesRarest(Player.local.creature);
                 }
-                else
+                //else
+                //{
+                //    lastFrameVelocity = Vector3.zero;
+                //}
+            }
+            //else
+            //{
+            //    lastFrameVelocity = Vector3.zero;
+            //}
+
+            base.ScriptUpdate();
+        }
+
+        private void Telekinesis_onTelekinesisSpinEnd(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle, bool spinning, EventTime eventTime)
+        {
+            if (side == Side.Left)
+            {
+                if (TelekinesisSpinLeft)
                 {
-                    lastFrameVelocity = Vector3.zero;
+                    TelekinesisSpinLeft = false;
+                    LOG("Player stops spinning with telekinesis left hand.");
                 }
             }
             else
             {
-                lastFrameVelocity = Vector3.zero;
+                if (TelekinesisSpinRight)
+                {
+                    TelekinesisSpinRight = false;
+                    LOG("Player stops spinning with telekinesis right hand.");
+                }
             }
-
-            base.Update();
         }
 
+        private void Telekinesis_onTelekinesisSpinStart(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle, bool spinning, EventTime eventTime)
+        {
+            if (eventTime == EventTime.OnStart)
+            {
+                if (side == Side.Left)
+                {
+                    if (!TelekinesisSpinLeft)
+                    {
+                        TelekinesisSpinLeft = true;
+                        Thread thread = new Thread(() => TelekinesisFunc(true, true));
+                        thread.Start();
+                        LOG("Player is spinning with telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (!TelekinesisSpinRight)
+                    {
+                        TelekinesisSpinRight = true;
+                        Thread thread = new Thread(() => TelekinesisFunc(true, false));
+                        thread.Start();
+                        LOG("Player is spinning with telekinesis right hand.");
+                    }
+                }
+            }
+        }
+
+        private void OnHeldItemsChangeEventFunc(Item oldRightHand, Item oldLeftHand, Item newRightHand, Item newLeftHand)
+        {
+            if (IntensityMultiplierGun > TOLERANCE)
+            {
+                if (newRightHand != oldRightHand)
+                {
+                    rightItem = newRightHand;
+
+                    ParticleSystem temp_rightItemShootVFX = null;
+
+                    if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "FireEffect")) != null && rightItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
+                    {
+                        temp_rightItemShootVFX = rightItem.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
+                    }
+                    else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotVFX")) != null && rightItem.GetCustomReference("bulletShotVFX")?.GetComponent<ParticleSystem>() != null)
+                    {
+                        temp_rightItemShootVFX = rightItem.GetCustomReference("bulletShotVFX").GetComponent<ParticleSystem>();
+                    }
+                    else
+                    {
+                        foreach (var vfx in VFXList)
+                        {
+                            if (rightItem.transform?.Find(vfx)?.gameObject?.GetComponentInChildren<ParticleSystem>() != null)
+                            {
+                                temp_rightItemShootVFX = rightItem.transform.Find(vfx).gameObject.GetComponentInChildren<ParticleSystem>();
+                                if (temp_rightItemShootVFX != null)
+                                    break;
+                            }
+                            else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == vfx)) != null && rightItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
+                            {
+                                temp_rightItemShootVFX = (ParticleSystem)((Component)rightItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
+                                if (temp_rightItemShootVFX != null)
+                                    break;
+                            }
+                        }
+                    }
+
+                    rightItemShootVFX = temp_rightItemShootVFX;
+
+                    if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "AltFireEffect")) != null && rightItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
+                    {
+                        rightItemShoot2VFX = rightItem.GetCustomReference("AltFireEffect").GetComponent<ParticleSystem>();
+                    }
+                    else
+                    {
+                        rightItemShoot2VFX = null;
+                    }
+
+                    if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotSFX")) != null && rightItem.GetCustomReference("bulletShotSFX")?.GetComponent<AudioSource>() != null)
+                    {
+                        rightItemShootSFX = rightItem.GetCustomReference("bulletShotSFX").GetComponent<AudioSource>();
+                    }
+                    else
+                    {
+                        foreach (var sfx in SFXList)
+                        {
+                            if (rightItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                            {
+                                rightItemShootSFX = rightItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
+                                if (rightItemShootSFX != null)
+                                    break;
+                            }
+                            else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == sfx)) != null && rightItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
+                            {
+                                rightItemShootSFX = (AudioSource)((Component)rightItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
+                                if (rightItemShootSFX != null)
+                                    break;
+                            }
+                        }
+                    }
+
+
+                    if (rightItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                    {
+                        rightItemChargeReadySFX = rightItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
+                    }
+                    else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeReadySounds")) != null && rightItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
+                    {
+                        rightItemChargeReadySFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
+                    }
+
+                    if (rightItem.transform?.Find("ChargeStartSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                    {
+                        rightItemChargeSFX = rightItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
+                    }
+                    else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeStartSounds")) != null && rightItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
+                    {
+                        rightItemChargeSFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
+                    }
+                    else if (rightItem.transform?.Find("ChargeSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                    {
+                        rightItemChargeSFX = rightItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
+                    }
+                    else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeSounds")) != null && rightItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
+                    {
+                        rightItemChargeSFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
+                    }
+
+                    rightItemBlasterComponent = rightItem.GetComponent("ItemBlaster");
+                    if (rightItemBlasterComponent != null)
+                    {
+                        if (rightItemChargeReadySFX == null)
+                        {
+                            rightItemChargeReadySFX = Utility.GetValuePrivateAudioSource(rightItemBlasterComponent, "chargeReadySound");
+                        }
+                        if (rightItemChargeReadySFX == null)
+                        {
+                            rightItemChargeReadySFX = Utility.GetValuePrivateAudioSource(rightItemBlasterComponent, "chargeReadySound2");
+                        }
+                        if (rightItemChargeSFX == null)
+                        {
+                            rightItemChargeSFX = Utility.GetValuePrivateAudioSource(rightItemBlasterComponent, "chargeStartSound");
+                        }
+                        if (rightItemChargeSFX == null)
+                        {
+                            rightItemChargeSFX = Utility.GetValuePrivateAudioSource(rightItemBlasterComponent, "chargeStartSound2");
+                        }
+                        if (rightItemChargeSFX == null)
+                        {
+                            rightItemChargeSFX = Utility.GetValuePrivateAudioSource(rightItemBlasterComponent, "chargeSound");
+                        }
+                        if (rightItemChargeSFX == null)
+                        {
+                            rightItemChargeSFX = Utility.GetValuePrivateAudioSource(rightItemBlasterComponent, "chargeSound2");
+                        }
+                    }
+
+                    rightItemModularFireArmBaseComponent1 = rightItem.GetComponent("ItemFirearmBase");
+                    if (rightItemModularFireArmBaseComponent1 == null)
+                        rightItemModularFireArmBaseComponent2 = rightItem.GetComponent("ItemMagicFirearm"); //If first is null
+                    else
+                        rightItemModularFireArmBaseComponent2 = null;
+                }
+
+                if (newLeftHand != oldLeftHand)
+                {
+                    leftItem = newLeftHand;
+
+                    if (leftItem != null)
+                    {
+                        ParticleSystem temp_leftItemShootVFX = null;
+
+                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "FireEffect")) != null && leftItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
+                        {
+                            temp_leftItemShootVFX = leftItem.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
+                        }
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotVFX")) != null && leftItem.GetCustomReference("bulletShotVFX")?.GetComponent<ParticleSystem>() != null)
+                        {
+                            temp_leftItemShootVFX = leftItem.GetCustomReference("bulletShotVFX").GetComponent<ParticleSystem>();
+                        }
+                        else
+                        {
+                            foreach (var vfx in VFXList)
+                            {
+                                if (leftItem.transform?.Find(vfx)?.gameObject?.GetComponentInChildren<ParticleSystem>() != null)
+                                {
+                                    temp_leftItemShootVFX = leftItem.transform.Find(vfx).gameObject.GetComponentInChildren<ParticleSystem>();
+                                    if (temp_leftItemShootVFX != null)
+                                        break;
+                                }
+                                else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == vfx)) != null && leftItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
+                                {
+                                    temp_leftItemShootVFX = (ParticleSystem)((Component)leftItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
+                                    if (temp_leftItemShootVFX != null)
+                                        break;
+                                }
+                            }
+                        }
+
+                        leftItemShootVFX = temp_leftItemShootVFX;
+
+                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "AltFireEffect")) != null && leftItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
+                        {
+                            leftItemShoot2VFX = leftItem.GetCustomReference("AltFireEffect").GetComponent<ParticleSystem>();
+                        }
+                        else
+                        {
+                            leftItemShoot2VFX = null;
+                        }
+
+                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotSFX")) != null && leftItem.GetCustomReference("bulletShotSFX")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemShootSFX = leftItem.GetCustomReference("bulletShotSFX").GetComponent<AudioSource>();
+                        }
+                        else
+                        {
+                            foreach (var sfx in SFXList)
+                            {
+                                if (leftItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                                {
+                                    leftItemShootSFX = leftItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
+                                    if (leftItemShootSFX != null)
+                                        break;
+                                }
+                                else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == sfx)) != null && leftItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
+                                {
+                                    leftItemShootSFX = (AudioSource)((Component)leftItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
+                                    if (leftItemShootSFX != null)
+                                        break;
+                                }
+                            }
+                        }
+
+                        if (leftItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            leftItemChargeReadySFX = leftItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeReadySounds")) != null && leftItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemChargeReadySFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
+                        }
+
+                        if (leftItem.transform?.Find("ChargeStartSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = leftItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeStartSounds")) != null && leftItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
+                        }
+                        else if (leftItem.transform?.Find("ChargeSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = leftItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
+                        }
+                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeSounds")) != null && leftItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
+                        {
+                            leftItemChargeSFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
+                        }
+
+                        leftItemBlasterComponent = leftItem.GetComponent("ItemBlaster");
+                        if (leftItemBlasterComponent != null)
+                        {
+                            if (leftItemChargeReadySFX == null)
+                            {
+                                leftItemChargeReadySFX = Utility.GetValuePrivateAudioSource(leftItemBlasterComponent, "chargeReadySound");
+                            }
+                            if (leftItemChargeReadySFX == null)
+                            {
+                                leftItemChargeReadySFX = Utility.GetValuePrivateAudioSource(leftItemBlasterComponent, "chargeReadySound2");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(leftItemBlasterComponent, "chargeStartSound");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(leftItemBlasterComponent, "chargeStartSound2");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(leftItemBlasterComponent, "chargeSound");
+                            }
+                            if (leftItemChargeSFX == null)
+                            {
+                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(leftItemBlasterComponent, "chargeSound2");
+                            }
+                        }
+
+                        leftItemModularFireArmBaseComponent1 = leftItem.GetComponent("ItemFirearmBase");
+                        if (leftItemModularFireArmBaseComponent1 == null)
+                            leftItemModularFireArmBaseComponent2 = leftItem.GetComponent("ItemMagicFirearm"); //If first is null
+                        else
+                            leftItemModularFireArmBaseComponent2 = null;
+                    }
+                }
+            }
+        }
+
+
+        private void OnTelekinesisUnTargetEvent(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle)
+        {
+            if (side == Side.Left)
+            {
+                 TelekinesisActiveLeft = false;
+                 TelekinesisPullLeft = false;
+                TelekinesisRepelLeft = false;
+                TelekinesisSpinLeft = false;
+            }
+            else
+            {
+                TelekinesisActiveRight = false;
+                TelekinesisPullRight = false;
+                TelekinesisRepelRight = false;
+                TelekinesisSpinRight = false;
+            }
+        }
+
+        private void OnTelekinesisGrabEvent(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle)
+        {
+            if (handle != null)
+            {
+                if (side == Side.Left)
+                {
+                    if (!TelekinesisActiveLeft)
+                    {
+                        TelekinesisActiveLeft = true;
+                        Thread thread = new Thread(() => TelekinesisActivateFunc(true));
+                        thread.Start();
+                        LOG("Player is activating with telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (!TelekinesisActiveRight)
+                    {
+                        TelekinesisActiveRight = true;
+                        Thread thread = new Thread(() => TelekinesisActivateFunc(false));
+                        thread.Start();
+                        LOG("Player is activating with telekinesis right hand.");
+                    }
+                }
+            }
+            else
+            {
+                if (side == Side.Left)
+                {
+                    if (TelekinesisActiveLeft)
+                    {
+                        TelekinesisActiveLeft = false;
+                        LOG("Player stops activating telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (TelekinesisActiveRight)
+                    {
+                        TelekinesisActiveRight = false;
+                        LOG("Player stops activating telekinesis right hand.");
+                    }
+                }
+            }
+
+            //tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerTelekinesisCatchRight, true, spellCaster.telekinesis.pullSpeed / spellCaster.telekinesis.pullAndRepelMaxSpeed, TactsuitVR.FeedbackType.NoFeedback, side == Side.Left);
+        }
+        private void OnTelekinesisUngrabEvent(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle)
+        {
+            if (side == Side.Left)
+            {
+                if (TelekinesisActiveLeft)
+                {
+                    TelekinesisActiveLeft = false;
+                    LOG("Player stops activating telekinesis left hand.");
+                }
+            }
+            else
+            {
+                if (TelekinesisActiveRight)
+                {
+                    TelekinesisActiveRight = false;
+                    LOG("Player stops activating telekinesis right hand.");
+                }
+            }
+        }
+
+        private void OnTelekinesisRepelEvent(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle, EventTime eventTime)
+        {
+            if (eventTime == EventTime.OnStart)
+            {
+                if (side == Side.Left)
+                {
+                    if (!TelekinesisRepelLeft)
+                    {
+                        TelekinesisRepelLeft = true;
+                        Thread thread = new Thread(() => TelekinesisFunc(false, true));
+                        thread.Start();
+                        LOG("Player is repelling with telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (!TelekinesisRepelRight)
+                    {
+                        TelekinesisRepelRight = true;
+                        Thread thread = new Thread(() => TelekinesisFunc(false, false));
+                        thread.Start();
+                        LOG("Player is repelling with telekinesis right hand.");
+                    }
+                }
+            }
+            else
+            {
+                if (side == Side.Left)
+                {
+                    if (TelekinesisRepelLeft)
+                    {
+                        TelekinesisRepelLeft = false;
+                        LOG("Player stops repelling with telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (TelekinesisRepelRight)
+                    {
+                        TelekinesisRepelRight = false;
+                        LOG("Player stops repelling with telekinesis right hand.");
+                    }
+                }
+            }
+        }
+
+        private void OnTelekinesisPullEventFunc(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle, EventTime eventTime)
+        {
+            if (eventTime == EventTime.OnStart)
+            {
+                if (side == Side.Left)
+                {
+                    if (!TelekinesisPullLeft)
+                    {
+                        TelekinesisPullLeft = true;
+                        Thread thread = new Thread(() => TelekinesisFunc(true, true));
+                        thread.Start();
+                        LOG("Player is pulling with telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (!TelekinesisPullRight)
+                    {
+                        TelekinesisPullRight = true;
+                        Thread thread = new Thread(() => TelekinesisFunc(true, false));
+                        thread.Start();
+                        LOG("Player is pulling with telekinesis right hand.");
+                    }
+                }
+            }
+            else
+            {
+                if (side == Side.Left)
+                {
+                    if (TelekinesisPullLeft)
+                    {
+                        TelekinesisPullLeft = false;
+                        LOG("Player stops pulling with telekinesis left hand.");
+                    }
+                }
+                else
+                {
+                    if (TelekinesisPullRight)
+                    {
+                        TelekinesisPullRight = false;
+                        LOG("Player stops pulling with telekinesis right hand.");
+                    }
+                }
+            }
+        }
 
         private void CheckPlayerSpawn()
         {
@@ -1096,7 +1670,8 @@ namespace TactsuitBS
                 LOG("Can't find Liquid Receiver on player.");
             }
 
-            
+            Player.local.creature.equipment.OnHeldItemsChangeEvent -= OnHeldItemsChangeEventFunc;
+            Player.local.creature.equipment.OnHeldItemsChangeEvent += OnHeldItemsChangeEventFunc;
         }
 
         //[HarmonyPatch("OnCollisionEnter")]
@@ -1169,7 +1744,7 @@ namespace TactsuitBS
 
         private static void RightProjectileRemovedFunc(Item item)
         {
-            if (!gamePaused && !GameManager.timeStopped)
+            if (!gamePaused && !TimeManager.timeStopped)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterArrowRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
             }
@@ -1177,7 +1752,7 @@ namespace TactsuitBS
 
         private static void RightProjectileAddedFunc(Item item)
         {
-            if (!gamePaused && !GameManager.timeStopped)
+            if (!gamePaused && !TimeManager.timeStopped)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterArrowRightShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
             }
@@ -1185,7 +1760,7 @@ namespace TactsuitBS
 
         private static void LeftProjectileRemovedFunc(Item item)
         {
-            if (!gamePaused && !GameManager.timeStopped && Player.local != null)
+            if (!gamePaused && !TimeManager.timeStopped && Player.local != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.UnholsterArrowLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
             }
@@ -1193,7 +1768,7 @@ namespace TactsuitBS
 
         private static void LeftProjectileAddedFunc(Item item)
         {
-            if (!gamePaused && !GameManager.timeStopped && Player.local != null)
+            if (!gamePaused && !TimeManager.timeStopped && Player.local != null)
             {
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HolsterArrowLeftShoulder, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
             }
@@ -1206,7 +1781,7 @@ namespace TactsuitBS
             [HarmonyPostfix]
             private static void Postfix(Holder __instance, Item item, bool silent = false)
             {
-                if (!gamePaused && !GameManager.timeStopped && item != null && __instance != null && Player.local.creature != null && __instance.creature == Player.local.creature)
+                if (!gamePaused && !TimeManager.timeStopped && item != null && __instance != null && Player.local.creature != null && __instance.creature == Player.local.creature)
                 {
                     if (!silent)
                     {
@@ -1245,7 +1820,7 @@ namespace TactsuitBS
             [HarmonyPostfix]
             private static void Postfix(Holder __instance, Item item, bool silent = false)
             {
-                if (!gamePaused && !GameManager.timeStopped && item != null && __instance != null && Player.local.creature!=null && __instance.creature == Player.local.creature)
+                if (!gamePaused && !TimeManager.timeStopped && item != null && __instance != null && Player.local.creature!=null && __instance.creature == Player.local.creature)
                 {
                     if (!silent)
                     {
@@ -1284,7 +1859,7 @@ namespace TactsuitBS
             [HarmonyPostfix]
             private static void Postfix(SpellMergeFire __instance, UnityEngine.Vector3 position, float radius)
             {
-                if (!gamePaused && !GameManager.timeStopped)
+                if (!gamePaused && !TimeManager.timeStopped)
                 {
                     float dist = Vector3.Distance(Player.local.locomotion.transform.position, position);
                     if (dist < radius * 1.5f)
@@ -1312,7 +1887,7 @@ namespace TactsuitBS
         //    [HarmonyPostfix]
         //    private static void Postfix(RepulsionForce __instance)
         //    {
-        //        if (!gamePaused && !GameManager.timeStopped)
+        //        if (!gamePaused && !TimeManager.timeStopped)
         //        {
         //            float dist = Vector3.Distance(Player.local.locomotion.transform.position, __instance.transform.position);
         //            if (dist < __instance.radius * 1.5f)
@@ -1340,7 +1915,7 @@ namespace TactsuitBS
         //    [HarmonyPostfix]
         //    private static void Postfix(SpellCastGravity __instance, UnityEngine.Vector3 contactPoint, UnityEngine.Vector3 impactVelocity)
         //    {
-        //        if (!gamePaused && !GameManager.timeStopped)
+        //        if (!gamePaused && !TimeManager.timeStopped)
         //        {
         //            float radius = 10.0f;
 
@@ -1369,7 +1944,7 @@ namespace TactsuitBS
         //    [HarmonyPostfix]
         //    private static void Postfix(SpellCastLightning __instance, UnityEngine.Vector3 position, float radius, float duration, System.Action<ColliderGroup> callback = null)
         //    {
-        //        if (!gamePaused && !GameManager.timeStopped)
+        //        if (!gamePaused && !TimeManager.timeStopped)
         //        {
         //            float dist = Vector3.Distance(Player.local.locomotion.transform.position, position);
         //            if (dist < radius * 1.5f)
@@ -1397,7 +1972,7 @@ namespace TactsuitBS
             [HarmonyPostfix]
             private static void Postfix(SpellCastCharge __instance, CollisionInstance collisionInstance)
             {
-                if (!gamePaused && !GameManager.timeStopped)
+                if (!gamePaused && !TimeManager.timeStopped)
                 {
                     if (__instance is SpellCastProjectile)
                         return;
@@ -1433,6 +2008,64 @@ namespace TactsuitBS
                             tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestLightning, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false, duration);
                         }
                         tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.DefaultDamage, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false, duration);
+                    }
+                }
+            }
+        }
+
+        [HarmonyPatch("RefreshHealth")]
+        [HarmonyPatch(typeof(CameraEffects))]
+        private static class CameraEffectsRefreshHealthPatch
+        {
+            private static void HeartBeatFunc()
+            {
+                while (!TimeManager.timeStopped && !gamePaused && Heartbeating)
+                {
+                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HeartBeat, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+
+                    Thread.Sleep(SleepDurationHeartBeat);
+                }
+            }
+
+            private static void HeartBeatFastFunc()
+            {
+                while (!TimeManager.timeStopped && !gamePaused && HeartbeatingFast)
+                {
+                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HeartBeatFast, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+
+                    Thread.Sleep(SleepDurationHeartBeatFast);
+                }
+            }
+
+            [HarmonyPostfix]
+            private static void Postfix(CameraEffects __instance)
+            {
+                if (Player.local?.creature)
+                {
+                    if (!gamePaused && Player.local.creature.state != Creature.State.Dead && !Player.local.creature.isKilled && Player.local.creature.currentHealth <= Player.local.creature.maxHealth * 0.1f && Player.local.creature.currentHealth > 0.01f)
+                    {
+                        Heartbeating = false;
+                        if (!HeartbeatingFast)
+                        {
+                            HeartbeatingFast = true;
+                            Thread thread = new Thread(HeartBeatFastFunc);
+                            thread.Start();
+                        }
+                    }
+                    else if (!gamePaused && Player.local.creature.state != Creature.State.Dead && !Player.local.creature.isKilled && Player.local.creature.currentHealth <= Player.local.creature.maxHealth * 0.2f && Player.local.creature.currentHealth > 0.01f)
+                    {
+                        HeartbeatingFast = false;
+                        if (!Heartbeating)
+                        {
+                            Heartbeating = true;
+                            Thread thread = new Thread(HeartBeatFunc);
+                            thread.Start();
+                        }
+                    }
+                    else
+                    {
+                        HeartbeatingFast = false;
+                        Heartbeating = false;
                     }
                 }
             }
@@ -1680,7 +2313,7 @@ namespace TactsuitBS
                         
         private void BeingPushedFunc()
         {
-            while (!gamePaused && !GameManager.timeStopped && Player.local.creature.state != Creature.State.Dead && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f)
+            while (!gamePaused && !TimeManager.timeStopped && Player.local.creature.state != Creature.State.Dead && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f)
             {
                 Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.rb.velocity;
                 float hitAngle = Utility.GetAngleForPosition(contactPoint);
@@ -1710,7 +2343,7 @@ namespace TactsuitBS
                 if (side == Side.Left)
                 {
                     Item leftItem = Player.local.creature.equipment.GetHeldItem(Side.Left);
-                    while (!beingPushed && !gamePaused && !GameManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
+                    while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
                     {
                         float intensity = Player.local.locomotion.rb.velocity.magnitude / 3f;
                         tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ClimbingRight, false, intensity, TactsuitVR.FeedbackType.NoFeedback, true);
@@ -1724,7 +2357,7 @@ namespace TactsuitBS
                 {
                     Item rightItem = Player.local.creature.equipment.GetHeldItem(Side.Right);
 
-                    while (!beingPushed && !gamePaused && !GameManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && rightItem != null && rightItem.name.Contains("Grapple") && rightItemUseStarted)
+                    while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && rightItem != null && rightItem.name.Contains("Grapple") && rightItemUseStarted)
                     {
                         float intensity = Player.local.locomotion.rb.velocity.magnitude / 3f;
                         tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ClimbingRight, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
@@ -1738,7 +2371,7 @@ namespace TactsuitBS
 
         private void BeingPushedOtherFunc()
         {
-            while (!beingPushed && !gamePaused && !GameManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f)
+            while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f)
             {
                 Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.rb.velocity;
                 float hitAngle = Utility.GetAngleForPosition(contactPoint);
@@ -1761,7 +2394,7 @@ namespace TactsuitBS
 
             while (bowString != null && bowStringHeld)
             {
-                if (GameManager.timeStopped)
+                if (TimeManager.timeStopped)
                 {
                     Thread.Sleep(1000);
                     continue;
@@ -1803,7 +2436,7 @@ namespace TactsuitBS
             if (side == Side.Left)
             {
                 float lastIntensity = 0;
-                while (!GameManager.timeStopped && leftHandClimbing)
+                while (!TimeManager.timeStopped && leftHandClimbing)
                 {
                     float intensity = Math.Abs(Player.local.handLeft.transform.position.y - Player.local.head.transform.position.y);
                     //LOG("***> Climbing left debug: " + lastIntensity + " - " + intensity + ">=0.03f");
@@ -1821,7 +2454,7 @@ namespace TactsuitBS
             else
             {
                 float lastIntensity = 0;
-                while (!GameManager.timeStopped && rightHandClimbing)
+                while (!TimeManager.timeStopped && rightHandClimbing)
                 {
                     float intensity = Math.Abs(Player.local.handRight.transform.position.y - Player.local.head.transform.position.y);
                     //LOG("***> Climbing right debug: " + lastIntensity + " - " + intensity + ">=0.03f");
@@ -2074,7 +2707,7 @@ namespace TactsuitBS
             }
         }
 
-        private void OnDamageFunc(CollisionInstance collisionInstance)
+        private void OnDamageFunc(CollisionInstance collisionInstance, EventTime eventTime)
         {
             if (collisionInstance.targetCollider == null && collisionInstance.sourceCollider == null)
             {
@@ -2129,33 +2762,47 @@ namespace TactsuitBS
             }
         }
 
-        private void HeartBeatFunc()
+        [HarmonyPatch("SetSlowMotion")]
+        [HarmonyPatch(typeof(TimeManager))]
+        private static class TimeManagerSetSlowMotionPatch
         {
-            while (!GameManager.timeStopped && !gamePaused && Heartbeating)
-            {
-                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HeartBeat, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            private static bool slowMotionActive = false;
 
-                Thread.Sleep(SleepDurationHeartBeat);
+            private static void SlowMotionFunc()
+            {
+                while (!TimeManager.timeStopped && TimeManager.slowMotionState == TimeManager.SlowMotionState.Running && slowMotionActive)
+                {
+                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.SlowMotion, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+
+                    Thread.Sleep(SleepDurationSlowMotion);
+                }
             }
-        }
 
-        private void HeartBeatFastFunc()
-        {
-            while (!GameManager.timeStopped && !gamePaused && HeartbeatingFast)
+            [HarmonyPostfix]
+            private static void Postfix(TimeManager __instance, 
+              bool active,
+              float scale,
+              AnimationCurve curve,
+              EffectData effectData = null,
+              bool snapshotTransition = true,
+              AudioMixerSnapshot exitMixer = null)
             {
-                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HeartBeatFast, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-
-                Thread.Sleep(SleepDurationHeartBeatFast);
-            }
-        }
-
-        private void SlowMotionFunc()
-        {
-            while (!GameManager.timeStopped && GameManager.slowMotionState == GameManager.SlowMotionState.Running)
-            {
-                tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.SlowMotion, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-
-                Thread.Sleep(SleepDurationSlowMotion);
+                if (slowMotionActive)
+                {
+                    if (!active)
+                    {
+                        slowMotionActive = false;
+                    }
+                }
+                else
+                {
+                    if (active)
+                    {
+                        slowMotionActive = true;
+                        Thread thread = new Thread(SlowMotionFunc);
+                        thread.Start();
+                    }
+                }
             }
         }
 
@@ -2195,7 +2842,7 @@ namespace TactsuitBS
         {
             if (tactsuitVr != null)
             {
-                while (!gamePaused && !GameManager.timeStopped && (leftShoulderTurretShootVFX != null && leftShoulderTurretShootVFX.isPlaying))
+                while (!gamePaused && !TimeManager.timeStopped && (leftShoulderTurretShootVFX != null && leftShoulderTurretShootVFX.isPlaying))
                 {
                     tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.LeftShoulderTurret, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                     Thread.Sleep(SleepDurationShootGun);
@@ -2211,7 +2858,7 @@ namespace TactsuitBS
         {
             if (tactsuitVr != null)
             {
-                while (!gamePaused && !GameManager.timeStopped && (hoverJetVFX != null && hoverJetVFX.isPlaying))
+                while (!gamePaused && !TimeManager.timeStopped && (hoverJetVFX != null && hoverJetVFX.isPlaying))
                 {
                     tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.HoverJetFeet, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                     Thread.Sleep(SleepDurationShootGun);
@@ -2237,7 +2884,7 @@ namespace TactsuitBS
 
                 if (leftHand)
                 {
-                    while (!gamePaused && !GameManager.timeStopped 
+                    while (!gamePaused && !TimeManager.timeStopped 
                                        && ((leftItemUseStarted && !altFire && (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying)))) 
                                            ||(leftItemAltUseStarted && altFire && (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))))))
                     {
@@ -2267,7 +2914,7 @@ namespace TactsuitBS
                 }
                 else
                 {
-                    while (!gamePaused && !GameManager.timeStopped
+                    while (!gamePaused && !TimeManager.timeStopped
                                        && ((rightItemUseStarted && !altFire && (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))))
                                             || (rightItemAltUseStarted && altFire && (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying))))))
                     {
@@ -2311,7 +2958,7 @@ namespace TactsuitBS
 
                 if (leftHand)
                 {
-                    while (!gamePaused && !GameManager.timeStopped && (leftItemUseStarted || leftModularGunFiring))
+                    while (!gamePaused && !TimeManager.timeStopped && (leftItemUseStarted || leftModularGunFiring))
                     {
                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
@@ -2333,7 +2980,7 @@ namespace TactsuitBS
                 }
                 else
                 {
-                    while (!gamePaused && !GameManager.timeStopped && (rightItemUseStarted || rightModularGunFiring))
+                    while (!gamePaused && !TimeManager.timeStopped && (rightItemUseStarted || rightModularGunFiring))
                     {
                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
                         tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, false, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
@@ -2361,7 +3008,7 @@ namespace TactsuitBS
         {
             if (tactsuitVr != null)
             {
-                while (!GameManager.timeStopped && ((TelekinesisActiveLeft && leftHand) || (TelekinesisActiveRight && !leftHand)))
+                while (!TimeManager.timeStopped && ((TelekinesisActiveLeft && leftHand) || (TelekinesisActiveRight && !leftHand)))
                 {
                     if ((leftHand && Player.local.creature.equipment.GetHeldItem(Side.Left)) || (!leftHand && Player.local.creature.equipment.GetHeldItem(Side.Right)))
                         break;
@@ -2379,7 +3026,7 @@ namespace TactsuitBS
             {
                 TactsuitVR.FeedbackType feedback = pull ? (TactsuitVR.FeedbackType.PlayerTelekinesisPullRight) : (TactsuitVR.FeedbackType.PlayerTelekinesisRepelRight);
                 
-                while (!GameManager.timeStopped && ((TelekinesisPullRight && pull) || (TelekinesisRepelRight && !pull)))
+                while (!TimeManager.timeStopped && ((TelekinesisPullRight && pull) || (TelekinesisRepelRight && !pull)))
                 {
                     if ((leftHand && Player.local.creature.equipment.GetHeldItem(Side.Left)) || (!leftHand && Player.local.creature.equipment.GetHeldItem(Side.Right)))
                         break;
@@ -2407,7 +3054,7 @@ namespace TactsuitBS
                 int index = RandomNumber.RandomBetweenLowerMoreProbable(0, 7, 8, 15, 4);
                 int pos = RandomNumber.Between(0, 1);
                 int durationOffset = RandomNumber.Between(0, 30) - 15;
-                tactsuitVr.ProvideDotFeedback(pos == 1 ? PositionType.VestFront : PositionType.VestBack, index, (int)(30.0f * rainIntensity * IntensityRaindropVest), RainEffectDuration + durationOffset);
+                tactsuitVr.ProvideDotFeedback(pos == 1 ? PositionType.VestFront : PositionType.VestBack, index, (int)(30.0f * rainIntensity * IntensityRaindropVest * IntensityMultiplierRaindrop), RainEffectDuration + durationOffset);
 
                 Thread.Sleep(sleepDuration);
             }
@@ -2430,7 +3077,7 @@ namespace TactsuitBS
 
                     int index = RandomNumber.Between(0, 5);
                     int durationOffset = RandomNumber.Between(0, 30) - 15;
-                    tactsuitVr.ProvideDotFeedback(left ? PositionType.ForearmL : PositionType.ForearmR, index, (int)(30.0f * rainIntensity * IntensityRaindropArm), RainEffectDuration + durationOffset);
+                    tactsuitVr.ProvideDotFeedback(left ? PositionType.ForearmL : PositionType.ForearmR, index, (int)(30.0f * rainIntensity * IntensityRaindropArm * IntensityMultiplierRaindrop), RainEffectDuration + durationOffset);
 
                     Thread.Sleep(sleepDuration);
                 }
@@ -2454,7 +3101,7 @@ namespace TactsuitBS
 
                     int index = RandomNumber.Between(0, 5);
                     int durationOffset = RandomNumber.Between(0, 30) - 15;
-                    tactsuitVr.ProvideDotFeedback(PositionType.Head, index, (int)(30.0f * rainIntensity * IntensityRaindropHead), RainEffectDuration + durationOffset);
+                    tactsuitVr.ProvideDotFeedback(PositionType.Head, index, (int)(30.0f * rainIntensity * IntensityRaindropHead * IntensityMultiplierRaindrop), RainEffectDuration + durationOffset);
 
                     Thread.Sleep(sleepDuration);
                 }
@@ -2470,36 +3117,6 @@ namespace TactsuitBS
                 if(checkFunction2 <= 0)
                 {
                     checkFunction2 = (int) (1.0f / Time.fixedDeltaTime);
-
-                    #region Heartbeat Check
-
-                    if (!gamePaused && creature.state != Creature.State.Dead && !creature.isKilled && creature.currentHealth <= creature.maxHealth * 0.1f && creature.currentHealth > 0.01f)
-                    {
-                        Heartbeating = false;
-                        if (!HeartbeatingFast)
-                        {
-                            HeartbeatingFast = true;
-                            Thread thread = new Thread(HeartBeatFastFunc);
-                            thread.Start();
-                        }
-                    }
-                    else if (!gamePaused && creature.state != Creature.State.Dead && !creature.isKilled && creature.currentHealth <= creature.maxHealth * 0.2f && creature.currentHealth > 0.01f)
-                    {
-                        HeartbeatingFast = false;
-                        if (!Heartbeating)
-                        {
-                            Heartbeating = true;
-                            Thread thread = new Thread(HeartBeatFunc);
-                            thread.Start();
-                        }
-                    }
-                    else
-                    {
-                        HeartbeatingFast = false;
-                        Heartbeating = false;
-                    }
-
-                    #endregion
 
                     #region Rain Effect (The Outer Rim)
 
@@ -2527,13 +3144,13 @@ namespace TactsuitBS
                     else if (!raining && tempRaining)
                     {
                         raining = true;
-                        if (IntensityRaindropVest > TOLERANCE)
+                        if (IntensityRaindropVest * IntensityMultiplierRaindrop > TOLERANCE)
                         {
                             Thread t55 = new Thread(() => RaindropVestEffect());
                             t55.Start();
                         }
 
-                        if (IntensityRaindropArm > TOLERANCE)
+                        if (IntensityRaindropArm * IntensityMultiplierRaindrop > TOLERANCE)
                         {
                             Thread t56 = new Thread(() => RaindropArmEffect(false));
                             t56.Start();
@@ -2541,7 +3158,7 @@ namespace TactsuitBS
                             t57.Start();
                         }
 
-                        if (IntensityRaindropHead > TOLERANCE)
+                        if (IntensityRaindropHead * IntensityMultiplierRaindrop > TOLERANCE)
                         {
                             Thread t58 = new Thread(() => RaindropHeadEffect());
                             t58.Start();
@@ -2574,7 +3191,7 @@ namespace TactsuitBS
                     TactsuitVR.FeedbackType feedback = TactsuitVR.GetSpellFeedbackFromId(spellId);
                     if (leftHand)
                     {
-                        while (!GameManager.timeStopped && CastingLeft && spellId == CastingLeftSpellId)
+                        while (!TimeManager.timeStopped && CastingLeft && spellId == CastingLeftSpellId)
                         {
                             if (Player.local != null && Player.local.creature != null
                                 && Player.local.creature.mana != null && Player.local.creature.mana.casterLeft != null)
@@ -2607,7 +3224,7 @@ namespace TactsuitBS
                     }
                     else
                     {
-                        while (!GameManager.timeStopped && CastingRight && spellId == CastingRightSpellId)
+                        while (!TimeManager.timeStopped && CastingRight && spellId == CastingRightSpellId)
                         {
                             if (Player.local != null && Player.local.creature != null
                                 && Player.local.creature.mana != null && Player.local.creature.mana.casterRight != null)
@@ -2699,7 +3316,7 @@ namespace TactsuitBS
                     TactsuitVR.FeedbackType leftFeedback = TactsuitVR.GetSpellFeedbackFromId(__instance.leftSpellId);
                     TactsuitVR.FeedbackType rightFeedback = TactsuitVR.GetSpellFeedbackFromId(__instance.rightSpellId);
                     
-                    while (!GameManager.timeStopped && Casting)
+                    while (!TimeManager.timeStopped && Casting)
                     {
                         if (Player.local != null && Player.local.creature != null
                             && Player.local.creature.mana != null)
@@ -2744,27 +3361,6 @@ namespace TactsuitBS
         {
             if (creature != null)
             {               
-                #region Slow Motion
-
-                if (slowMotionActive)
-                {
-                    if (GameManager.slowMotionState != GameManager.SlowMotionState.Running)
-                    {
-                        slowMotionActive = false;
-                    }
-                }
-                else
-                {
-                    if (GameManager.slowMotionState == GameManager.SlowMotionState.Running)
-                    {
-                        slowMotionActive = true;
-                        Thread thread = new Thread(SlowMotionFunc);
-                        thread.Start();
-                    }
-                }
-
-                #endregion
-
                 #region Pushed
 
                 if (Player.local.locomotion.isGrounded && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f && (hoverJetVFX == null))
@@ -2840,161 +3436,7 @@ namespace TactsuitBS
                 //    tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestBluntStoneLarge, false, lastFrameVelocity.magnitude/10f, TactsuitVR.FeedbackType.NoFeedback, false);
                 //}
 
-                lastFrameVelocity = Player.local.locomotion.rb.velocity;
-
-                #endregion
-
-                #region Telekinesis
-
-                if (creature.mana != null)
-                {
-                    if (creature.mana.casterLeft != null && creature.mana.casterLeft.telekinesis != null)
-                    {
-                        if (creature.mana.casterLeft.telekinesis.catchedHandle != null)
-                        {
-                            if (!TelekinesisActiveLeft)
-                            {
-                                TelekinesisActiveLeft = true;
-                                Thread thread = new Thread(() => TelekinesisActivateFunc(true));
-                                thread.Start();
-                                LOG("Player is activating with telekinesis left hand.");
-                            }
-                        }
-                        else
-                        {
-                            if (TelekinesisActiveLeft)
-                            {
-                                TelekinesisActiveLeft = false;
-                                LOG("Player stops activating telekinesis left hand.");
-                            }
-                        }
-
-                        if (creature.mana.casterLeft.telekinesis.pullSpeed > 0)
-                        {
-                            if (!TelekinesisPullLeft)
-                            {
-                                TelekinesisPullLeft = true;
-                                Thread thread = new Thread(() => TelekinesisFunc(true, true));
-                                thread.Start();
-                                LOG("Player is pulling with telekinesis left hand.");
-                            }
-                        }
-                        else
-                        {
-                            if (TelekinesisPullLeft)
-                            {
-                                TelekinesisPullLeft = false;
-                                LOG("Player stops pulling with telekinesis left hand.");
-                            }
-                        }
-
-                        if (creature.mana.casterLeft.telekinesis.repelSpeed > 0)
-                        {
-                            if (!TelekinesisRepelLeft)
-                            {
-                                TelekinesisRepelLeft = true;
-                                Thread thread = new Thread(() => TelekinesisFunc(false, true));
-                                thread.Start();
-                                LOG("Player is repelling with telekinesis left hand.");
-                            }
-                        }
-                        else
-                        {
-                            if (TelekinesisRepelLeft)
-                            {
-                                TelekinesisRepelLeft = false;
-                                LOG("Player stops repelling with telekinesis left hand.");
-                            }
-                        }
-                        if (creature.mana.casterLeft.telekinesis.justCatched)
-                        {
-                            if (TelekinesisCatchLeftLast == false)
-                            {
-                                TelekinesisCatchLeftLast = true;
-                                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerTelekinesisCatchRight, true, creature.mana.casterLeft.telekinesis.pullSpeed / creature.mana.casterLeft.telekinesis.pullAndRepelMaxSpeed, TactsuitVR.FeedbackType.NoFeedback, true);
-                                LOG("Player catched item with left hand.");
-                            }
-                        }
-                        else
-                        {
-                            TelekinesisCatchLeftLast = false;
-                        }
-                    }
-
-                    if (creature.mana.casterRight != null && creature.mana.casterRight.telekinesis != null)
-                    {
-                        if (creature.mana.casterRight.telekinesis.catchedHandle != null)
-                        {
-                            if (!TelekinesisActiveRight)
-                            {
-                                TelekinesisActiveRight = true;
-                                Thread thread = new Thread(() => TelekinesisActivateFunc(false));
-                                thread.Start();
-                                LOG("Player is activating with telekinesis right hand.");
-                            }
-                        }
-                        else
-                        {
-                            if (TelekinesisActiveRight)
-                            {
-                                TelekinesisActiveRight = false;
-                                LOG("Player stops activating telekinesis right hand.");
-                            }
-                        }
-
-                        if (creature.mana.casterRight.telekinesis.pullSpeed > 0)
-                        {
-                            if (!TelekinesisPullRight)
-                            {
-                                TelekinesisPullRight = true;
-                                Thread thread = new Thread(() => TelekinesisFunc(true, false));
-                                thread.Start();
-                                LOG("Player is pulling with telekinesis right hand.");
-                            }
-                        }
-                        else
-                        {
-                            if (TelekinesisPullRight)
-                            {
-                                TelekinesisPullRight = false;
-                                LOG("Player stops pulling with telekinesis right hand.");
-                            }
-                        }
-
-                        if (creature.mana.casterRight.telekinesis.repelSpeed > 0)
-                        {
-                            if (!TelekinesisRepelRight)
-                            {
-                                TelekinesisRepelRight = true;
-                                Thread thread = new Thread(() => TelekinesisFunc(false, false));
-                                thread.Start();
-                                LOG("Player is repelling with telekinesis right hand.");
-                            }
-                        }
-                        else
-                        {
-                            if (TelekinesisRepelRight)
-                            {
-                                TelekinesisRepelRight = false;
-                                LOG("Player stops repelling with telekinesis right hand.");
-                            }
-                        }
-
-                        if (creature.mana.casterRight.telekinesis.justCatched)
-                        {
-                            if (TelekinesisCatchRightLast == false)
-                            {
-                                TelekinesisCatchRightLast = true;
-                                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerTelekinesisCatchRight, true, creature.mana.casterRight.telekinesis.pullSpeed / creature.mana.casterRight.telekinesis.pullAndRepelMaxSpeed, TactsuitVR.FeedbackType.NoFeedback, false);
-                                LOG("Player catched item with right hand.");
-                            }
-                        }
-                        else
-                        {
-                            TelekinesisCatchRightLast = false;
-                        }
-                    }
-                }
+                //lastFrameVelocity = Player.local.locomotion.rb.velocity;
 
                 #endregion
 
@@ -3002,7 +3444,7 @@ namespace TactsuitBS
 
                 climbingCheckTimeLeft -= deltaTime;
 
-                if (!GameManager.timeStopped && climbingCheckTimeLeft <= 0f)
+                if (!TimeManager.timeStopped && climbingCheckTimeLeft <= 0f)
                 {
                     climbingCheckTimeLeft = 300;
 
@@ -3011,7 +3453,7 @@ namespace TactsuitBS
                                        
 
                     if ((/*leftObject == null && Player.local?.handLeft?.link != null && Player.local?.handLeft?.link.isActive == true && Player.local?.handLeft?.link.playerJointActive == true && */Player.local?.handLeft?.ragdollHand?.climb != null && Player.local.handLeft.ragdollHand.climb.isGripping)
-                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handLeftEnabled && creature.ragdoll.ik.handLeftTarget != null && leftObject == null && creature.equipment.GetHeldHandle(Side.Left) != null && !creature.equipment.GetHeldHandle(Side.Left).rb.isKinematic && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Left) - 1f) < TOLERANCE)
+                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handLeftEnabled && creature.ragdoll.ik.handLeftTarget != null && leftObject == null && creature.equipment.GetHeldHandle(Side.Left) != null && !creature.equipment.GetHeldHandle(Side.Left).physicBody.isKinematic && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Left) - 1f) < TOLERANCE)
                         || grabbedLadderWithLeftHand
                         )
                     {
@@ -3029,7 +3471,7 @@ namespace TactsuitBS
                     }
 
                     if ((/*rightObject == null && Player.local?.handRight?.link != null && Player.local?.handRight?.link.isActive == true && Player.local?.handRight?.link.playerJointActive == true &&*/ Player.local?.handRight?.ragdollHand?.climb != null && Player.local.handRight.ragdollHand.climb.isGripping)
-                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handRightEnabled && creature.ragdoll.ik.handRightTarget != null && rightObject == null && creature.equipment.GetHeldHandle(Side.Right) != null && !creature.equipment.GetHeldHandle(Side.Right).rb.isKinematic && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Right) - 1f) < TOLERANCE)
+                        || (creature.ragdoll.ik != null && creature.ragdoll.ik.handRightEnabled && creature.ragdoll.ik.handRightTarget != null && rightObject == null && creature.equipment.GetHeldHandle(Side.Right) != null && !creature.equipment.GetHeldHandle(Side.Right).physicBody.isKinematic && Math.Abs(creature.ragdoll.ik.GetHandPositionWeight(Side.Right) - 1f) < TOLERANCE)
                         || grabbedLadderWithRightHand
                         )
                     {
@@ -3053,183 +3495,52 @@ namespace TactsuitBS
 
                 shootGunCheckTimeLeft -= deltaTime;
 
-                if (!GameManager.timeStopped && shootGunCheckTimeLeft <= 0f)
+                if (!TimeManager.timeStopped && IntensityMultiplierGun > TOLERANCE && shootGunCheckTimeLeft <= 0f)
                 {
                     shootGunCheckTimeLeft = 30;
 
-                    Item leftItem = creature.equipment.GetHeldItem(Side.Left);
-                    Item rightItem = creature.equipment.GetHeldItem(Side.Right);
-
-                    if (leftItem != null)
+                    if(leftItem !=null)
                     {
-                        ParticleSystem temp_leftItemShootVFX = null;
-
-                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "FireEffect")) != null && leftItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
-                        {
-                            temp_leftItemShootVFX = leftItem.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
-                        }
-                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotVFX")) != null && leftItem.GetCustomReference("bulletShotVFX")?.GetComponent<ParticleSystem>() != null)
-                        {
-                            temp_leftItemShootVFX = leftItem.GetCustomReference("bulletShotVFX").GetComponent<ParticleSystem>();
-                        }
-                        else
-                        {
-                            foreach (var vfx in VFXList)
-                            {
-                                if (leftItem.transform?.Find(vfx)?.gameObject?.GetComponentInChildren<ParticleSystem>() != null)
-                                {
-                                    temp_leftItemShootVFX = leftItem.transform.Find(vfx).gameObject.GetComponentInChildren<ParticleSystem>();
-                                    if (temp_leftItemShootVFX != null)
-                                        break;
-                                }
-                                else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == vfx)) != null && leftItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
-                                {
-                                    temp_leftItemShootVFX = (ParticleSystem)((Component)leftItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
-                                    if (temp_leftItemShootVFX != null)
-                                        break;
-                                }
-                            }
-                        }
-
-                        leftItemShootVFX = temp_leftItemShootVFX;
-
-                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "AltFireEffect")) != null && leftItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
-                        {
-                            leftItemShoot2VFX = leftItem.GetCustomReference("AltFireEffect").GetComponent<ParticleSystem>();
-                        }
-                        else
-                        {
-                            leftItemShoot2VFX = null;
-                        }
-
-                        if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotSFX")) != null && leftItem.GetCustomReference("bulletShotSFX")?.GetComponent<AudioSource>() != null)
-                        {
-                            leftItemShootSFX = leftItem.GetCustomReference("bulletShotSFX").GetComponent<AudioSource>();
-                        }
-                        else
-                        {
-                            foreach (var sfx in SFXList)
-                            {
-                                if (leftItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                                {
-                                    leftItemShootSFX = leftItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
-                                    if (leftItemShootSFX != null)
-                                        break;
-                                }
-                                else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == sfx)) != null && leftItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
-                                {
-                                    leftItemShootSFX = (AudioSource)((Component)leftItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
-                                    if (leftItemShootSFX != null)
-                                        break;
-                                }
-                            }
-                        }
-
-                        if (leftItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                        {
-                            leftItemChargeReadySFX = leftItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
-                        }
-                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeReadySounds")) != null && leftItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
-                        {
-                            leftItemChargeReadySFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
-                        }
-
-                        if (leftItem.transform?.Find("ChargeStartSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                        {
-                            leftItemChargeSFX = leftItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
-                        }
-                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeStartSounds")) != null && leftItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
-                        {
-                            leftItemChargeSFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
-                        }
-                        else if (leftItem.transform?.Find("ChargeSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                        {
-                            leftItemChargeSFX = leftItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
-                        }
-                        else if (leftItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeSounds")) != null && leftItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
-                        {
-                            leftItemChargeSFX = (AudioSource)((Component)leftItem.GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
-                        }
-
                         int fireMode = 0;
                         bool stunMode = false;
                         bool isChargedFire = false;
                         bool charging = false;
-                        Component itemBlasterComponent = leftItem.GetComponent("ItemBlaster");
-                        if (itemBlasterComponent != null)
+                        if (leftItemBlasterComponent != null)
                         {
-                            fireMode = Utility.GetValue<int>(itemBlasterComponent, "currentFiremode");
-                            stunMode = Utility.GetValuePrivate<bool>(itemBlasterComponent, "altFireEnabled");
-                            isChargedFire = Utility.GetValuePrivate<bool>(itemBlasterComponent, "isChargedFire");
+                            fireMode = Utility.GetValue<int>(leftItemBlasterComponent, "currentFiremode");
+                            stunMode = Utility.GetValuePrivate<bool>(leftItemBlasterComponent, "altFireEnabled");
+                            isChargedFire = Utility.GetValuePrivate<bool>(leftItemBlasterComponent, "isChargedFire");
 
-                            ParticleSystem chargeEffect = Utility.GetValuePrivateParticleSystem(itemBlasterComponent, "chargeEffect");
+                            ParticleSystem chargeEffect = Utility.GetValuePrivateParticleSystem(leftItemBlasterComponent, "chargeEffect");
                             if (chargeEffect != null && stunMode == false)
                             {
                                 charging = true;
-                            }
-                            if (leftItemChargeReadySFX == null)
-                            {
-                                leftItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound");
-                            }
-                            if (leftItemChargeReadySFX == null)
-                            {
-                                leftItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound2");
-                            }
-                            if (leftItemChargeSFX == null)
-                            {
-                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound");
-                            }
-                            if (leftItemChargeSFX == null)
-                            {
-                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound2");
-                            }
-                            if (leftItemChargeSFX == null)
-                            {
-                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound");
-                            }
-                            if (leftItemChargeSFX == null)
-                            {
-                                leftItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound2");
                             }
                         }
 
                         bool modularFireArmIsFiring = false;
                         bool modularFireArmIsRoundChambered = false;
                         int modularFireArmFireMode = 1;
-                        Component itemModularFireArmBaseComponent = leftItem.GetComponent("ItemFirearmBase");
-                        if (itemModularFireArmBaseComponent != null)
+                        if (leftItemModularFireArmBaseComponent1 != null)
                         {
-                            modularFireArmIsFiring = Utility.GetValue<bool>(itemModularFireArmBaseComponent, "isFiring");
-                            modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
-                            modularFireArmIsRoundChambered = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "roundChambered");
+                            modularFireArmIsFiring = Utility.GetValue<bool>(leftItemModularFireArmBaseComponent1, "isFiring");
+                            modularFireArmFireMode = Utility.GetValuePrivate<int>(leftItemModularFireArmBaseComponent1, "fireModeSelection");
+                            modularFireArmIsRoundChambered = Utility.GetValuePrivate<bool>(leftItemModularFireArmBaseComponent1, "roundChambered");
                         }
-
-                        if (itemModularFireArmBaseComponent == null)
+                                                
+                        if (leftItemModularFireArmBaseComponent2 != null)
                         {
-                            itemModularFireArmBaseComponent = leftItem.GetComponent("ItemMagicFirearm");
-                            if (itemModularFireArmBaseComponent != null)
-                            {
-                                modularFireArmIsFiring = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "triggerPressed");
-                                modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
-                                modularFireArmIsRoundChambered = modularFireArmIsFiring && leftItemUseStarted;
-                            }
+                            modularFireArmIsFiring = Utility.GetValuePrivate<bool>(leftItemModularFireArmBaseComponent2, "triggerPressed");
+                            modularFireArmFireMode = Utility.GetValuePrivate<int>(leftItemModularFireArmBaseComponent2, "fireModeSelection");
+                            modularFireArmIsRoundChambered = modularFireArmIsFiring && leftItemUseStarted;
                         }
 
                         leftModularGunFiring = modularFireArmIsFiring;
 
                         if ((modularFireArmIsFiring && modularFireArmIsRoundChambered) || (charging && leftItemUseStarted) || (leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying))
                         {
-                            //if (!GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))
-                            //{
-                            //    LOG("ERROR: GunUseMultipleShotMap doesn't contain key for " + leftItem.data.displayName);
-                            //}
-
-
-                            if (itemModularFireArmBaseComponent != null && modularFireArmIsFiring && modularFireArmIsRoundChambered && modularFireArmFireMode != 0)
+                            if ((leftItemModularFireArmBaseComponent1 != null || leftItemModularFireArmBaseComponent2 != null) && modularFireArmIsFiring && modularFireArmIsRoundChambered && modularFireArmFireMode != 0)
                             {
-                                if (itemModularFireArmBaseComponent != null)
-                                    LOG("Left gun fireMode:" + modularFireArmFireMode.ToString());
-
                                 if (modularFireArmFireMode == 3 || modularFireArmFireMode == 2) //This item allows multi shots
                                 {
                                     if (!shootingLeftGun)
@@ -3252,69 +3563,72 @@ namespace TactsuitBS
                                 }
                             }
 
-                            if (itemModularFireArmBaseComponent == null && ((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying))
-                                                                        && ((leftItemUseStarted || (charging && leftItemUseStarted)) && GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))) // Item allows use and use started
+                            if ((leftItemModularFireArmBaseComponent1 == null && leftItemModularFireArmBaseComponent2 == null))
                             {
-                                if (itemBlasterComponent != null)
-                                    LOG("Left gun fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
-
-                                bool value = false;
-                                if (GunUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value) || itemBlasterComponent != null)
+                                if (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemChargeSFX != null && leftItemChargeSFX.isPlaying) || (leftItemChargeReadySFX != null && leftItemChargeReadySFX.isPlaying))
+                                                                            && ((leftItemUseStarted || (charging && leftItemUseStarted)) && GunUseMultipleShotMap.ContainsKey(leftItem.data.displayName))) // Item allows use and use started
                                 {
-                                    if ((itemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && leftItemUseStarted)) //This item allows multi shots
-                                    {
-                                        if (!shootingLeftGun)
-                                        {
-                                            shootingLeftGun = true;
-                                            Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, false, true, itemBlasterComponent != null && stunMode, fireMode == 3, (charging && leftItemUseStarted)));
-                                            thread.Start();
-                                            LOG("Player is firing left gun: " + leftItem.data.displayName);
-                                        }
-                                    }
-                                    else //This item doesn't allow multi shot. Don't play the effect until leftitemusestarted is first false, then true again.
-                                    {
-                                        leftItemUseStarted = false;
+                                    if (leftItemBlasterComponent != null)
+                                        LOG("Left gun fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
 
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, itemBlasterComponent != null && stunMode);
-                                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
-                                        if (!leftItem.name.Contains("Grapple"))
+                                    bool value = false;
+                                    if (GunUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value) || leftItemBlasterComponent != null)
+                                    {
+                                        if ((leftItemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && leftItemUseStarted)) //This item allows multi shots
                                         {
-                                            TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Left);
-                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            if (!shootingLeftGun)
+                                            {
+                                                shootingLeftGun = true;
+                                                Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, false, true, leftItemBlasterComponent != null && stunMode, fireMode == 3, (charging && leftItemUseStarted)));
+                                                thread.Start();
+                                                LOG("Player is firing left gun: " + leftItem.data.displayName);
+                                            }
                                         }
+                                        else //This item doesn't allow multi shot. Don't play the effect until leftitemusestarted is first false, then true again.
+                                        {
+                                            leftItemUseStarted = false;
 
-                                        LOG("Fired left gun: " + leftItem.data.displayName);
+                                            TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, leftItemBlasterComponent != null && stunMode);
+                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
+                                            if (!leftItem.name.Contains("Grapple"))
+                                            {
+                                                TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Left);
+                                                tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            }
+
+                                            LOG("Fired left gun: " + leftItem.data.displayName);
+                                        }
                                     }
                                 }
-                            }
-                            if (itemModularFireArmBaseComponent == null && ((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))
-                                                                        && (leftItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(leftItem.data.displayName)) && itemBlasterComponent == null) // Item allows alt use and use started
-                            {
-                                bool value = false;
-                                if (GunAltUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value))
+                                if (((leftItemShootVFX != null && leftItemShootVFX.isPlaying) || (leftItemShootSFX != null && leftItemShootSFX.isPlaying) || (leftItemShoot2VFX != null && leftItemShoot2VFX.isPlaying))
+                                                                            && (leftItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(leftItem.data.displayName)) && leftItemBlasterComponent == null) // Item allows alt use and use started
                                 {
-                                    if (value) //This item allows multi shots
+                                    bool value = false;
+                                    if (GunAltUseMultipleShotMap.TryGetValue(leftItem.data.displayName, out value))
                                     {
-                                        if (!altShootingLeftGun)
+                                        if (value) //This item allows multi shots
                                         {
-                                            altShootingLeftGun = true;
-                                            Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, true, true, false, false, false));
-                                            thread.Start();
-                                            LOG("Player is alt firing left gun: " + leftItem.data.displayName);
+                                            if (!altShootingLeftGun)
+                                            {
+                                                altShootingLeftGun = true;
+                                                Thread thread = new Thread(() => FireGun(leftItem.name, leftItem.data.displayName, true, true, false, false, false));
+                                                thread.Start();
+                                                LOG("Player is alt firing left gun: " + leftItem.data.displayName);
+                                            }
                                         }
-                                    }
-                                    else //This item doesn't allow multi shot. Don't play the effect until leftitemaltusestarted is first false, then true again.
-                                    {
-                                        leftItemAltUseStarted = false;
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, false);
-                                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
-                                        if (!leftItem.name.Contains("Grapple"))
+                                        else //This item doesn't allow multi shot. Don't play the effect until leftitemaltusestarted is first false, then true again.
                                         {
-                                            TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Left);
-                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                                        }
+                                            leftItemAltUseStarted = false;
+                                            TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(leftItem.name, leftItem.data.displayName, false);
+                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
+                                            if (!leftItem.name.Contains("Grapple"))
+                                            {
+                                                TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Left);
+                                                tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            }
 
-                                        LOG("Alt Fired left gun: " + leftItem.data.displayName);
+                                            LOG("Alt Fired left gun: " + leftItem.data.displayName);
+                                        }
                                     }
                                 }
                             }
@@ -3323,159 +3637,42 @@ namespace TactsuitBS
 
                     if (rightItem != null)
                     {
-                        ParticleSystem temp_rightItemShootVFX = null;
-
-                        if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "FireEffect")) != null && rightItem.GetCustomReference("FireEffect")?.GetComponent<ParticleSystem>() != null)
-                        {
-                            temp_rightItemShootVFX = rightItem.GetCustomReference("FireEffect").GetComponent<ParticleSystem>();
-                        }
-                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotVFX")) != null && rightItem.GetCustomReference("bulletShotVFX")?.GetComponent<ParticleSystem>() != null)
-                        {
-                            temp_rightItemShootVFX = rightItem.GetCustomReference("bulletShotVFX").GetComponent<ParticleSystem>();
-                        }
-                        else
-                        {
-                            foreach (var vfx in VFXList)
-                            {
-                                if (rightItem.transform?.Find(vfx)?.gameObject?.GetComponentInChildren<ParticleSystem>() != null)
-                                {
-                                    temp_rightItemShootVFX = rightItem.transform.Find(vfx).gameObject.GetComponentInChildren<ParticleSystem>();
-                                    if (temp_rightItemShootVFX != null)
-                                        break;
-                                }
-                                else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == vfx)) != null && rightItem.GetCustomReference(vfx)?.GetComponent<ParticleSystem>() != null)
-                                {
-                                    temp_rightItemShootVFX = (ParticleSystem)((Component)rightItem.GetCustomReference(vfx)).GetComponent<ParticleSystem>();
-                                    if (temp_rightItemShootVFX != null)
-                                        break;
-                                }
-                            }
-                        }
-
-                        rightItemShootVFX = temp_rightItemShootVFX;
-
-                        if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "AltFireEffect")) != null && rightItem.GetCustomReference("AltFireEffect")?.GetComponent<ParticleSystem>() != null)
-                        {
-                            rightItemShoot2VFX = rightItem.GetCustomReference("AltFireEffect").GetComponent<ParticleSystem>();
-                        }
-                        else
-                        {
-                            rightItemShoot2VFX = null;
-                        }
-
-                        if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "bulletShotSFX")) != null && rightItem.GetCustomReference("bulletShotSFX")?.GetComponent<AudioSource>() != null)
-                        {
-                            rightItemShootSFX = rightItem.GetCustomReference("bulletShotSFX").GetComponent<AudioSource>();
-                        }
-                        else
-                        {
-                            foreach (var sfx in SFXList)
-                            {
-                                if (rightItem.transform?.Find(sfx)?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                                {
-                                    rightItemShootSFX = rightItem.transform.Find(sfx).gameObject.GetComponentInChildren<AudioSource>();
-                                    if (rightItemShootSFX != null)
-                                        break;
-                                }
-                                else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == sfx)) != null && rightItem.GetCustomReference(sfx)?.GetComponent<AudioSource>() != null)
-                                {
-                                    rightItemShootSFX = (AudioSource)((Component)rightItem.GetCustomReference(sfx)).GetComponent<AudioSource>();
-                                    if (rightItemShootSFX != null)
-                                        break;
-                                }
-                            }
-                        }
-                        
-
-                        if (rightItem.transform?.Find("ChargeReadySounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                        {
-                            rightItemChargeReadySFX = rightItem.transform.Find("ChargeReadySounds").gameObject.GetComponentInChildren<AudioSource>();
-                        }
-                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeReadySounds")) != null && rightItem.GetCustomReference("ChargeReadySounds")?.GetComponent<AudioSource>() != null)
-                        {
-                            rightItemChargeReadySFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeReadySounds")).GetComponent<AudioSource>();
-                        }
-
-                        if (rightItem.transform?.Find("ChargeStartSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                        {
-                            rightItemChargeSFX = rightItem.transform.Find("ChargeStartSounds").gameObject.GetComponentInChildren<AudioSource>();
-                        }
-                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeStartSounds")) != null && rightItem.GetCustomReference("ChargeStartSounds")?.GetComponent<AudioSource>() != null)
-                        {
-                            rightItemChargeSFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeStartSounds")).GetComponent<AudioSource>();
-                        }
-                        else if (rightItem.transform?.Find("ChargeSounds")?.gameObject?.GetComponentInChildren<AudioSource>() != null)
-                        {
-                            rightItemChargeSFX = rightItem.transform.Find("ChargeSounds").gameObject.GetComponentInChildren<AudioSource>();
-                        }
-                        else if (rightItem.customReferences.Find((Predicate<CustomReference>)(cr => cr.name == "ChargeSounds")) != null && rightItem.GetCustomReference("ChargeSounds")?.GetComponent<AudioSource>() != null)
-                        {
-                            rightItemChargeSFX = (AudioSource)((Component)rightItem.GetCustomReference("ChargeSounds")).GetComponent<AudioSource>();
-                        }
-
                         int fireMode = 0;
                         bool stunMode = false;
                         bool isChargedFire = false;
-                        Component itemBlasterComponent = rightItem.GetComponent("ItemBlaster");
                         bool charging = false;
-                        if (itemBlasterComponent != null)
-                        {
-                            fireMode = Utility.GetValue<int>(itemBlasterComponent, "currentFiremode");
-                            stunMode = Utility.GetValuePrivate<bool>(itemBlasterComponent, "altFireEnabled");
-                            isChargedFire = Utility.GetValuePrivate<bool>(itemBlasterComponent, "isChargedFire");
 
-                            ParticleSystem chargeEffect = Utility.GetValuePrivateParticleSystem(itemBlasterComponent, "chargeEffect");
+                        if (rightItemBlasterComponent != null)
+                        {
+                            fireMode = Utility.GetValue<int>(rightItemBlasterComponent, "currentFiremode");
+                            stunMode = Utility.GetValuePrivate<bool>(rightItemBlasterComponent, "altFireEnabled");
+                            isChargedFire = Utility.GetValuePrivate<bool>(rightItemBlasterComponent, "isChargedFire");
+
+                            ParticleSystem chargeEffect = Utility.GetValuePrivateParticleSystem(rightItemBlasterComponent, "chargeEffect");
                             if (chargeEffect != null && stunMode == false)
                             {
                                 charging = true;
-                            }
-                            if (rightItemChargeReadySFX == null)
-                            {
-                                rightItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound");
-                            }
-                            if (rightItemChargeReadySFX == null)
-                            {
-                                rightItemChargeReadySFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeReadySound2");
-                            }
-                            if (rightItemChargeSFX == null)
-                            {
-                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound");
-                            }
-                            if (rightItemChargeSFX == null)
-                            {
-                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeStartSound2");
-                            }
-                            if (rightItemChargeSFX == null)
-                            {
-                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound");
-                            }
-                            if (rightItemChargeSFX == null)
-                            {
-                                rightItemChargeSFX = Utility.GetValuePrivateAudioSource(itemBlasterComponent, "chargeSound2");
                             }
                         }
 
                         bool modularFireArmIsFiring = false;
                         bool modularFireArmIsRoundChambered = false;
                         int modularFireArmFireMode = 1;
-                        Component itemModularFireArmBaseComponent = rightItem.GetComponent("ItemFirearmBase");
-                        if (itemModularFireArmBaseComponent != null)
+
+                        if (rightItemModularFireArmBaseComponent1 != null)
                         {
-                            modularFireArmIsFiring = Utility.GetValue<bool>(itemModularFireArmBaseComponent, "isFiring");
-                            modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
-                            modularFireArmIsRoundChambered = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "roundChambered");
+                            modularFireArmIsFiring = Utility.GetValue<bool>(rightItemModularFireArmBaseComponent1, "isFiring");
+                            modularFireArmFireMode = Utility.GetValuePrivate<int>(rightItemModularFireArmBaseComponent1, "fireModeSelection");
+                            modularFireArmIsRoundChambered = Utility.GetValuePrivate<bool>(rightItemModularFireArmBaseComponent1, "roundChambered");
+                        }
+                                                
+                        if (rightItemModularFireArmBaseComponent2 != null)
+                        {
+                            modularFireArmIsFiring = Utility.GetValuePrivate<bool>(rightItemModularFireArmBaseComponent2, "triggerPressed");
+                            modularFireArmFireMode = Utility.GetValuePrivate<int>(rightItemModularFireArmBaseComponent2, "fireModeSelection");
+                            modularFireArmIsRoundChambered = modularFireArmIsFiring && rightItemUseStarted;
                         }
 
-                        if (itemModularFireArmBaseComponent == null)
-                        {
-                            itemModularFireArmBaseComponent = rightItem.GetComponent("ItemMagicFirearm");
-                            if (itemModularFireArmBaseComponent != null)
-                            {
-                                modularFireArmIsFiring = Utility.GetValuePrivate<bool>(itemModularFireArmBaseComponent, "triggerPressed");
-                                modularFireArmFireMode = Utility.GetValuePrivate<int>(itemModularFireArmBaseComponent, "fireModeSelection");
-                                modularFireArmIsRoundChambered = modularFireArmIsFiring && rightItemUseStarted;
-                            }
-                        }
                         rightModularGunFiring = modularFireArmIsFiring;
 
                         if ((modularFireArmIsFiring && modularFireArmIsRoundChambered) || (charging && rightItemUseStarted) || (rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))
@@ -3485,11 +3682,8 @@ namespace TactsuitBS
                             //    LOG("ERROR: GunUseMultipleShotMap doesn't contain key for " + rightItem.data.displayName);
                             //}
 
-                            if (itemModularFireArmBaseComponent != null && modularFireArmIsFiring && modularFireArmIsRoundChambered && modularFireArmFireMode != 0)
+                            if ((rightItemModularFireArmBaseComponent1 != null || rightItemModularFireArmBaseComponent2!=null) && modularFireArmIsFiring && modularFireArmIsRoundChambered && modularFireArmFireMode != 0)
                             {
-                                if (itemModularFireArmBaseComponent != null)
-                                    LOG("Right fireMode:" + modularFireArmFireMode.ToString());
-
                                 if (modularFireArmFireMode == 3 || modularFireArmFireMode == 2) //This item allows multi shots
                                 {
                                     if (!shootingRightGun)
@@ -3512,70 +3706,73 @@ namespace TactsuitBS
                                 }
                             }
 
-                            if (itemModularFireArmBaseComponent == null && ((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))
-                                                                        && ((rightItemUseStarted || (charging && rightItemUseStarted)) && GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))) // Item allows use and use started
+                            if ((rightItemModularFireArmBaseComponent1 == null && rightItemModularFireArmBaseComponent2 == null))
                             {
-                                if (itemBlasterComponent != null)
-                                    LOG("Right blaster fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
-
-                                bool value = false;
-                                if (GunUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value) || itemBlasterComponent != null || !GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))
+                                if (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemChargeSFX != null && rightItemChargeSFX.isPlaying) || (rightItemChargeReadySFX != null && rightItemChargeReadySFX.isPlaying))
+                                                                            && ((rightItemUseStarted || (charging && rightItemUseStarted)) && GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))) // Item allows use and use started
                                 {
-                                    if ((itemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && rightItemUseStarted)) //This item allows multi shots
-                                    {
-                                        if (!shootingRightGun)
-                                        {
-                                            shootingRightGun = true;
-                                            Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, false, false, itemBlasterComponent != null && stunMode, fireMode == 3, (charging && rightItemUseStarted)));
-                                            thread.Start();
-                                            LOG("Player is firing right gun: " + rightItem.data.displayName);
-                                        }
-                                    }
-                                    else //This item doesn't allow multi shot. Don't play the effect until rightitemusestarted is first false, then true again.
-                                    {
-                                        rightItemUseStarted = false;
+                                    if (rightItemBlasterComponent != null)
+                                        LOG("Right blaster fireMode:" + fireMode.ToString() + " StunMode:" + stunMode.ToString());
 
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, itemBlasterComponent != null && stunMode);
-                                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                                        if (!rightItem.name.Contains("Grapple"))
+                                    bool value = false;
+                                    if (GunUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value) || rightItemBlasterComponent != null || !GunUseMultipleShotMap.ContainsKey(rightItem.data.displayName))
+                                    {
+                                        if ((rightItemBlasterComponent == null && value) || (fireMode < 0 || fireMode == 3) || (charging && rightItemUseStarted)) //This item allows multi shots
                                         {
-                                            TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Right);
-                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            if (!shootingRightGun)
+                                            {
+                                                shootingRightGun = true;
+                                                Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, false, false, rightItemBlasterComponent != null && stunMode, fireMode == 3, (charging && rightItemUseStarted)));
+                                                thread.Start();
+                                                LOG("Player is firing right gun: " + rightItem.data.displayName);
+                                            }
                                         }
+                                        else //This item doesn't allow multi shot. Don't play the effect until rightitemusestarted is first false, then true again.
+                                        {
+                                            rightItemUseStarted = false;
 
-                                        LOG("Fired right gun: " + rightItem.data.displayName);
+                                            TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, rightItemBlasterComponent != null && stunMode);
+                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            if (!rightItem.name.Contains("Grapple"))
+                                            {
+                                                TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Right);
+                                                tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            }
+
+                                            LOG("Fired right gun: " + rightItem.data.displayName);
+                                        }
                                     }
                                 }
-                            }
 
-                            if (itemModularFireArmBaseComponent == null && ((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying))
-                                                                        && (rightItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(rightItem.data.displayName)) && itemBlasterComponent == null) // Item allows alt use and use started
-                            {
-                                bool value = false;
-                                if (GunAltUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value))
+                                if (((rightItemShootVFX != null && rightItemShootVFX.isPlaying) || (rightItemShootSFX != null && rightItemShootSFX.isPlaying) || (rightItemShoot2VFX != null && rightItemShoot2VFX.isPlaying))
+                                                                            && (rightItemAltUseStarted && GunAltUseMultipleShotMap.ContainsKey(rightItem.data.displayName)) && rightItemBlasterComponent == null) // Item allows alt use and use started
                                 {
-                                    if (value) //This item allows multi shots
+                                    bool value = false;
+                                    if (GunAltUseMultipleShotMap.TryGetValue(rightItem.data.displayName, out value))
                                     {
-                                        if (!altShootingRightGun)
+                                        if (value) //This item allows multi shots
                                         {
-                                            altShootingRightGun = true;
-                                            Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, true, false, false, false, false));
-                                            thread.Start();
-                                            LOG("Player is alt firing right gun: " + rightItem.data.displayName);
+                                            if (!altShootingRightGun)
+                                            {
+                                                altShootingRightGun = true;
+                                                Thread thread = new Thread(() => FireGun(rightItem.name, rightItem.data.displayName, true, false, false, false, false));
+                                                thread.Start();
+                                                LOG("Player is alt firing right gun: " + rightItem.data.displayName);
+                                            }
                                         }
-                                    }
-                                    else //This item doesn't allow multi shot. Don't play the effect until rightitemaltusestarted is first false, then true again.
-                                    {
-                                        rightItemAltUseStarted = false;
-                                        TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, false);
-                                        tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                                        if (!rightItem.name.Contains("Grapple"))
+                                        else //This item doesn't allow multi shot. Don't play the effect until rightitemaltusestarted is first false, then true again.
                                         {
-                                            TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Right);
-                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
-                                        }
+                                            rightItemAltUseStarted = false;
+                                            TactsuitVR.FeedbackType feedback = TactsuitVR.GetPlayerGunShootFeedback(rightItem.name, rightItem.data.displayName, false);
+                                            tactsuitVr?.ProvideHapticFeedback(0, 0, feedback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            if (!rightItem.name.Contains("Grapple"))
+                                            {
+                                                TactsuitVR.FeedbackType feedbackKickback = TactsuitVR.GetPlayerGunShootFeedbackKickback(feedback, Side.Right);
+                                                tactsuitVr?.ProvideHapticFeedback(0, 0, feedbackKickback, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                                            }
 
-                                        LOG("Alt Fired right gun: " + rightItem.data.displayName);
+                                            LOG("Alt Fired right gun: " + rightItem.data.displayName);
+                                        }
                                     }
                                 }
                             }
@@ -3637,7 +3834,6 @@ namespace TactsuitBS
 
                 #endregion
 
-
             }
             else
             {
@@ -3656,7 +3852,7 @@ namespace TactsuitBS
             while(collisionstruct!=null && collisionstruct.active && Player.local!=null)
             {
                 Thread.Sleep(SleepDurationStuckArrow);
-                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * IntensityMultiplierStuckArrow, TactsuitVR.FeedbackType.NoFeedback, reflected);
+                tactsuitVr?.ProvideHapticFeedback(hitAngle, locationHeight, feedback, false, intensity * IntensityMultiplierStuckArrow * IntensityStuckArrow, TactsuitVR.FeedbackType.NoFeedback, reflected);
             }
         }
 
@@ -3805,7 +4001,7 @@ namespace TactsuitBS
             }
             else
             {
-                if (IntensityMultiplierStuckArrow > TOLERANCE && collisionstruct.active &&
+                if (IntensityMultiplierStuckArrow * IntensityStuckArrow > TOLERANCE && collisionstruct.active &&
                     (feedback == TactsuitVR.FeedbackType.DamageHeadArrow
                     || feedback == TactsuitVR.FeedbackType.DamageHeadFireArrow
                     || feedback == TactsuitVR.FeedbackType.DamageHeadIceArrow
@@ -3958,7 +4154,7 @@ namespace TactsuitBS
             LOG("Player is killed.");
             Heartbeating = false;
             HeartbeatingFast = false;
-            lastFrameVelocity = Vector3.zero;
+            //lastFrameVelocity = Vector3.zero;
         }
 
         private void OnCreatureKillFunc(Creature creature, Player player, CollisionInstance collisionstruct, EventTime eventTime)
@@ -3971,11 +4167,11 @@ namespace TactsuitBS
                 LOG("Player is killed.");
                 Heartbeating = false;
                 HeartbeatingFast = false;
-                lastFrameVelocity = Vector3.zero;
+                //lastFrameVelocity = Vector3.zero;
             }
         }
-
-        private void OnCreatureHealFunc(Creature creature, float heal, Creature healer)
+        
+        private void OnCreatureHealFunc(Creature creature, float heal, Creature healer, EventTime eventTime)
         {
             if (creature && Player.local && Player.local.creature && Player.local.creature == creature)
             {
@@ -3998,9 +4194,12 @@ namespace TactsuitBS
             }
         }
 
-        private void OnEdibleConsumedFunc(Item edible)
+        private void OnEdibleConsumedFunc(Item edible, Creature consumer, EventTime eventTime)
         {
-            tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ConsumableFood, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            if (consumer && Player.local && Player.local.creature && Player.local.creature == consumer)
+            {
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ConsumableFood, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            }
         }
 
         #endregion

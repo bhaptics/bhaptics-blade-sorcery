@@ -92,9 +92,6 @@
     <Content Include="UnityDlls\0Harmony.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="UnityDlls\PowerBooks.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="UnityDlls\ThunderRoad.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

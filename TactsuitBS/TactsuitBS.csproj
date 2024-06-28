@@ -37,6 +37,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>UnityDlls\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>UnityDlls\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Bhaptics.Tact, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bhaptics.Tac.1.4.16\lib\net35\Bhaptics.Tact.dll</HintPath>
     </Reference>
@@ -55,6 +59,10 @@
     <Reference Include="ThunderRoad, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>UnityDlls\ThunderRoad.dll</HintPath>
+    </Reference>
+    <Reference Include="ThunderRoad.EventLinker, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>UnityDlls\ThunderRoad.EventLinker.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -92,9 +100,11 @@
     <Content Include="UnityDlls\0Harmony.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="UnityDlls\Assembly-CSharp.dll" />
     <Content Include="UnityDlls\ThunderRoad.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="UnityDlls\ThunderRoad.EventLinker.dll" />
     <Content Include="UnityDlls\UnityEngine.AnimationModule.dll" />
     <Content Include="UnityDlls\UnityEngine.AudioModule.dll" />
     <Content Include="UnityDlls\UnityEngine.CoreModule.dll" />
@@ -104,6 +114,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="bHaptics\AddToChestInventory_1.tact" />
     <None Include="bHaptics\ClimbingRight_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -977,6 +988,7 @@
     <None Include="bHaptics\LeftShoulderTurret_3.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="bHaptics\OpenChestInventory_1.tact" />
     <None Include="bHaptics\PlayerBowPullRight_1.tact">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

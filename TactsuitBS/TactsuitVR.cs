@@ -350,7 +350,16 @@ namespace TactsuitBS
 
             feedbackMap.Add(FeedbackType.ConsumableFood, new Feedback(FeedbackType.ConsumableFood, "ConsumableFood_", 0, PositionType.Vest));
 
-            
+            feedbackMap.Add(FeedbackType.AddToChestInventory, new Feedback(FeedbackType.AddToChestInventory, "AddToChestInventory_", 0, PositionType.Vest));
+            feedbackMap.Add(FeedbackType.OpenChestInventory, new Feedback(FeedbackType.OpenChestInventory, "OpenChestInventory_", 0, PositionType.Vest));
+            //feedbackMap.Add(FeedbackType.SwimVest20, new Feedback(FeedbackType.SwimVest20, "SwimVest20_", 0, PositionType.Vest));
+            //feedbackMap.Add(FeedbackType.SwimVest40, new Feedback(FeedbackType.SwimVest40, "SwimVest40_", 0, PositionType.Vest));
+            //feedbackMap.Add(FeedbackType.SwimVest60, new Feedback(FeedbackType.SwimVest60, "SwimVest60_", 0, PositionType.Vest));
+            //feedbackMap.Add(FeedbackType.SwimVest80, new Feedback(FeedbackType.SwimVest80, "SwimVest80_", 0, PositionType.Vest));
+            //feedbackMap.Add(FeedbackType.SwimVest100, new Feedback(FeedbackType.SwimVest100, "SwimVest100_", 0, PositionType.Vest));
+            //feedbackMap.Add(FeedbackType.DrowningEffectVest, new Feedback(FeedbackType.DrowningEffectVest, "DrowningEffectVest_", 0, PositionType.Vest));
+            // feedbackMap.Add(FeedbackType.DrowningEffectHead, new Feedback(FeedbackType.DrowningEffectHead, "DrowningEffectHead_", 0, PositionType.Head));
+
         }
 
         public bool systemInitialized = false;
@@ -691,6 +700,18 @@ namespace TactsuitBS
             UnequipHelmet,
             EquipFeet,
             UnequipFeet,
+
+            AddToChestInventory,
+            OpenChestInventory,
+
+            //SwimVest20,
+            //SwimVest40,
+            //SwimVest60,
+            //SwimVest80,
+            //SwimVest100,
+
+            // DrowningEffectVest,
+            // DrowningEffectHead,
 
             NoFeedback
         }
@@ -2693,6 +2714,18 @@ namespace TactsuitBS
                 case TactsuitVR.FeedbackType.UnequipFeet: return Engine.IntensityEquipUnequip; break;
 
                 case TactsuitVR.FeedbackType.ConsumableFood: return Engine.IntensityConsumableFood * Engine.IntensityMultiplierConsuming; break;
+                case TactsuitVR.FeedbackType.AddToChestInventory: return Engine.IntensityEquipUnequip; break;
+                case TactsuitVR.FeedbackType.OpenChestInventory: return Engine.IntensityEquipUnequip; break;
+
+                    //case TactsuitVR.FeedbackType.SwimVest20: return Engine.IntensitySwim; break;
+                    //case TactsuitVR.FeedbackType.SwimVest40: return Engine.IntensitySwim; break;
+                    //case TactsuitVR.FeedbackType.SwimVest60: return Engine.IntensitySwim; break;
+                    //case TactsuitVR.FeedbackType.SwimVest80: return Engine.IntensitySwim; break;
+                    //case TactsuitVR.FeedbackType.SwimVest100: return Engine.IntensitySwim; break;
+                    //  case TactsuitVR.FeedbackType.DrowningEffectVest: return Engine.IntensityDrowning; break;
+                    //  case TactsuitVR.FeedbackType.DrowningEffectHead: return Engine.IntensityDrowning; break;
+
+
             }
 
             return Engine.IntensityDefaultDamage;

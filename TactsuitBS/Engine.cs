@@ -15,6 +15,9 @@ using Newtonsoft.Json.Linq;
 using UnityEngine.SceneManagement;
 using HarmonyLib;
 using UnityEngine.Audio;
+using ThunderRoad.Skill.Spell;
+using ThunderRoad.Skill.SpellPower;
+using ThunderRoad.Skill.SpellMerge;
 
 namespace TactsuitBS
 {
@@ -26,6 +29,10 @@ namespace TactsuitBS
 
         [ModOption("Enable Logging", "Enables Logging", defaultValueIndex = 0, order = 0)]
         public static bool Logging = false;
+
+
+        [ModOption("Disable Native bHaptics", "Disable Native bHaptics", defaultValueIndex = 1, order = 1)]
+        public static bool disableNativeBHaptics = true;
 
         public static bool GravityEffectOnArms = false;
         public static bool GravityEffectOnHead = false;
@@ -136,6 +143,11 @@ namespace TactsuitBS
         [ModOption("Gun Firing Intensity Multiplier", "Gun Firing Intensity Multiplier", defaultValueIndex = 0, order = 23)]
         public static float IntensityMultiplierGun = 0.0f;
 
+        //[ModOption("Swimming Intensity Multiplier", "Swimming Intensity Multiplier", defaultValueIndex = 10, order = 24)]
+        //public static float IntensitySwim = 1.0f;
+
+        //[ModOption("Drowning Intensity Multiplier", "Drowning Intensity Multiplier", defaultValueIndex = 10, order = 25)]
+       // public static float IntensityDrowning = 1.0f;
 
         public static float IntensityPlayerBowPull = 0.6f;
         
@@ -989,23 +1001,18 @@ namespace TactsuitBS
                 EventManager.onCreatureHit += OnCreatureHitFunc;
                 EventManager.onCreatureHeal += OnCreatureHealFunc;
                 EventManager.onCreatureKill += OnCreatureKillFunc;
-                EventManager.onCreatureParry += OnCreatureParryFunc;
+                EventManager.onCreatureAttackParry += OnCreatureParryFunc;
                 EventManager.onDeflect += OnDeflectFunc;
                 EventManager.onEdibleConsumed += OnEdibleConsumedFunc;
+                EventManager.onLiquidConsumed += OnLiquidConsumedFunc;
 
                 SpellTelekinesis.onTelekinesisPullEvent += OnTelekinesisPullEventFunc;
                 SpellTelekinesis.onTelekinesisRepelEvent += OnTelekinesisRepelEvent;
                 SpellTelekinesis.onTelekinesisUngrabEvent += OnTelekinesisUngrabEvent;
                 SpellTelekinesis.onTelekinesisGrabEvent += OnTelekinesisGrabEvent;
                 SpellTelekinesis.onTelekinesisUnTargetEvent += OnTelekinesisUnTargetEvent;
-
-
-                SpellTelekinesis telekinesis = Catalog.GetData<SpellTelekinesis>("Telekinesis");
-                if(telekinesis!=null)
-                {
-                    telekinesis.onTelekinesisSpinStart += Telekinesis_onTelekinesisSpinStart;
-                    telekinesis.onTelekinesisSpinEnd += Telekinesis_onTelekinesisSpinEnd; ;
-                }
+                SpellTelekinesis.onTelekinesisSpinStart += Telekinesis_onTelekinesisSpinStart;
+                SpellTelekinesis.onTelekinesisSpinEnd += Telekinesis_onTelekinesisSpinEnd;
 
                 //Locomotion.OnGroundEvent 
                 eventsCreated = true;
@@ -1354,8 +1361,8 @@ namespace TactsuitBS
         {
             if (side == Side.Left)
             {
-                 TelekinesisActiveLeft = false;
-                 TelekinesisPullLeft = false;
+                TelekinesisActiveLeft = false;
+                TelekinesisPullLeft = false;
                 TelekinesisRepelLeft = false;
                 TelekinesisSpinLeft = false;
             }
@@ -1415,7 +1422,7 @@ namespace TactsuitBS
 
             //tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerTelekinesisCatchRight, true, spellCaster.telekinesis.pullSpeed / spellCaster.telekinesis.pullAndRepelMaxSpeed, TactsuitVR.FeedbackType.NoFeedback, side == Side.Left);
         }
-        private void OnTelekinesisUngrabEvent(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle)
+        private void OnTelekinesisUngrabEvent(SpellCaster spellCaster, SpellTelekinesis spellTelekinesis, Side side, Handle handle, bool thrown)
         {
             if (side == Side.Left)
             {
@@ -1722,12 +1729,12 @@ namespace TactsuitBS
         private static class SpellCastGravityPushPlayerPatch
         {
             [HarmonyPostfix]
-            private static void Postfix(PlayerControl __instance, RagdollPart ragdollPart, UnityEngine.Vector3 velocity)
+            private static void Postfix(SpellCastGravity __instance, RagdollPart ragdollPart, UnityEngine.Vector3 velocity)
             {
                 Vector3 contactPoint = Player.local.locomotion.transform.position - velocity;
                 float hitAngle = Utility.GetAngleForPosition(contactPoint);
 
-                float intensity = Player.local.locomotion.rb.velocity.magnitude / 5f;
+                float intensity = Player.local.locomotion.velocity.magnitude / 5f;
                 tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestGravity, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
                 if (GravityEffectOnHead)
                 {
@@ -1785,7 +1792,7 @@ namespace TactsuitBS
                 {
                     if (!silent)
                     {
-                        bool arrow = (item.data?.moduleAI != null && item.data.moduleAI.weaponClass == ItemModuleAI.WeaponClass.Arrow);
+                        bool arrow = (item.data?.moduleAI != null && item.data.moduleAI.primaryClass == ItemModuleAI.WeaponClass.Arrow);
 
                         if (__instance.drawSlot == Holder.DrawSlot.BackRight)
                         {
@@ -1824,7 +1831,7 @@ namespace TactsuitBS
                 {
                     if (!silent)
                     {
-                        bool arrow = (item.data?.moduleAI != null && item.data.moduleAI.weaponClass == ItemModuleAI.WeaponClass.Arrow);
+                        bool arrow = (item.data?.moduleAI != null && item.data.moduleAI.primaryClass == ItemModuleAI.WeaponClass.Arrow);
 
                         if (__instance.drawSlot == Holder.DrawSlot.BackRight)
                         {
@@ -2071,6 +2078,48 @@ namespace TactsuitBS
             }
         }
 
+        [HarmonyPatch("AddItemToInventory")]
+        [HarmonyPatch(typeof(InventoryChestHolder))]
+        private static class InventoryChestHolderAddItemPatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(InventoryChestHolder __instance, Item item)
+            {
+                if (item != null && __instance != null && __instance.IsPlayerCreature)
+                {
+                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.AddToChestInventory, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                }
+            }
+        }
+
+        [HarmonyPatch("TryTouchAction")]
+        [HarmonyPatch(typeof(InventoryChestHolder))]
+        private static class InventoryChestHolderGrab
+        {
+            [HarmonyPostfix]
+            private static void Postfix(InventoryChestHolder __instance, RagdollHand ragdollHand, Interactable.Action action)
+            {
+                if (__instance != null && (action == Interactable.Action.Grab))
+                {
+                    tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.OpenChestInventory, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                }
+            }
+        }
+
+        [HarmonyPatch("PlayHaptic")]
+        [HarmonyPatch(typeof(BhapticsHandler))]
+        private static class bHapticsNativePlayHapticPatch
+        {
+            [HarmonyPrefix]
+            private static bool Prefix(BhapticsHandler __instance, float locationAngle, float locationHeight, BhapticsHandler.FeedbackType effect, bool waitToPlay = false, float intensity = 1, BhapticsHandler.FeedbackType secondEffect = BhapticsHandler.FeedbackType.NoFeedback, bool reflected = false, float duration = 1)
+            {
+                return !disableNativeBHaptics;
+            }
+        }
+
+        
+
+
         private TactsuitVR.FeedbackType GetPlayerPunchFeedback(string material)
         {
             if (!material.IsNullOrEmpty())
@@ -2313,12 +2362,12 @@ namespace TactsuitBS
                         
         private void BeingPushedFunc()
         {
-            while (!gamePaused && !TimeManager.timeStopped && Player.local.creature.state != Creature.State.Dead && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f)
+            while (!gamePaused && !TimeManager.timeStopped && Player.local.creature.state != Creature.State.Dead && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.velocity.magnitude >= 0.1f)
             {
-                Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.rb.velocity;
+                Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.velocity;
                 float hitAngle = Utility.GetAngleForPosition(contactPoint);
 
-                float intensity = Player.local.locomotion.rb.velocity.magnitude / 5f;
+                float intensity = Player.local.locomotion.velocity.magnitude / 5f;
                 tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.DamageVestGravity, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
                 if (GravityEffectOnHead)
                 {
@@ -2343,9 +2392,9 @@ namespace TactsuitBS
                 if (side == Side.Left)
                 {
                     Item leftItem = Player.local.creature.equipment.GetHeldItem(Side.Left);
-                    while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
+                    while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.velocity.magnitude > 1f && Player.local.locomotion.velocity.y >= 0f && leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
                     {
-                        float intensity = Player.local.locomotion.rb.velocity.magnitude / 3f;
+                        float intensity = Player.local.locomotion.velocity.magnitude / 3f;
                         tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ClimbingRight, false, intensity, TactsuitVR.FeedbackType.NoFeedback, true);
 
                         Thread.Sleep(SleepDurationSpellCast);
@@ -2357,9 +2406,9 @@ namespace TactsuitBS
                 {
                     Item rightItem = Player.local.creature.equipment.GetHeldItem(Side.Right);
 
-                    while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f && Player.local.locomotion.rb.velocity.y >= 0f && rightItem != null && rightItem.name.Contains("Grapple") && rightItemUseStarted)
+                    while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.velocity.magnitude > 1f && Player.local.locomotion.velocity.y >= 0f && rightItem != null && rightItem.name.Contains("Grapple") && rightItemUseStarted)
                     {
-                        float intensity = Player.local.locomotion.rb.velocity.magnitude / 3f;
+                        float intensity = Player.local.locomotion.velocity.magnitude / 3f;
                         tactsuitVr.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ClimbingRight, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
 
                         Thread.Sleep(SleepDurationClimb);
@@ -2371,12 +2420,12 @@ namespace TactsuitBS
 
         private void BeingPushedOtherFunc()
         {
-            while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.rb.velocity.magnitude > 1f)
+            while (!beingPushed && !gamePaused && !TimeManager.timeStopped && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.creature.state != Creature.State.Dead && Player.local.locomotion.velocity.magnitude > 1f)
             {
-                Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.rb.velocity;
+                Vector3 contactPoint = Player.local.locomotion.transform.position - Player.local.locomotion.velocity;
                 float hitAngle = Utility.GetAngleForPosition(contactPoint);
 
-                float intensity = Player.local.locomotion.rb.velocity.magnitude / 5f;
+                float intensity = Player.local.locomotion.velocity.magnitude / 5f;
                 tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.Explosion, false, intensity, TactsuitVR.FeedbackType.NoFeedback, false);
                
                 Thread.Sleep(SleepDurationSpellHit);
@@ -2488,7 +2537,7 @@ namespace TactsuitBS
 
             if (handle != null)
             {
-                if (handle.name == "HandleString" && handle.item?.data?.moduleAI?.weaponClass == ItemModuleAI.WeaponClass.Bow)
+                if (handle.name == "HandleString" && handle.item?.data?.moduleAI?.primaryClass == ItemModuleAI.WeaponClass.Bow)
                 {
                     bowStringHeld = false;
                 }
@@ -2652,7 +2701,7 @@ namespace TactsuitBS
 
                 if (handle !=null)
                 {
-                    if (handle?.name == "HandleString" && handle?.item?.data?.moduleAI?.weaponClass == ItemModuleAI.WeaponClass.Bow)
+                    if (handle?.name == "HandleString" && handle?.item?.data?.moduleAI?.primaryClass == ItemModuleAI.WeaponClass.Bow)
                     {
                         LOG("...it is a bow string, grabbed with " + (side == Side.Right ? "right" : "left") + "hand.");
                         if (!bowStringHeld)
@@ -2719,7 +2768,7 @@ namespace TactsuitBS
             }
         }
 
-        private void OnGroundFunc(Vector3 groundPoint, Vector3 velocity, Collider groundCollider) 
+        private void OnGroundFunc(Locomotion locomotion, Vector3 groundPoint, Vector3 velocity, Collider groundCollider)
         {
             if (NoFallEffectWhenFallDamageIsDisabled && !Player.fallDamage)
             {
@@ -2779,13 +2828,8 @@ namespace TactsuitBS
             }
 
             [HarmonyPostfix]
-            private static void Postfix(TimeManager __instance, 
-              bool active,
-              float scale,
-              AnimationCurve curve,
-              EffectData effectData = null,
-              bool snapshotTransition = true,
-              AudioMixerSnapshot exitMixer = null)
+            private static void Postfix(TimeManager __instance,
+              bool active, float scale, AnimationCurve curve, EffectData effectData = null, bool snapshotTransition = true, bool playEndEffect = true)
             {
                 if (slowMotionActive)
                 {
@@ -3363,7 +3407,7 @@ namespace TactsuitBS
             {               
                 #region Pushed
 
-                if (Player.local.locomotion.isGrounded && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude >= 0.1f && (hoverJetVFX == null))
+                if (Player.local.locomotion.isGrounded && !Player.local.locomotion.allowMove && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.velocity.magnitude >= 0.1f && (hoverJetVFX == null))
                 {
                     if (!beingPushed)
                     {
@@ -3380,7 +3424,7 @@ namespace TactsuitBS
                     Item leftItem = creature.equipment.GetHeldItem(Side.Left);
                     Item rightItem = creature.equipment.GetHeldItem(Side.Right);
 
-                    if (!noExplosionFeedback && Player.local.locomotion.isGrounded && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.rb.velocity.magnitude > 5f && Player.local.locomotion.rb.velocity.y>=-TOLERANCE
+                    if (!noExplosionFeedback && Player.local.locomotion.isGrounded && Player.local.locomotion.moveDirection == UnityEngine.Vector3.zero && Player.local.locomotion.velocity.magnitude > 5f && Player.local.locomotion.velocity.y>=-TOLERANCE
                         && (leftItem == null || (leftItem != null && !leftItemUseStarted) || (leftItem != null && leftItemUseStarted && !leftItem.name.Contains("Grapple")))
                         && (rightItem == null || (rightItem != null && !rightItemUseStarted) || (rightItem != null && rightItemUseStarted && !rightItem.name.Contains("Grapple"))))
                     {
@@ -3395,7 +3439,7 @@ namespace TactsuitBS
                     }
                     else
                     {
-                        if (Player.local.locomotion.rb.velocity.magnitude > 3f && Player.local.locomotion.rb.velocity.y >=-TOLERANCE)
+                        if (Player.local.locomotion.velocity.magnitude > 3f && Player.local.locomotion.velocity.y >=-TOLERANCE)
                         {
                             if (leftItem != null && leftItem.name.Contains("Grapple") && leftItemUseStarted)
                             {
@@ -3490,6 +3534,26 @@ namespace TactsuitBS
                 }
 
                 #endregion
+
+                //#region Swimming
+                //LOG("Player in water: " + Player.local.waterHandler.inWater + " submerged: " + Player.local.waterHandler.submergedRatio + " player velocity:" + Player.local.locomotion.velocity.magnitude);
+
+                //if (Player.local.waterHandler.inWater && IntensitySwim>0.0001f && Player.local.waterHandler.submergedRatio >= 0.2f && Player.local.locomotion.velocity.magnitude >= 0.1f)
+                //{
+                //    float hitAngle = Utility.GetAngleForPosition(Player.local.locomotion.moveDirection);
+
+                //    if (Player.local.waterHandler.submergedRatio >= 0.90f)
+                //        tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.SwimVest100, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                //    else if (Player.local.waterHandler.submergedRatio >= 0.70f)
+                //        tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.SwimVest80, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                //    else if (Player.local.waterHandler.submergedRatio >= 0.50f)
+                //        tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.SwimVest60, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                //    else if (Player.local.waterHandler.submergedRatio >= 0.30f)
+                //        tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.SwimVest40, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                //    else
+                //        tactsuitVr.ProvideHapticFeedback(hitAngle, 0, TactsuitVR.FeedbackType.SwimVest20, false, 1.00f, TactsuitVR.FeedbackType.NoFeedback, false);
+                //}
+                //#endregion
 
                 #region Shooting a weapon
 
@@ -4022,7 +4086,7 @@ namespace TactsuitBS
             }
         }
 
-        private void OnCreatureHitFunc(Creature creature, CollisionInstance collisionstruct)
+        private void OnCreatureHitFunc(Creature creature, CollisionInstance collisionstruct, EventTime eventTime)
         {
             try
             {
@@ -4102,7 +4166,7 @@ namespace TactsuitBS
             }
         }
 
-        private void OnCreatureParryFunc(Creature creature, CollisionInstance collisionstruct)
+        private void OnCreatureParryFunc(Creature parriedCreature, Item parriedItem, Creature parryingCreature, Item parryingItem, CollisionInstance collisionstruct)
         {
             if (collisionstruct.damageStruct.damage <= 0.00001f)
                 return;
@@ -4167,6 +4231,9 @@ namespace TactsuitBS
                 LOG("Player is killed.");
                 Heartbeating = false;
                 HeartbeatingFast = false;
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.FallDamage, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerSpellCrushRight, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.PlayerSpellCrushRight, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, true);
                 //lastFrameVelocity = Vector3.zero;
             }
         }
@@ -4201,6 +4268,15 @@ namespace TactsuitBS
                 tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ConsumableFood, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
             }
         }
+
+        private void OnLiquidConsumedFunc(LiquidContainer liquidContainer, Creature consumer, EventTime eventTime)
+        {
+            if (consumer && Player.local && Player.local.creature && Player.local.creature == consumer)
+            {
+                tactsuitVr?.ProvideHapticFeedback(0, 0, TactsuitVR.FeedbackType.ConsumableFood, true, 1.0f, TactsuitVR.FeedbackType.NoFeedback, false);
+            }
+        }
+        
 
         #endregion
     }
